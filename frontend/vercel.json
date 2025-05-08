@@ -13,8 +13,17 @@
       "handle": "filesystem"
     },
     {
+      "src": "/api/(.*)",
+      "dest": "https://agendaplus-backend.vercel.app/api/$1"
+    },
+    {
+      "src": "/(.*\\.(js|css|ico|png|jpg|jpeg|svg|webp|json))",
+      "dest": "/$1"
+    },
+    {
       "src": "/(.*)",
-      "dest": "/index.html"
+      "dest": "/index.html",
+      "status": 200
     }
   ]
 }
