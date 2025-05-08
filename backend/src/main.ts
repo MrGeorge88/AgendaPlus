@@ -11,7 +11,13 @@ async function bootstrap() {
   app.enableCors({
     origin: isDev
       ? ['http://localhost:5173', 'http://localhost:4173']
-      : ['https://agendaplus-frontend.vercel.app', 'https://agendaplus-git-main-mrgeorge88.vercel.app', 'https://agendaplus.vercel.app'],
+      : [
+          'https://agendaplus-frontend.vercel.app',
+          'https://agendaplus-git-main-mrgeorge88.vercel.app',
+          'https://agendaplus.vercel.app',
+          'https://agenda-plus-frontend.vercel.app',
+          'https://agenda-plus-frontend-mrgeorge88.vercel.app'
+        ],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
