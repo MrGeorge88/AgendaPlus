@@ -8,6 +8,8 @@ export interface Client {
   phone: string;
   lastVisit?: string;
   totalSpent?: number;
+  notes?: string;
+  avatar?: string;
 }
 
 export interface Service {
