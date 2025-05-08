@@ -1,0 +1,200 @@
+{
+  "common": {
+    "appName": "AgendaPlus",
+    "loading": "Loading...",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "search": "Search",
+    "add": "Add",
+    "new": "New",
+    "yes": "Yes",
+    "no": "No",
+    "confirm": "Confirm",
+    "back": "Back",
+    "next": "Next",
+    "error": "Error",
+    "success": "Success",
+    "warning": "Warning",
+    "info": "Information",
+    "today": "Today",
+    "user": "User",
+    "saving": "Saving...",
+    "update": "Update"
+  },
+  "auth": {
+    "login": "Login",
+    "register": "Register",
+    "logout": "Logout",
+    "name": "Name",
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "forgotPassword": "Forgot Password?",
+    "loginError": "Login error. Please check your credentials.",
+    "registerError": "Registration error. Please try again.",
+    "passwordsDontMatch": "Passwords don't match",
+    "passwordMinLength": "Password must be at least 6 characters long",
+    "loginTitle": "Sign in to your account",
+    "loggingIn": "Signing in...",
+    "noAccount": "Don't have an account?",
+    "backToHome": "Back to home page",
+    "registerTitle": "Create a new account",
+    "registering": "Registering...",
+    "haveAccount": "Already have an account?",
+    "passwordHelperText": "Minimum 6 characters"
+  },
+  "navigation": {
+    "dashboard": "Dashboard",
+    "clients": "Clients",
+    "services": "Services",
+    "staff": "Staff",
+    "income": "Income",
+    "settings": "Settings",
+    "profile": "Profile"
+  },
+  "dashboard": {
+    "title": "Today's Schedule",
+    "noAppointments": "No appointments for today",
+    "upcomingAppointments": "Upcoming Appointments",
+    "todayStats": "Today's Stats",
+    "totalAppointments": "Total Appointments",
+    "totalClients": "Total Clients",
+    "totalIncome": "Total Income"
+  },
+  "clients": {
+    "title": "Clients",
+    "searchPlaceholder": "Search clients...",
+    "newClient": "New Client",
+    "editClient": "Edit Client",
+    "deleteClient": "Delete Client",
+    "deleteConfirm": "Are you sure you want to delete this client?",
+    "name": "Name",
+    "email": "Email",
+    "phone": "Phone",
+    "lastVisit": "Last Visit",
+    "totalSpent": "Total Spent",
+    "appointmentsCount": "Appointments",
+    "notes": "Notes",
+    "addSuccess": "Client added successfully",
+    "editSuccess": "Client updated successfully",
+    "deleteSuccess": "Client deleted successfully",
+    "never": "Never",
+    "loadError": "Error loading clients",
+    "saveError": "Error saving client",
+    "deleteError": "Error deleting client",
+    "deleteErrorTitle": "Delete Error",
+    "noResults": "No clients found matching your search."
+  },
+  "services": {
+    "title": "Services",
+    "searchPlaceholder": "Search services...",
+    "newService": "New Service",
+    "editService": "Edit Service",
+    "deleteService": "Delete Service",
+    "deleteConfirm": "Are you sure you want to delete this service?",
+    "name": "Name",
+    "description": "Description",
+    "duration": "Duration (min)",
+    "price": "Price (€)",
+    "category": "Category",
+    "minutes": "min",
+    "addSuccess": "Service added successfully",
+    "editSuccess": "Service updated successfully",
+    "deleteSuccess": "Service deleted successfully",
+    "createSuccess": "Service created",
+    "createSuccessDetail": "The service \"{name}\" has been created successfully.",
+    "updateSuccess": "Service updated",
+    "updateSuccessDetail": "The service \"{name}\" has been updated successfully.",
+    "deleteSuccessDetail": "The service has been deleted successfully.",
+    "loadSuccess": "Services loaded",
+    "loadSuccessDetail": "{count} services have been loaded successfully.",
+    "loadError": "Error loading services",
+    "saveError": "Error saving service",
+    "deleteError": "Error deleting service",
+    "noResults": "No services found matching your search.",
+    "validation": {
+      "priceMin": "Price must be greater than or equal to 0",
+      "durationMin": "Duration must be greater than or equal to 1"
+    },
+    "categories": {
+      "haircare": "Hair Care",
+      "nails": "Nails",
+      "massage": "Massage",
+      "aesthetics": "Aesthetics",
+      "makeup": "Makeup",
+      "other": "Other"
+    }
+  },
+  "staff": {
+    "title": "Staff",
+    "searchPlaceholder": "Search staff...",
+    "newStaff": "New Staff Member",
+    "editStaff": "Edit Staff Member",
+    "deleteStaff": "Delete Staff Member",
+    "deleteConfirm": "Are you sure you want to delete this staff member?",
+    "name": "Name",
+    "email": "Email",
+    "phone": "Phone",
+    "specialty": "Specialty",
+    "color": "Color",
+    "addSuccess": "Staff member added successfully",
+    "editSuccess": "Staff member updated successfully",
+    "deleteSuccess": "Staff member deleted successfully",
+    "noResults": "No staff members found matching your search."
+  },
+  "income": {
+    "title": "Income",
+    "today": "Today",
+    "week": "This Week",
+    "month": "This Month",
+    "year": "This Year",
+    "totalIncome": "Total Income",
+    "todayIncome": "Today's Income",
+    "weekIncome": "This Week's Income",
+    "monthIncome": "This Month's Income",
+    "appointmentsToday": "Appointments Today",
+    "clientsToday": "Clients Today",
+    "monthlyIncome": "Monthly Income",
+    "topServices": "Top Services",
+    "topStaff": "Top Staff",
+    "noData": "No data available",
+    "appointments": "appointments"
+  },
+  "landing": {
+    "hero": {
+      "title": "Manage your business with minimal friction",
+      "subtitle": "The all-in-one platform for beauty, health, and wellness professionals. Scheduling, payments, and metrics in one place.",
+      "tryDemo": "Try Demo"
+    },
+    "features": {
+      "title": "Main Features",
+      "calendar": {
+        "title": "Smart Calendar",
+        "description": "Manage appointments with drag-and-drop, filter by professional or location."
+      },
+      "clients": {
+        "title": "Client Management",
+        "description": "Complete profile with appointment and payment history to retain clients."
+      },
+      "payments": {
+        "title": "Integrated Payments",
+        "description": "Collect deposits or full payments with Stripe or MercadoPago."
+      },
+      "metrics": {
+        "title": "Business Metrics",
+        "description": "Analyze income and discover which services generate the highest margin."
+      }
+    },
+    "cta": {
+      "title": "Ready to transform your business?",
+      "subtitle": "Join thousands of professionals who are already optimizing their time and increasing their income with AgendaPlus.",
+      "button": "Start Now"
+    },
+    "footer": {
+      "copyright": "© 2023 AgendaPlus. All rights reserved.",
+      "subtitle": "The complete solution for appointment management"
+    }
+  }
+}

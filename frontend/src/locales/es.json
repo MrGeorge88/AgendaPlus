@@ -1,0 +1,200 @@
+{
+  "common": {
+    "appName": "AgendaPlus",
+    "loading": "Cargando...",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "search": "Buscar",
+    "add": "Añadir",
+    "new": "Nuevo",
+    "yes": "Sí",
+    "no": "No",
+    "confirm": "Confirmar",
+    "back": "Atrás",
+    "next": "Siguiente",
+    "error": "Error",
+    "success": "Éxito",
+    "warning": "Advertencia",
+    "info": "Información",
+    "today": "Hoy",
+    "user": "Usuario",
+    "saving": "Guardando...",
+    "update": "Actualizar"
+  },
+  "auth": {
+    "login": "Iniciar sesión",
+    "register": "Registrarse",
+    "logout": "Cerrar sesión",
+    "name": "Nombre",
+    "email": "Correo electrónico",
+    "password": "Contraseña",
+    "confirmPassword": "Confirmar contraseña",
+    "forgotPassword": "¿Olvidaste tu contraseña?",
+    "loginError": "Error al iniciar sesión. Por favor, verifica tus credenciales.",
+    "registerError": "Error al registrarse. Por favor, inténtalo de nuevo.",
+    "passwordsDontMatch": "Las contraseñas no coinciden",
+    "passwordMinLength": "La contraseña debe tener al menos 6 caracteres",
+    "loginTitle": "Inicia sesión en tu cuenta",
+    "loggingIn": "Iniciando sesión...",
+    "noAccount": "¿No tienes una cuenta?",
+    "backToHome": "Volver a la página principal",
+    "registerTitle": "Crea una nueva cuenta",
+    "registering": "Registrando...",
+    "haveAccount": "¿Ya tienes una cuenta?",
+    "passwordHelperText": "Mínimo 6 caracteres"
+  },
+  "navigation": {
+    "dashboard": "Agenda del día",
+    "clients": "Clientes",
+    "services": "Servicios",
+    "staff": "Personal",
+    "income": "Ingresos",
+    "settings": "Configuración",
+    "profile": "Perfil"
+  },
+  "dashboard": {
+    "title": "Agenda del día",
+    "noAppointments": "No hay citas para hoy",
+    "upcomingAppointments": "Próximas citas",
+    "todayStats": "Estadísticas de hoy",
+    "totalAppointments": "Total de citas",
+    "totalClients": "Total de clientes",
+    "totalIncome": "Ingresos totales"
+  },
+  "clients": {
+    "title": "Clientes",
+    "searchPlaceholder": "Buscar clientes...",
+    "newClient": "Nuevo cliente",
+    "editClient": "Editar cliente",
+    "deleteClient": "Eliminar cliente",
+    "deleteConfirm": "¿Estás seguro de que deseas eliminar este cliente?",
+    "name": "Nombre",
+    "email": "Correo electrónico",
+    "phone": "Teléfono",
+    "lastVisit": "Última visita",
+    "totalSpent": "Total gastado",
+    "appointmentsCount": "Citas",
+    "notes": "Notas",
+    "addSuccess": "Cliente añadido con éxito",
+    "editSuccess": "Cliente actualizado con éxito",
+    "deleteSuccess": "Cliente eliminado con éxito",
+    "never": "Nunca",
+    "loadError": "Error al cargar los clientes",
+    "saveError": "Error al guardar el cliente",
+    "deleteError": "Error al eliminar el cliente",
+    "deleteErrorTitle": "Error al eliminar",
+    "noResults": "No se encontraron clientes que coincidan con la búsqueda."
+  },
+  "services": {
+    "title": "Servicios",
+    "searchPlaceholder": "Buscar servicios...",
+    "newService": "Nuevo servicio",
+    "editService": "Editar servicio",
+    "deleteService": "Eliminar servicio",
+    "deleteConfirm": "¿Estás seguro de que deseas eliminar este servicio?",
+    "name": "Nombre",
+    "description": "Descripción",
+    "duration": "Duración (min)",
+    "price": "Precio (€)",
+    "category": "Categoría",
+    "minutes": "min",
+    "addSuccess": "Servicio añadido con éxito",
+    "editSuccess": "Servicio actualizado con éxito",
+    "deleteSuccess": "Servicio eliminado con éxito",
+    "createSuccess": "Servicio creado",
+    "createSuccessDetail": "El servicio \"{name}\" ha sido creado correctamente.",
+    "updateSuccess": "Servicio actualizado",
+    "updateSuccessDetail": "El servicio \"{name}\" ha sido actualizado correctamente.",
+    "deleteSuccessDetail": "El servicio ha sido eliminado correctamente.",
+    "loadSuccess": "Servicios cargados",
+    "loadSuccessDetail": "Se han cargado {count} servicios correctamente.",
+    "loadError": "Error al cargar los servicios",
+    "saveError": "Error al guardar el servicio",
+    "deleteError": "Error al eliminar el servicio",
+    "noResults": "No se encontraron servicios que coincidan con la búsqueda.",
+    "validation": {
+      "priceMin": "El precio debe ser mayor o igual a 0",
+      "durationMin": "La duración debe ser mayor o igual a 1"
+    },
+    "categories": {
+      "haircare": "Peluquería",
+      "nails": "Uñas",
+      "massage": "Masajes",
+      "aesthetics": "Estética",
+      "makeup": "Maquillaje",
+      "other": "Otros"
+    }
+  },
+  "staff": {
+    "title": "Personal",
+    "searchPlaceholder": "Buscar personal...",
+    "newStaff": "Nuevo miembro del personal",
+    "editStaff": "Editar miembro del personal",
+    "deleteStaff": "Eliminar miembro del personal",
+    "deleteConfirm": "¿Estás seguro de que deseas eliminar este miembro del personal?",
+    "name": "Nombre",
+    "email": "Correo electrónico",
+    "phone": "Teléfono",
+    "specialty": "Especialidad",
+    "color": "Color",
+    "addSuccess": "Miembro del personal añadido con éxito",
+    "editSuccess": "Miembro del personal actualizado con éxito",
+    "deleteSuccess": "Miembro del personal eliminado con éxito",
+    "noResults": "No se encontraron miembros del personal que coincidan con la búsqueda."
+  },
+  "income": {
+    "title": "Ingresos",
+    "today": "Hoy",
+    "week": "Esta semana",
+    "month": "Este mes",
+    "year": "Este año",
+    "totalIncome": "Ingresos totales",
+    "todayIncome": "Ingresos hoy",
+    "weekIncome": "Ingresos esta semana",
+    "monthIncome": "Ingresos este mes",
+    "appointmentsToday": "Citas hoy",
+    "clientsToday": "Clientes hoy",
+    "monthlyIncome": "Ingresos mensuales",
+    "topServices": "Servicios más populares",
+    "topStaff": "Profesionales más activos",
+    "noData": "No hay datos disponibles",
+    "appointments": "citas"
+  },
+  "landing": {
+    "hero": {
+      "title": "Gestiona tu negocio con la mínima fricción",
+      "subtitle": "La plataforma todo-en-uno para profesionales de belleza, salud y wellness. Agenda, cobros y métricas en un solo lugar.",
+      "tryDemo": "Probar demo"
+    },
+    "features": {
+      "title": "Características principales",
+      "calendar": {
+        "title": "Agenda inteligente",
+        "description": "Gestiona citas con drag-and-drop, filtra por profesional o sucursal."
+      },
+      "clients": {
+        "title": "Gestión de clientes",
+        "description": "Ficha completa con historial de citas y pagos para fidelizar clientes."
+      },
+      "payments": {
+        "title": "Pagos integrados",
+        "description": "Cobra depósitos o pagos completos con Stripe o MercadoPago."
+      },
+      "metrics": {
+        "title": "Métricas de negocio",
+        "description": "Analiza ingresos y descubre qué servicios generan mayor margen."
+      }
+    },
+    "cta": {
+      "title": "¿Listo para transformar tu negocio?",
+      "subtitle": "Únete a miles de profesionales que ya optimizan su tiempo y aumentan sus ingresos con AgendaPlus.",
+      "button": "Comenzar ahora"
+    },
+    "footer": {
+      "copyright": "© 2023 AgendaPlus. Todos los derechos reservados.",
+      "subtitle": "La solución completa para la gestión de citas"
+    }
+  }
+}

@@ -1,0 +1,111 @@
+/* Estilos específicos para el calendario */
+.calendar-container {
+  width: 100%;
+  height: 600px;
+  overflow: auto;
+}
+
+.fc {
+  background-color: white;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  height: 100%;
+}
+
+.fc-toolbar-title {
+  font-size: 1.25rem !important;
+  font-weight: 600;
+}
+
+.fc-button {
+  background-color: #4f46e5 !important;
+  border-color: #4f46e5 !important;
+}
+
+.fc-button:hover {
+  background-color: #4338ca !important;
+  border-color: #4338ca !important;
+}
+
+.fc-event {
+  border-radius: 0.25rem;
+  padding: 0.25rem;
+}
+
+.fc-daygrid-day {
+  height: 100px;
+}
+
+.fc-col-header-cell {
+  background-color: #f8fafc;
+  padding: 0.5rem;
+}
+
+.fc-timegrid-slot {
+  height: 40px !important;
+}
+
+.fc-timegrid-slot-label {
+  font-size: 0.75rem;
+}
+
+.fc-timegrid-event {
+  margin: 1px;
+}
+
+.fc-timegrid-now-indicator-line {
+  border-color: #ec4899;
+}
+
+.fc-timegrid-now-indicator-arrow {
+  border-color: #ec4899;
+  border-top-color: transparent;
+  border-bottom-color: transparent;
+}
+
+/* Estilos para los filtros de staff */
+.staff-filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.staff-filter-item {
+  display: flex;
+  align-items: center;
+  padding: 0.25rem 0.5rem;
+  border-radius: 9999px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.staff-filter-item.active {
+  color: white;
+}
+
+.staff-filter-item:not(.active) {
+  opacity: 0.7;
+}
+
+.staff-filter-item:hover:not(.active) {
+  opacity: 1;
+}
+
+.staff-filter-avatar {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 9999px;
+  overflow: hidden;
+}
+
+.staff-filter-name {
+  margin-left: 0.5rem;
+}
+
+@media (max-width: 768px) {
+  .staff-filter-name {
+    display: none;
+  }
+}
