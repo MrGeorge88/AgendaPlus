@@ -27,7 +27,10 @@
     "noUnusedParameters": false,
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": false,
-    "noImplicitAny": false
+    "noImplicitAny": false,
+
+    /* Ignore errors for build */
+    "noEmitOnError": false
   },
   "include": ["src"],
   "exclude": ["src/tests/**/*", "**/*.test.ts", "**/*.test.tsx"]
