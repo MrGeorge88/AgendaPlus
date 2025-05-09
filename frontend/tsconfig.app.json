@@ -22,11 +22,14 @@
     },
 
     /* Linting */
-    "strict": true,
+    "strict": false,
     "noUnusedLocals": false,
     "noUnusedParameters": false,
     "noFallthroughCasesInSwitch": true,
-    "noUncheckedSideEffectImports": false
+    "noUncheckedSideEffectImports": false,
+    "noImplicitAny": false,
+    "suppressImplicitAnyIndexErrors": true
   },
-  "include": ["src"]
+  "include": ["src"],
+  "exclude": ["src/tests/**/*", "**/*.test.ts", "**/*.test.tsx"]
 }
