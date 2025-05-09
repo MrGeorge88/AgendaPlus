@@ -1,7 +1,7 @@
+import { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/auth-context';
 import { useLanguage } from '../contexts/language-context';
-import { useForm } from '../hooks/use-form';
 import { email as emailValidator, required } from '../utils/validation';
 
 export function Login() {
@@ -9,37 +9,29 @@ export function Login() {
   const location = useLocation();
   const { signIn } = useAuth();
   const { t } = useLanguage();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Get the intended destination from location state, or default to dashboard
   const from = (location.state as { from?: { pathname: string } })?.from?.pathname || '/dashboard';
 
-  const {
-    values,
-    errors,
-    handleChange,
-    handleBlur,
-    handleSubmit,
-    isSubmitting
-  } = useForm({
-    initialValues: {
-      email: '',
-      password: '',
-    },
-    validationRules: {
-      email: [required(), emailValidator()],
-      password: [required()],
-    },
-    onSubmit: async (values) => {
-      try {
-        await signIn(values.email, values.password);
-        // Navigate to the intended destination
-        navigate(from, { replace: true });
-      } catch (error) {
-        // This will be handled by the form error state
-        throw new Error(t('auth.loginError'));
-      }
-    },
-  });
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    setIsSubmitting(true);
+
+    try {
+      await signIn(email, password);
+      // Navigate to the intended destination
+      navigate(from, { replace: true });
+    } catch (err) {
+      setError(t('auth.loginError'));
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <div style={{
@@ -67,7 +59,7 @@ export function Login() {
           </p>
         </div>
 
-        {errors.form && (
+        {error && (
           <div style={{
             marginBottom: '1rem',
             backgroundColor: '#fee2e2',
@@ -76,7 +68,7 @@ export function Login() {
             borderRadius: '0.5rem',
             fontSize: '0.875rem'
           }}>
-            {errors.form}
+            {error}
           </div>
         )}
 
@@ -94,22 +86,16 @@ export function Login() {
               type="email"
               name="email"
               id="email"
-              value={values.email}
-              onChange={handleChange}
-              onBlur={handleBlur}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               style={{
                 width: '100%',
                 padding: '0.5rem',
                 borderRadius: '0.375rem',
-                border: errors.email ? '1px solid #ef4444' : '1px solid #cbd5e1'
+                border: '1px solid #cbd5e1'
               }}
               required
             />
-            {errors.email && (
-              <p style={{ marginTop: '0.25rem', fontSize: '0.875rem', color: '#ef4444' }}>
-                {errors.email}
-              </p>
-            )}
           </div>
 
           <div style={{ marginBottom: '1.5rem' }}>
@@ -125,22 +111,16 @@ export function Login() {
               type="password"
               name="password"
               id="password"
-              value={values.password}
-              onChange={handleChange}
-              onBlur={handleBlur}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               style={{
                 width: '100%',
                 padding: '0.5rem',
                 borderRadius: '0.375rem',
-                border: errors.password ? '1px solid #ef4444' : '1px solid #cbd5e1'
+                border: '1px solid #cbd5e1'
               }}
               required
             />
-            {errors.password && (
-              <p style={{ marginTop: '0.25rem', fontSize: '0.875rem', color: '#ef4444' }}>
-                {errors.password}
-              </p>
-            )}
           </div>
 
           <div style={{ marginTop: '1.5rem' }}>
