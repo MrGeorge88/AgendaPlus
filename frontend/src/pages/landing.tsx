@@ -2,138 +2,334 @@ import { Link } from 'react-router-dom';
 import { Button } from '../components/ui/button';
 import { useLanguage } from '../contexts/language-context';
 import { LanguageSwitcher } from '../components/ui/language-switcher';
+import { ArrowRight, Calendar, Bell, BarChart2, CreditCard, ChevronRight } from 'lucide-react';
+import { useState } from 'react';
+
+// Imágenes (estas rutas deberán ajustarse según la estructura de tu proyecto)
+const AppScreenshot = '/assets/app-screenshot.png'; // Placeholder - crear esta imagen
 
 export function Landing() {
   const { t } = useLanguage();
+  const [activeTestimonial, setActiveTestimonial] = useState(0);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-indigo-50 to-white">
-      <header className="container mx-auto flex items-center justify-between p-4">
-        <div className="text-2xl font-bold text-primary">{t('common.appName')} - v2.1</div>
-        <div className="flex items-center space-x-4">
-          <LanguageSwitcher variant="minimal" />
-          <Link to="/login">
-            <Button variant="ghost">{t('auth.login')}</Button>
-          </Link>
-          <Link to="/register">
-            <Button>{t('auth.register')}</Button>
-          </Link>
-        </div>
-      </header>
-
-      <main className="container mx-auto px-4 py-16 text-center">
-        <h1 className="mb-6 text-4xl font-bold text-slate-900 md:text-6xl">
-          {t('landing.hero.title')}
-        </h1>
-        <p className="mx-auto mb-8 max-w-2xl text-lg text-slate-600">
-          {t('landing.hero.subtitle')}
-        </p>
-        <div className="flex flex-col items-center justify-center space-y-4 md:flex-row md:space-x-4 md:space-y-0">
-          <Link to="/register">
-            <Button size="lg" className="w-full md:w-auto">
-              {t('landing.cta.button')}
-            </Button>
-          </Link>
-          <Link to="/login">
-            <Button size="lg" variant="outline" className="w-full md:w-auto">
-              {t('auth.login')}
-            </Button>
-          </Link>
-        </div>
-      </main>
-
-      <section className="bg-white py-16">
-        <div className="container mx-auto px-4">
-          <h2 className="mb-12 text-center text-3xl font-bold text-slate-900">
-            {t('landing.features.title')}
-          </h2>
-          <div className="grid gap-8 md:grid-cols-3">
-            <div className="rounded-2xl bg-slate-50 p-6 shadow-soft">
-              <div className="mb-4 inline-flex rounded-full bg-primary/10 p-3 text-primary">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                  <line x1="16" y1="2" x2="16" y2="6"></line>
-                  <line x1="8" y1="2" x2="8" y2="6"></line>
-                  <line x1="3" y1="10" x2="21" y2="10"></line>
-                </svg>
-              </div>
-              <h3 className="mb-2 text-xl font-bold">{t('landing.features.calendar.title')}</h3>
-              <p className="text-slate-600">
-                {t('landing.features.calendar.description')}
-              </p>
+    <div className="min-h-screen bg-white">
+      {/* Navbar - Moderno y minimalista */}
+      <nav className="border-b border-gray-100">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="flex h-16 items-center justify-between">
+            <div className="flex items-center">
+              <Link to="/" className="flex items-center">
+                <span className="text-xl font-bold text-indigo-600">{t('common.appName')}</span>
+              </Link>
             </div>
-            <div className="rounded-2xl bg-slate-50 p-6 shadow-soft">
-              <div className="mb-4 inline-flex rounded-full bg-primary/10 p-3 text-primary">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                  <circle cx="9" cy="7" r="4"></circle>
-                  <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                  <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-                </svg>
+            <div className="hidden md:block">
+              <div className="ml-10 flex items-center space-x-4">
+                <a href="#features" className="text-gray-600 hover:text-gray-900 px-3 py-2 text-sm font-medium transition duration-200">
+                  {t('landing.features.title')}
+                </a>
+                <a href="#how-it-works" className="text-gray-600 hover:text-gray-900 px-3 py-2 text-sm font-medium transition duration-200">
+                  Cómo funciona
+                </a>
+                <a href="#testimonials" className="text-gray-600 hover:text-gray-900 px-3 py-2 text-sm font-medium transition duration-200">
+                  Testimonios
+                </a>
+                <LanguageSwitcher variant="minimal" />
               </div>
-              <h3 className="mb-2 text-xl font-bold">{t('landing.features.clients.title')}</h3>
-              <p className="text-slate-600">
-                {t('landing.features.clients.description')}
-              </p>
             </div>
-            <div className="rounded-2xl bg-slate-50 p-6 shadow-soft">
-              <div className="mb-4 inline-flex rounded-full bg-primary/10 p-3 text-primary">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"></path>
-                </svg>
+            <div className="flex items-center space-x-4">
+              <Link to="/login" className="text-gray-600 hover:text-gray-900 px-3 py-2 text-sm font-medium transition duration-200">
+                {t('auth.login')}
+              </Link>
+              <Link to="/register">
+                <Button className="bg-indigo-600 hover:bg-indigo-700 text-white transition duration-200">
+                  {t('auth.register')}
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      {/* Hero Section - Moderno con ilustración */}
+      <section className="relative bg-white overflow-hidden">
+        <div className="mx-auto max-w-7xl">
+          <div className="relative z-10 pb-8 bg-white sm:pb-16 md:pb-20 lg:pb-28 xl:pb-32">
+            <div className="mt-10 mx-auto max-w-7xl px-4 sm:mt-12 sm:px-6 md:mt-16 lg:mt-20 lg:px-8 xl:mt-28">
+              <div className="sm:text-center lg:text-left">
+                <h1 className="text-4xl tracking-tight font-extrabold text-gray-900 sm:text-5xl md:text-6xl">
+                  <span className="block">{t('landing.hero.title')}</span>
+                  <span className="block text-indigo-600">con eficiencia</span>
+                </h1>
+                <p className="mt-3 text-base text-gray-500 sm:mt-5 sm:text-lg sm:max-w-xl sm:mx-auto md:mt-5 md:text-xl lg:mx-0">
+                  {t('landing.hero.subtitle')}
+                </p>
+                <div className="mt-5 sm:mt-8 sm:flex sm:justify-center lg:justify-start">
+                  <div className="rounded-md shadow">
+                    <Link to="/register">
+                      <Button className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 md:py-4 md:text-lg md:px-10 transition duration-200">
+                        {t('landing.cta.button')}
+                        <ArrowRight className="ml-2 h-5 w-5" />
+                      </Button>
+                    </Link>
+                  </div>
+                  <div className="mt-3 sm:mt-0 sm:ml-3">
+                    <a href="#how-it-works" className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-indigo-700 bg-indigo-100 hover:bg-indigo-200 md:py-4 md:text-lg md:px-10 transition duration-200">
+                      Cómo funciona
+                    </a>
+                  </div>
+                </div>
               </div>
-              <h3 className="mb-2 text-xl font-bold">{t('landing.features.metrics.title')}</h3>
-              <p className="text-slate-600">
-                {t('landing.features.metrics.description')}
-              </p>
+            </div>
+          </div>
+        </div>
+        <div className="lg:absolute lg:inset-y-0 lg:right-0 lg:w-1/2">
+          <img
+            className="h-56 w-full object-cover sm:h-72 md:h-96 lg:w-full lg:h-full shadow-lg rounded-bl-2xl"
+            src={AppScreenshot || "https://placehold.co/800x600/e2e8f0/475569?text=AgendaPlus+Dashboard"}
+            alt="AgendaPlus dashboard"
+          />
+        </div>
+      </section>
+
+      {/* Features Section - Diseño moderno con tarjetas elevadas */}
+      <section id="features" className="py-16 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="lg:text-center">
+            <h2 className="text-base text-indigo-600 font-semibold tracking-wide uppercase">Características</h2>
+            <p className="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-gray-900 sm:text-4xl">
+              {t('landing.features.title')}
+            </p>
+            <p className="mt-4 max-w-2xl text-xl text-gray-500 lg:mx-auto">
+              Herramientas diseñadas para simplificar tu día a día y potenciar tu crecimiento.
+            </p>
+          </div>
+
+          <div className="mt-16">
+            <div className="space-y-10 md:space-y-0 md:grid md:grid-cols-2 md:gap-x-8 md:gap-y-10 lg:grid-cols-4">
+              {/* Feature 1 */}
+              <div className="relative bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition duration-200">
+                <div className="absolute -top-3 -left-3 p-3 rounded-full bg-indigo-100">
+                  <Calendar className="h-6 w-6 text-indigo-600" />
+                </div>
+                <div className="mt-8">
+                  <h3 className="text-lg font-medium text-gray-900">{t('landing.features.calendar.title')}</h3>
+                  <p className="mt-2 text-base text-gray-500">
+                    {t('landing.features.calendar.description')}
+                  </p>
+                </div>
+              </div>
+
+              {/* Feature 2 */}
+              <div className="relative bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition duration-200">
+                <div className="absolute -top-3 -left-3 p-3 rounded-full bg-indigo-100">
+                  <Bell className="h-6 w-6 text-indigo-600" />
+                </div>
+                <div className="mt-8">
+                  <h3 className="text-lg font-medium text-gray-900">Recordatorios automáticos</h3>
+                  <p className="mt-2 text-base text-gray-500">
+                    Reduce cancelaciones con notificaciones por email y SMS a tus clientes.
+                  </p>
+                </div>
+              </div>
+
+              {/* Feature 3 */}
+              <div className="relative bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition duration-200">
+                <div className="absolute -top-3 -left-3 p-3 rounded-full bg-indigo-100">
+                  <BarChart2 className="h-6 w-6 text-indigo-600" />
+                </div>
+                <div className="mt-8">
+                  <h3 className="text-lg font-medium text-gray-900">{t('landing.features.metrics.title')}</h3>
+                  <p className="mt-2 text-base text-gray-500">
+                    {t('landing.features.metrics.description')}
+                  </p>
+                </div>
+              </div>
+
+              {/* Feature 4 */}
+              <div className="relative bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition duration-200">
+                <div className="absolute -top-3 -left-3 p-3 rounded-full bg-indigo-100">
+                  <CreditCard className="h-6 w-6 text-indigo-600" />
+                </div>
+                <div className="mt-8">
+                  <h3 className="text-lg font-medium text-gray-900">{t('landing.features.payments.title')}</h3>
+                  <p className="mt-2 text-base text-gray-500">
+                    {t('landing.features.payments.description')}
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      <footer className="bg-slate-900 py-8 text-white">
-        <div className="container mx-auto px-4 text-center">
-          <div className="mb-4 text-xl font-bold">{t('common.appName')}</div>
-          <p className="mb-6 text-slate-400">{t('landing.footer.subtitle')}</p>
-          <div className="flex justify-center space-x-4">
-            <Link to="/login" className="text-slate-400 hover:text-white">
-              {t('auth.login')}
-            </Link>
-            <Link to="/register" className="text-slate-400 hover:text-white">
-              {t('auth.register')}
-            </Link>
+      {/* How it Works Section */}
+      <section id="how-it-works" className="py-16 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="lg:text-center">
+            <h2 className="text-base text-indigo-600 font-semibold tracking-wide uppercase">Cómo funciona</h2>
+            <p className="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-gray-900 sm:text-4xl">
+              Tres pasos simples para empezar
+            </p>
+            <p className="mt-4 max-w-2xl text-xl text-gray-500 lg:mx-auto">
+              Comienza a usar AgendaPlus en minutos, sin complicaciones.
+            </p>
           </div>
-          <div className="mt-8 text-sm text-slate-500">
+
+          <div className="mt-16">
+            <div className="space-y-12 lg:space-y-0 lg:grid lg:grid-cols-3 lg:gap-x-8">
+              {/* Step 1 */}
+              <div className="relative">
+                <div className="relative flex items-center justify-center h-40">
+                  <img
+                    className="h-full"
+                    src="https://placehold.co/300x200/e2e8f0/475569?text=Paso+1"
+                    alt="Paso 1"
+                  />
+                  <div className="absolute top-0 right-0 -mr-8 -mt-2 flex items-center justify-center rounded-full bg-indigo-600 p-1 w-8 h-8">
+                    <span className="text-white font-medium">1</span>
+                  </div>
+                </div>
+                <div className="mt-6">
+                  <h3 className="text-lg font-medium text-gray-900">Crea tu cuenta</h3>
+                  <p className="mt-2 text-base text-gray-500">
+                    Regístrate en menos de 2 minutos y configura tu perfil profesional.
+                  </p>
+                </div>
+              </div>
+
+              {/* Step 2 */}
+              <div className="relative">
+                <div className="relative flex items-center justify-center h-40">
+                  <img
+                    className="h-full"
+                    src="https://placehold.co/300x200/e2e8f0/475569?text=Paso+2"
+                    alt="Paso 2"
+                  />
+                  <div className="absolute top-0 right-0 -mr-8 -mt-2 flex items-center justify-center rounded-full bg-indigo-600 p-1 w-8 h-8">
+                    <span className="text-white font-medium">2</span>
+                  </div>
+                </div>
+                <div className="mt-6">
+                  <h3 className="text-lg font-medium text-gray-900">Configura tus servicios</h3>
+                  <p className="mt-2 text-base text-gray-500">
+                    Añade tus servicios, precios y disponibilidad en el calendario.
+                  </p>
+                </div>
+              </div>
+
+              {/* Step 3 */}
+              <div className="relative">
+                <div className="relative flex items-center justify-center h-40">
+                  <img
+                    className="h-full"
+                    src="https://placehold.co/300x200/e2e8f0/475569?text=Paso+3"
+                    alt="Paso 3"
+                  />
+                  <div className="absolute top-0 right-0 -mr-8 -mt-2 flex items-center justify-center rounded-full bg-indigo-600 p-1 w-8 h-8">
+                    <span className="text-white font-medium">3</span>
+                  </div>
+                </div>
+                <div className="mt-6">
+                  <h3 className="text-lg font-medium text-gray-900">¡Comienza a gestionar!</h3>
+                  <p className="mt-2 text-base text-gray-500">
+                    Empieza a recibir citas y gestiona tu negocio de forma eficiente.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonials Section */}
+      <section id="testimonials" className="py-16 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="lg:text-center">
+            <h2 className="text-base text-indigo-600 font-semibold tracking-wide uppercase">Testimonios</h2>
+            <p className="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-gray-900 sm:text-4xl">
+              Lo que dicen nuestros usuarios
+            </p>
+            <p className="mt-4 max-w-2xl text-xl text-gray-500 lg:mx-auto">
+              Profesionales como tú que han transformado su negocio con AgendaPlus.
+            </p>
+          </div>
+
+          <div className="mt-16">
+            <div className="mx-auto max-w-md overflow-hidden rounded-xl bg-white shadow-lg md:max-w-2xl">
+              <div className="md:flex">
+                <div className="md:shrink-0">
+                  <img
+                    className="h-48 w-full object-cover md:h-full md:w-48"
+                    src="https://placehold.co/300x300/e2e8f0/475569?text=Testimonio"
+                    alt="Testimonio"
+                  />
+                </div>
+                <div className="p-8">
+                  <div className="text-sm font-semibold uppercase tracking-wide text-indigo-500">María Rodríguez</div>
+                  <p className="mt-1 text-slate-500">Estilista</p>
+                  <p className="mt-4 text-lg italic text-gray-600">
+                    "AgendaPlus ha transformado mi negocio. Ahora gestiono mis citas sin estrés y mis clientes están más satisfechos."
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-12 flex justify-center">
+            <div className="flex space-x-2">
+              <button className="h-3 w-3 rounded-full bg-indigo-600"></button>
+              <button className="h-3 w-3 rounded-full bg-gray-300 hover:bg-indigo-400"></button>
+              <button className="h-3 w-3 rounded-full bg-gray-300 hover:bg-indigo-400"></button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="bg-indigo-700">
+        <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:py-16 lg:px-8 lg:flex lg:items-center lg:justify-between">
+          <h2 className="text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
+            <span className="block">{t('landing.cta.title')}</span>
+            <span className="block text-indigo-200">{t('landing.cta.subtitle')}</span>
+          </h2>
+          <div className="mt-8 flex lg:mt-0 lg:flex-shrink-0">
+            <div className="inline-flex rounded-md shadow">
+              <Link to="/register">
+                <Button className="inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-indigo-600 bg-white hover:bg-indigo-50 transition duration-200">
+                  {t('landing.cta.button')}
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="bg-gray-900 py-12 text-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div>
+              <div className="text-2xl font-bold text-white">{t('common.appName')}</div>
+              <p className="mt-2 text-gray-400">{t('landing.footer.subtitle')}</p>
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold mb-4">Enlaces rápidos</h3>
+              <ul className="space-y-2">
+                <li><a href="#features" className="text-gray-400 hover:text-white transition duration-200">Características</a></li>
+                <li><a href="#how-it-works" className="text-gray-400 hover:text-white transition duration-200">Cómo funciona</a></li>
+                <li><a href="#testimonials" className="text-gray-400 hover:text-white transition duration-200">Testimonios</a></li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold mb-4">Cuenta</h3>
+              <ul className="space-y-2">
+                <li><Link to="/login" className="text-gray-400 hover:text-white transition duration-200">{t('auth.login')}</Link></li>
+                <li><Link to="/register" className="text-gray-400 hover:text-white transition duration-200">{t('auth.register')}</Link></li>
+              </ul>
+            </div>
+          </div>
+          <div className="mt-12 pt-8 border-t border-gray-800 text-center text-sm text-gray-400">
             &copy; {new Date().getFullYear()} {t('landing.footer.copyright')}
           </div>
         </div>
