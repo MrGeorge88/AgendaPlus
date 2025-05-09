@@ -167,57 +167,60 @@ export function Staff() {
           <span className="ml-2">{t('common.loading')}</span>
         </div>
       ) : (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {filteredStaff.map(person => (
-            <Card key={person.id} className="flex flex-col">
-              <div className="flex items-start justify-between p-4">
-                <div className="flex items-center">
-                  <Avatar className="mr-3 h-10 w-10">
-                    <AvatarImage src={person.avatar} alt={person.name} />
-                    <AvatarFallback style={{ backgroundColor: person.color, color: "white" }}>
-                      {person.name.split(" ").map(n => n[0]).join("")}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <h3 className="text-lg font-bold">{person.name}</h3>
-                    <div className="flex items-center text-sm text-slate-500">
-                      <Briefcase className="mr-1 h-3 w-3" /> {person.specialty}
+        <>
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {filteredStaff.map(person => (
+              <Card key={person.id} className="flex flex-col">
+                <div className="flex items-start justify-between p-4">
+                  <div className="flex items-center">
+                    <Avatar className="mr-3 h-10 w-10">
+                      <AvatarImage src={person.avatar} alt={person.name} />
+                      <AvatarFallback style={{ backgroundColor: person.color, color: "white" }}>
+                        {person.name.split(" ").map(n => n[0]).join("")}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div>
+                      <h3 className="text-lg font-bold">{person.name}</h3>
+                      <div className="flex items-center text-sm text-slate-500">
+                        <Briefcase className="mr-1 h-3 w-3" /> {person.specialty}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex space-x-2">
+                    <button
+                      onClick={() => handleEditStaff(person)}
+                      className="rounded-full p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+                    >
+                      <Edit className="h-4 w-4" />
+                    </button>
+                    <button
+                      onClick={() => handleDeleteStaff(person.id)}
+                      className="rounded-full p-1 text-slate-400 hover:bg-red-100 hover:text-red-600"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </div>
+                </div>
+                <div className="mt-auto border-t p-4">
+                  <div className="space-y-1 text-sm">
+                    <div className="flex items-center text-slate-500">
+                      <Phone className="mr-2 h-4 w-4" /> {person.phone}
+                    </div>
+                    <div className="flex items-center text-slate-500">
+                      <Mail className="mr-2 h-4 w-4" /> {person.email}
                     </div>
                   </div>
                 </div>
-                <div className="flex space-x-2">
-                  <button
-                    onClick={() => handleEditStaff(person)}
-                    className="rounded-full p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
-                  >
-                    <Edit className="h-4 w-4" />
-                  </button>
-                  <button
-                    onClick={() => handleDeleteStaff(person.id)}
-                    className="rounded-full p-1 text-slate-400 hover:bg-red-100 hover:text-red-600"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </button>
-                </div>
-              </div>
-              <div className="mt-auto border-t p-4">
-                <div className="space-y-1 text-sm">
-                  <div className="flex items-center text-slate-500">
-                    <Phone className="mr-2 h-4 w-4" /> {person.phone}
-                  </div>
-                  <div className="flex items-center text-slate-500">
-                    <Mail className="mr-2 h-4 w-4" /> {person.email}
-                  </div>
-                </div>
-              </div>
-            </Card>
-          ))}
-        </div>
+              </Card>
+            ))}
+          </div>
 
-      {filteredStaff.length === 0 && (
-        <div className="mt-8 text-center">
-          <p className="text-slate-500">{t('staff.noResults')}</p>
-        </div>
+          {filteredStaff.length === 0 && (
+            <div className="mt-8 text-center">
+              <p className="text-slate-500">{t('staff.noResults')}</p>
+            </div>
+          )}
+        </>
       )}
 
       <Modal
