@@ -119,43 +119,59 @@ export function Calendar() {
         <>
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div className="flex flex-wrap gap-2">
-              {staffMembers.map((staffMember) => {
-                const isSelected = selectedStaff.includes(staffMember.id);
-                return (
-                  <button
-                    key={staffMember.id}
-                    className={`flex items-center rounded-full px-3 py-1.5 text-sm transition-colors ${
-                      isSelected
-                        ? 'text-white'
-                        : 'text-slate-600 border'
-                    }`}
-                    style={{
-                      backgroundColor: isSelected ? staffMember.color : 'transparent',
-                      borderColor: isSelected ? 'transparent' : staffMember.color
-                    }}
-                    onClick={() => handleStaffFilterChange(staffMember.id)}
-                  >
-                    <img
-                      src={staffMember.avatar}
-                      alt={staffMember.name}
-                      className="mr-2 h-5 w-5 rounded-full object-cover"
-                      onError={(e) => {
-                        const target = e.target as HTMLImageElement;
-                        target.onerror = null;
-                        target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(staffMember.name)}&background=random`;
+              {staffMembers.length > 0 ? (
+                staffMembers.map((staffMember) => {
+                  const isSelected = selectedStaff.includes(staffMember.id);
+                  return (
+                    <button
+                      key={staffMember.id}
+                      className={`flex items-center rounded-full px-3 py-1.5 text-sm transition-colors ${
+                        isSelected
+                          ? 'text-white'
+                          : 'text-slate-600 border'
+                      }`}
+                      style={{
+                        backgroundColor: isSelected ? staffMember.color : 'transparent',
+                        borderColor: isSelected ? 'transparent' : staffMember.color
                       }}
-                    />
-                    <span>{staffMember.name}</span>
-                  </button>
-                );
-              })}
+                      onClick={() => handleStaffFilterChange(staffMember.id)}
+                    >
+                      <img
+                        src={staffMember.avatar}
+                        alt={staffMember.name}
+                        className="mr-2 h-5 w-5 rounded-full object-cover"
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement;
+                          target.onerror = null;
+                          target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(staffMember.name)}&background=random`;
+                        }}
+                      />
+                      <span>{staffMember.name}</span>
+                    </button>
+                  );
+                })
+              ) : (
+                <div className="text-sm text-slate-500">
+                  No hay personal disponible. Por favor, añade personal primero.
+                </div>
+              )}
             </div>
-            <Button
-              onClick={() => setShowForm(true)}
-              className="flex items-center gap-1"
-            >
-              <Plus className="h-4 w-4" /> Nueva cita
-            </Button>
+            <div className="flex gap-2">
+              <Button
+                onClick={() => window.location.href = '/staff'}
+                variant="outline"
+                className="flex items-center gap-1"
+              >
+                <Users className="h-4 w-4" /> Gestionar personal
+              </Button>
+              <Button
+                onClick={() => setShowForm(true)}
+                className="flex items-center gap-1"
+                disabled={staffMembers.length === 0}
+              >
+                <Plus className="h-4 w-4" /> Nueva cita
+              </Button>
+            </div>
           </div>
         </>
       )}
