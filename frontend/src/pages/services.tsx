@@ -23,24 +23,26 @@ export function Services() {
   // Cargar servicios desde Supabase
   useEffect(() => {
     const loadServices = async () => {
-      try {
-        setLoading(true);
-        const data = await servicesService.getServices();
-        setServices(data);
-      } catch (error) {
-        console.error('Error al cargar servicios:', error);
-        showNotification({
-          title: t('common.error'),
-          message: t('services.errorLoading'),
-          type: 'error'
-        });
-      } finally {
-        setLoading(false);
+      if (user) {
+        try {
+          setLoading(true);
+          const data = await servicesService.getServices(user.id);
+          setServices(data);
+        } catch (error) {
+          console.error('Error al cargar servicios:', error);
+          showNotification({
+            title: t('common.error'),
+            message: t('services.errorLoading'),
+            type: 'error'
+          });
+        } finally {
+          setLoading(false);
+        }
       }
     };
 
     loadServices();
-  }, [t, showNotification]);
+  }, [user, t, showNotification]);
 
   const filteredServices = services.filter(service =>
     service.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -185,28 +187,32 @@ export function Services() {
                 };
 
                 let result;
-                if (currentService) {
-                  // Actualizar servicio existente
-                  result = await servicesService.updateService(currentService.id, serviceData);
-                  if (result) {
-                    setServices(prev => prev.map(service => service.id === currentService.id ? result! : service));
-                    showNotification({
-                      title: t('common.success'),
-                      message: t('services.updateSuccess'),
-                      type: 'success'
-                    });
+                if (user) {
+                  if (currentService) {
+                    // Actualizar servicio existente
+                    result = await servicesService.updateService(currentService.id, serviceData);
+                    if (result) {
+                      setServices(prev => prev.map(service => service.id === currentService.id ? result! : service));
+                      showNotification({
+                        title: t('common.success'),
+                        message: t('services.updateSuccess'),
+                        type: 'success'
+                      });
+                    }
+                  } else {
+                    // Añadir nuevo servicio
+                    result = await servicesService.createService(serviceData, user.id);
+                    if (result) {
+                      setServices(prev => [...prev, result!]);
+                      showNotification({
+                        title: t('common.success'),
+                        message: t('services.createSuccess'),
+                        type: 'success'
+                      });
+                    }
                   }
                 } else {
-                  // Añadir nuevo servicio
-                  result = await servicesService.createService(serviceData);
-                  if (result) {
-                    setServices(prev => [...prev, result!]);
-                    showNotification({
-                      title: t('common.success'),
-                      message: t('services.createSuccess'),
-                      type: 'success'
-                    });
-                  }
+                  throw new Error('Usuario no autenticado');
                 }
 
                 if (!result) throw new Error('Error en la operación');

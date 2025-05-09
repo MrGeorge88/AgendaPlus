@@ -28,12 +28,18 @@ const mapSupabaseService = (service: SupabaseService): Service => ({
 // Servicio de servicios
 export const servicesService = {
   // Obtener todos los servicios
-  getServices: async (): Promise<Service[]> => {
+  getServices: async (userId?: string): Promise<Service[]> => {
     try {
-      const { data, error } = await supabase
+      let query = supabase
         .from('services')
         .select('*')
         .order('name', { ascending: true });
+
+      if (userId) {
+        query = query.eq('user_id', userId);
+      }
+
+      const { data, error } = await query;
 
       if (error) throw error;
 
@@ -64,7 +70,7 @@ export const servicesService = {
   },
 
   // Crear un nuevo servicio
-  createService: async (service: Omit<Service, 'id'>): Promise<Service> => {
+  createService: async (service: Omit<Service, 'id'>, userId: string): Promise<Service> => {
     try {
       // Convertir al formato de Supabase
       const supabaseService = {
@@ -73,7 +79,8 @@ export const servicesService = {
         duration: service.duration,
         price: service.price,
         category: service.category || null,
-        cost: 0 // Valor por defecto
+        cost: 0, // Valor por defecto
+        user_id: userId
       };
 
       const { data, error } = await supabase
