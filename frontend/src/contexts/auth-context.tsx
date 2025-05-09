@@ -1,11 +1,11 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { authService, User } from '../services/auth';
+import { authService, User, AuthResponse } from '../services/auth';
 
 interface AuthContextType {
   user: User | null;
   loading: boolean;
   signIn: (email: string, password: string) => Promise<void>;
-  signUp: (email: string, password: string) => Promise<void>;
+  signUp: (email: string, password: string, name?: string) => Promise<AuthResponse>;
   signOut: () => Promise<void>;
 }
 
@@ -47,12 +47,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const signUp = async (email: string, password: string) => {
+  const signUp = async (email: string, password: string, name: string = '') => {
     setLoading(true);
     try {
-      const { user, error } = await authService.signUp(email, password);
-      if (error) throw error;
-      setUser(user);
+      const response = await authService.signUp(email, password, name);
+      if (response.error) throw response.error;
+
+      // If there's a message, it means email confirmation is required
+      if (response.message) {
+        // Don't set the user yet, they need to confirm their email
+        return response;
+      }
+
+      setUser(response.user);
+      return response;
     } catch (error) {
       console.error('Error al registrarse:', error);
       throw error;

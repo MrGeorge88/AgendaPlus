@@ -8,9 +8,7 @@ import { useLanguage } from "../../contexts/language-context";
 const navItems = [
   { key: "navigation.dashboard", path: "/dashboard", icon: Calendar },
   { key: "navigation.clients", path: "/clients", icon: Users },
-  { key: "navigation.clients", suffix: " (New)", path: "/clients-new", icon: Users },
   { key: "navigation.services", path: "/services", icon: Briefcase },
-  { key: "navigation.services", suffix: " (New)", path: "/services-new", icon: Briefcase },
   { key: "navigation.staff", path: "/staff", icon: Users },
   { key: "navigation.income", path: "/income", icon: BarChart3 },
 ];

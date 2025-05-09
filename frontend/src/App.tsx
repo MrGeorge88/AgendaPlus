@@ -9,6 +9,8 @@ import { Clients as ClientsNew } from './pages/clients-new';
 import { Services as ServicesNew } from './pages/services-new';
 import { Login } from './pages/login';
 import { Register } from './pages/register';
+import { AuthCallback } from './pages/auth-callback';
+import { ProtectedRoute } from './components/auth/protected-route';
 import { TestPage } from './pages/test-page';
 import { LoginSimple } from './pages/login-simple';
 import { LoginDebug } from './pages/login-debug';
@@ -34,13 +36,44 @@ function App() {
                   <Route path="/" element={<Landing />} />
                   <Route path="/login" element={<Login />} />
                   <Route path="/register" element={<Register />} />
-                  <Route path="/dashboard" element={<Dashboard />} />
-                  <Route path="/clients" element={<Clients />} />
-                  <Route path="/clients-new" element={<ClientsNew />} />
-                  <Route path="/services" element={<Services />} />
-                  <Route path="/services-new" element={<ServicesNew />} />
-                  <Route path="/staff" element={<Staff />} />
-                  <Route path="/income" element={<Income />} />
+                  <Route path="/auth/callback" element={<AuthCallback />} />
+
+                  {/* Protected Routes */}
+                  <Route path="/dashboard" element={
+                    <ProtectedRoute>
+                      <Dashboard />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/clients" element={
+                    <ProtectedRoute>
+                      <Clients />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/clients-new" element={
+                    <ProtectedRoute>
+                      <ClientsNew />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/services" element={
+                    <ProtectedRoute>
+                      <Services />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/services-new" element={
+                    <ProtectedRoute>
+                      <ServicesNew />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/staff" element={
+                    <ProtectedRoute>
+                      <Staff />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/income" element={
+                    <ProtectedRoute>
+                      <Income />
+                    </ProtectedRoute>
+                  } />
                   <Route path="/test" element={<TestPage />} />
                   <Route path="/login-simple" element={<LoginSimple />} />
                   <Route path="/login-debug" element={<LoginDebug />} />

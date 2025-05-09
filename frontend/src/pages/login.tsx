@@ -1,4 +1,4 @@
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/auth-context';
 import { useLanguage } from '../contexts/language-context';
 import { useForm } from '../hooks/use-form';
@@ -6,8 +6,12 @@ import { email as emailValidator, required } from '../utils/validation';
 
 export function Login() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { signIn } = useAuth();
   const { t } = useLanguage();
+
+  // Get the intended destination from location state, or default to dashboard
+  const from = (location.state as { from?: { pathname: string } })?.from?.pathname || '/dashboard';
 
   const {
     values,
@@ -28,7 +32,8 @@ export function Login() {
     onSubmit: async (values) => {
       try {
         await signIn(values.email, values.password);
-        navigate('/dashboard');
+        // Navigate to the intended destination
+        navigate(from, { replace: true });
       } catch (error) {
         // This will be handled by the form error state
         throw new Error(t('auth.loginError'));
