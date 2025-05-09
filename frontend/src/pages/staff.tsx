@@ -211,9 +211,8 @@ export function Staff() {
                 </div>
               </div>
             </Card>
-          ))
-        }
-      </div>
+          ))}
+        </div>
 
       {filteredStaff.length === 0 && (
         <div className="mt-8 text-center">
