@@ -125,7 +125,8 @@ async function main() {
         fs.renameSync(path.join(__dirname, 'frontend', '.vercel.env'),
                      path.join(__dirname, 'frontend', '.env.local'));
 
-        execSync('vercel', { stdio: 'inherit' });
+        // Usar --name para especificar el nombre del proyecto y evitar duplicados
+        execSync('vercel --name agenda-plus-frontend', { stdio: 'inherit' });
         console.log(`${colors.green}Frontend desplegado correctamente.${colors.reset}`);
       } catch (error) {
         console.log(`${colors.red}Error al desplegar el frontend: ${error.message}${colors.reset}`);
@@ -154,7 +155,8 @@ async function main() {
         fs.renameSync(path.join(__dirname, 'backend', '.vercel.env'),
                      path.join(__dirname, 'backend', '.env.local'));
 
-        execSync('vercel', { stdio: 'inherit' });
+        // Usar --name para especificar el nombre del proyecto y evitar duplicados
+        execSync('vercel --name agenda-plus-backend', { stdio: 'inherit' });
         console.log(`${colors.green}Backend desplegado correctamente.${colors.reset}`);
       } catch (error) {
         console.log(`${colors.red}Error al desplegar el backend: ${error.message}${colors.reset}`);
