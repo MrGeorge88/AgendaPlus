@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { authService } from '../services/auth';
+import { supabase } from '../lib/supabase';
 
 export function LoginSimple() {
   const [email, setEmail] = useState('');
@@ -8,19 +10,55 @@ export function LoginSimple() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
+  // Función para probar la conexión con Supabase
+  const testSupabaseConnection = async () => {
+    try {
+      console.log('Probando conexión con Supabase...');
+      console.log('URL:', import.meta.env.VITE_SUPABASE_URL);
+      console.log('ANON KEY:', import.meta.env.VITE_SUPABASE_ANON_KEY ? 'Configurada' : 'No configurada');
+
+      const { data, error } = await supabase.from('clients').select('*').limit(1);
+
+      if (error) {
+        console.error('Error al conectar con Supabase:', error);
+        return false;
+      }
+
+      console.log('Conexión exitosa con Supabase:', data);
+      return true;
+    } catch (err) {
+      console.error('Error al probar la conexión con Supabase:', err);
+      return false;
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     setLoading(true);
 
+    // Probar la conexión con Supabase
+    const isConnected = await testSupabaseConnection();
+    console.log('¿Conectado a Supabase?', isConnected);
+
     try {
-      // Simulamos un inicio de sesión exitoso
-      console.log('Iniciando sesión con:', email, password);
-      setTimeout(() => {
-        navigate('/dashboard');
-      }, 1000);
-    } catch (error) {
-      setError('Error al iniciar sesión. Por favor, verifica tus credenciales.');
+      // Intentar iniciar sesión con Supabase
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) {
+        console.error('Error de Supabase:', error);
+        setError(error.message);
+        return;
+      }
+
+      console.log('Inicio de sesión exitoso:', data);
+      navigate('/dashboard');
+    } catch (error: any) {
+      console.error('Error al iniciar sesión:', error);
+      setError(error.message || 'Error al iniciar sesión. Por favor, verifica tus credenciales.');
     } finally {
       setLoading(false);
     }

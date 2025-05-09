@@ -1,29 +1,103 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { supabase } from '../lib/supabase';
 
 export function LoginBasic() {
-  // Función simple para manejar el envío del formulario
-  const handleSubmit = (e: React.FormEvent) => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState('');
+  const [supabaseInfo, setSupabaseInfo] = useState({
+    url: '',
+    hasKey: false,
+    connected: false
+  });
+  const navigate = useNavigate();
+
+  // Verificar la conexión con Supabase al cargar
+  useEffect(() => {
+    async function checkSupabase() {
+      try {
+        const url = import.meta.env.VITE_SUPABASE_URL || '';
+        const key = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
+
+        setSupabaseInfo({
+          url,
+          hasKey: !!key,
+          connected: false
+        });
+
+        if (url && key) {
+          try {
+            const { error } = await supabase.from('clients').select('count').limit(1);
+
+            if (!error) {
+              setSupabaseInfo(prev => ({
+                ...prev,
+                connected: true
+              }));
+              setMessage('Conectado a Supabase correctamente');
+            } else {
+              console.error('Error al conectar con Supabase:', error);
+              setMessage(`Error al conectar con Supabase: ${error.message}`);
+            }
+          } catch (err) {
+            console.error('Error al consultar Supabase:', err);
+          }
+        }
+      } catch (err) {
+        console.error('Error al verificar Supabase:', err);
+        setMessage(`Error al verificar Supabase: ${err}`);
+      }
+    }
+
+    checkSupabase();
+  }, []);
+
+  // Función para manejar el envío del formulario
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Formulario enviado');
+    setLoading(true);
+    setMessage('');
+
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password
+      });
+
+      if (error) {
+        setMessage(`Error: ${error.message}`);
+      } else {
+        setMessage('Inicio de sesión exitoso');
+        console.log('Usuario:', data.user);
+        setTimeout(() => {
+          navigate('/dashboard');
+        }, 1000);
+      }
+    } catch (err: any) {
+      setMessage(`Error: ${err.message}`);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div style={{ 
-      display: 'flex', 
-      minHeight: '100vh', 
-      alignItems: 'center', 
-      justifyContent: 'center', 
-      backgroundColor: '#f8fafc', 
-      padding: '1rem' 
+    <div style={{
+      display: 'flex',
+      minHeight: '100vh',
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: '#f8fafc',
+      padding: '1rem'
     }}>
-      <div style={{ 
-        width: '100%', 
-        maxWidth: '28rem', 
-        backgroundColor: 'white', 
-        borderRadius: '0.5rem', 
-        padding: '1.5rem', 
-        boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)' 
+      <div style={{
+        width: '100%',
+        maxWidth: '28rem',
+        backgroundColor: 'white',
+        borderRadius: '0.5rem',
+        padding: '1.5rem',
+        boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)'
       }}>
         <div style={{ marginBottom: '1.5rem', textAlign: 'center' }}>
           <h1 style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#4f46e5' }}>AgendaPlus</h1>
@@ -37,11 +111,11 @@ export function LoginBasic() {
             </label>
             <input
               type="email"
-              style={{ 
-                width: '100%', 
-                padding: '0.5rem', 
-                borderRadius: '0.375rem', 
-                border: '1px solid #cbd5e1' 
+              style={{
+                width: '100%',
+                padding: '0.5rem',
+                borderRadius: '0.375rem',
+                border: '1px solid #cbd5e1'
               }}
               required
             />
@@ -53,11 +127,11 @@ export function LoginBasic() {
             </label>
             <input
               type="password"
-              style={{ 
-                width: '100%', 
-                padding: '0.5rem', 
-                borderRadius: '0.375rem', 
-                border: '1px solid #cbd5e1' 
+              style={{
+                width: '100%',
+                padding: '0.5rem',
+                borderRadius: '0.375rem',
+                border: '1px solid #cbd5e1'
               }}
               required
             />
@@ -65,12 +139,12 @@ export function LoginBasic() {
 
           <button
             type="submit"
-            style={{ 
-              width: '100%', 
-              backgroundColor: '#4f46e5', 
-              color: 'white', 
-              padding: '0.5rem 1rem', 
-              borderRadius: '0.375rem', 
+            style={{
+              width: '100%',
+              backgroundColor: '#4f46e5',
+              color: 'white',
+              padding: '0.5rem 1rem',
+              borderRadius: '0.375rem',
               fontWeight: '500',
               border: 'none',
               cursor: 'pointer'
