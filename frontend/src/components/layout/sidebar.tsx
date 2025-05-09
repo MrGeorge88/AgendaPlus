@@ -13,12 +13,16 @@ const navItems = [
   { key: "navigation.income", path: "/income", icon: BarChart3 },
 ];
 
-export function Sidebar() {
+interface SidebarProps {
+  isOpen?: boolean;
+}
+
+export function Sidebar({ isOpen = false }: SidebarProps) {
   const location = useLocation();
   const { t } = useLanguage();
 
   return (
-    <aside className="sidebar">
+    <aside className={`sidebar ${isOpen ? 'open' : ''}`}>
       <div className="sidebar-header">
         <Link to="/dashboard">
           <span className="text-xl font-bold text-primary">{t('common.appName')}</span>

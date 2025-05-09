@@ -3,16 +3,18 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "../ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { useAuth } from "../../contexts/auth-context";
-import { LogOut } from "lucide-react";
+import { LogOut, Menu } from "lucide-react";
 import { ThemeToggle } from "../ui/theme-toggle";
 import { LanguageSwitcher } from "../ui/language-switcher";
 import { useLanguage } from "../../contexts/language-context";
 
 interface TopbarProps {
   title: string;
+  onMenuToggle?: () => void;
+  isMobile?: boolean;
 }
 
-export function Topbar({ title }: TopbarProps) {
+export function Topbar({ title, onMenuToggle, isMobile = false }: TopbarProps) {
   const [date, setDate] = useState(new Date());
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
@@ -47,15 +49,27 @@ export function Topbar({ title }: TopbarProps) {
 
   return (
     <div className="topbar">
-      <div>
-        <h1 className="text-xl font-bold">{title}</h1>
-        <p className="text-sm">{formatDate(date)}</p>
+      <div className="flex items-center gap-3">
+        {isMobile && onMenuToggle && (
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onMenuToggle}
+            className="md:hidden"
+          >
+            <Menu />
+          </Button>
+        )}
+        <div>
+          <h1 className="text-xl font-bold">{title}</h1>
+          <p className="text-sm">{formatDate(date)}</p>
+        </div>
       </div>
       <div className="flex items-center gap-4">
         <Button variant="outline" onClick={handleTodayClick}>
           {t('common.today')}
         </Button>
-        <LanguageSwitcher variant="minimal" />
+        <LanguageSwitcher variant="minimal" className="hidden sm:flex" />
         <ThemeToggle />
         <div className="relative">
           <Avatar

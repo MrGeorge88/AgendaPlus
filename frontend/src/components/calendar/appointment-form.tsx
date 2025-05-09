@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { Button } from "../ui/button";
-import { Card } from "../ui/card";
+import { StaffMember } from "../../services/staff";
+import { Appointment } from "../../services/appointments";
 
 interface AppointmentFormProps {
   onClose: () => void;
-  onSave: (appointment: any) => void;
-  staffMembers: any[];
+  onSave: (appointment: Omit<Appointment, 'id'>) => void;
+  staffMembers: StaffMember[];
   date?: Date;
 }
 
@@ -59,10 +60,10 @@ export function AppointmentForm({ onClose, onSave, staffMembers, date = new Date
         </button>
       </div>
 
-        <form onSubmit={handleSubmit} style={{display: 'flex', flexDirection: 'column', gap: '20px'}}>
-          <div style={{display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '20px'}}>
+        <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label style={{display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '500'}}>
+              <label className="block mb-2 text-sm font-medium">
                 Servicio
               </label>
               <input
@@ -70,18 +71,13 @@ export function AppointmentForm({ onClose, onSave, staffMembers, date = new Date
                 name="title"
                 value={formData.title}
                 onChange={handleChange}
-                style={{
-                  width: '100%',
-                  padding: '8px 12px',
-                  border: '1px solid #e2e8f0',
-                  borderRadius: '8px'
-                }}
+                className="w-full px-3 py-2 border border-slate-200 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 required
               />
             </div>
 
             <div>
-              <label style={{display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '500'}}>
+              <label className="block mb-2 text-sm font-medium">
                 Cliente
               </label>
               <input
@@ -89,32 +85,22 @@ export function AppointmentForm({ onClose, onSave, staffMembers, date = new Date
                 name="clientName"
                 value={formData.clientName}
                 onChange={handleChange}
-                style={{
-                  width: '100%',
-                  padding: '8px 12px',
-                  border: '1px solid #e2e8f0',
-                  borderRadius: '8px'
-                }}
+                className="w-full px-3 py-2 border border-slate-200 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 required
               />
             </div>
           </div>
 
-          <div style={{display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '20px'}}>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label style={{display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '500'}}>
+              <label className="block mb-2 text-sm font-medium">
                 Profesional
               </label>
               <select
                 name="staffId"
                 value={formData.staffId}
                 onChange={handleChange}
-                style={{
-                  width: '100%',
-                  padding: '8px 12px',
-                  border: '1px solid #e2e8f0',
-                  borderRadius: '8px'
-                }}
+                className="w-full px-3 py-2 border border-slate-200 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 required
               >
                 {staffMembers.map((staff) => (
@@ -126,7 +112,7 @@ export function AppointmentForm({ onClose, onSave, staffMembers, date = new Date
             </div>
 
             <div>
-              <label style={{display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '500'}}>
+              <label className="block mb-2 text-sm font-medium">
                 Fecha
               </label>
               <input
@@ -134,20 +120,15 @@ export function AppointmentForm({ onClose, onSave, staffMembers, date = new Date
                 name="date"
                 value={formData.date}
                 onChange={handleChange}
-                style={{
-                  width: '100%',
-                  padding: '8px 12px',
-                  border: '1px solid #e2e8f0',
-                  borderRadius: '8px'
-                }}
+                className="w-full px-3 py-2 border border-slate-200 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 required
               />
             </div>
           </div>
 
-          <div style={{display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px'}}>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <label style={{display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '500'}}>
+              <label className="block mb-2 text-sm font-medium">
                 Hora inicio
               </label>
               <input
@@ -155,18 +136,13 @@ export function AppointmentForm({ onClose, onSave, staffMembers, date = new Date
                 name="startTime"
                 value={formData.startTime}
                 onChange={handleChange}
-                style={{
-                  width: '100%',
-                  padding: '8px 12px',
-                  border: '1px solid #e2e8f0',
-                  borderRadius: '8px'
-                }}
+                className="w-full px-3 py-2 border border-slate-200 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 required
               />
             </div>
 
             <div>
-              <label style={{display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '500'}}>
+              <label className="block mb-2 text-sm font-medium">
                 Hora fin
               </label>
               <input
@@ -174,18 +150,13 @@ export function AppointmentForm({ onClose, onSave, staffMembers, date = new Date
                 name="endTime"
                 value={formData.endTime}
                 onChange={handleChange}
-                style={{
-                  width: '100%',
-                  padding: '8px 12px',
-                  border: '1px solid #e2e8f0',
-                  borderRadius: '8px'
-                }}
+                className="w-full px-3 py-2 border border-slate-200 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 required
               />
             </div>
 
             <div>
-              <label style={{display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '500'}}>
+              <label className="block mb-2 text-sm font-medium">
                 Precio
               </label>
               <input
@@ -193,31 +164,21 @@ export function AppointmentForm({ onClose, onSave, staffMembers, date = new Date
                 name="price"
                 value={formData.price}
                 onChange={handleChange}
-                style={{
-                  width: '100%',
-                  padding: '8px 12px',
-                  border: '1px solid #e2e8f0',
-                  borderRadius: '8px'
-                }}
+                className="w-full px-3 py-2 border border-slate-200 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 required
               />
             </div>
           </div>
 
           <div>
-            <label style={{display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '500'}}>
+            <label className="block mb-2 text-sm font-medium">
               Estado
             </label>
             <select
               name="status"
               value={formData.status}
               onChange={handleChange}
-              style={{
-                width: '100%',
-                padding: '8px 12px',
-                border: '1px solid #e2e8f0',
-                borderRadius: '8px'
-              }}
+              className="w-full px-3 py-2 border border-slate-200 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
               required
             >
               <option value="confirmed">Confirmada</option>
@@ -227,33 +188,19 @@ export function AppointmentForm({ onClose, onSave, staffMembers, date = new Date
             </select>
           </div>
 
-          <div style={{display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '10px'}}>
-            <button
+          <div className="flex justify-end gap-3 mt-4">
+            <Button
               type="button"
+              variant="outline"
               onClick={onClose}
-              style={{
-                padding: '8px 16px',
-                borderRadius: '8px',
-                border: '1px solid #e2e8f0',
-                backgroundColor: 'white',
-                cursor: 'pointer'
-              }}
             >
               Cancelar
-            </button>
-            <button
+            </Button>
+            <Button
               type="submit"
-              style={{
-                padding: '8px 16px',
-                borderRadius: '8px',
-                backgroundColor: '#4f46e5',
-                color: 'white',
-                border: 'none',
-                cursor: 'pointer'
-              }}
             >
               Guardar
-            </button>
+            </Button>
           </div>
         </form>
     </div>

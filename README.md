@@ -91,47 +91,43 @@ npm run dev:backend
 1. Crea una cuenta en [Supabase](https://supabase.com) si aún no tienes una.
 2. Crea un nuevo proyecto en Supabase.
 3. Obtén las credenciales de tu proyecto (URL y claves API) desde la sección "Settings > API".
-4. Ejecuta el script de configuración:
-   ```bash
-   node deploy.js
+4. Crea un archivo `.env` en la carpeta `frontend` con las siguientes variables:
+   ```
+   VITE_SUPABASE_URL=tu_url_de_supabase
+   VITE_SUPABASE_ANON_KEY=tu_clave_anon_de_supabase
    ```
 5. Configura el esquema de la base de datos:
    - Ve a la sección "SQL Editor" en el panel de Supabase.
-   - Copia y pega el contenido del archivo `supabase-schema.sql`.
+   - Copia y pega el contenido del archivo `supabase/schema.sql`.
    - Ejecuta el script para crear las tablas necesarias.
-6. (Opcional) Inserta datos de ejemplo:
-   - Copia y pega el contenido del archivo `supabase-seed.sql`.
-   - Ejecuta el script para insertar datos de ejemplo.
-7. Configura la autenticación por email:
+6. Configura la autenticación por email:
    - Ve a "Authentication > Providers" y asegúrate de que "Email" esté habilitado.
    - Configura las plantillas de email en "Authentication > Email Templates".
+   - Configura el dominio de redirección para confirmación de email (tu dominio de producción o localhost para desarrollo).
+7. Habilita Row Level Security (RLS) para las tablas:
+   - Ve a "Authentication > Policies" y asegúrate de que las políticas se han creado correctamente.
+   - Verifica que cada tabla tenga políticas para SELECT, INSERT, UPDATE y DELETE.
 
 ### Prueba de Conexión con Supabase
 
-Para verificar que la conexión con Supabase funciona correctamente:
-```bash
-node test-supabase.js
-```
+Para verificar que la conexión con Supabase funciona correctamente, puedes iniciar sesión en la aplicación y comprobar que puedes ver y crear citas.
 
 ### Despliegue en Vercel
 
 1. Crea una cuenta en [Vercel](https://vercel.com) si aún no tienes una.
-2. Instala la CLI de Vercel:
-   ```bash
-   npm install -g vercel
-   ```
-3. Inicia sesión en Vercel:
-   ```bash
-   vercel login
-   ```
-4. Despliega el frontend:
-   ```bash
-   cd frontend
-   vercel
-   ```
-5. Configura las variables de entorno en Vercel:
+2. Conecta tu repositorio de GitHub a Vercel:
+   - Ve a [Vercel](https://vercel.com) y haz clic en "Add New..." > "Project".
+   - Selecciona tu repositorio de GitHub.
+   - Configura el proyecto:
+     - Framework Preset: Vite
+     - Root Directory: frontend
+     - Build Command: npm run build
+     - Output Directory: dist
+3. Configura las variables de entorno en Vercel:
    - `VITE_SUPABASE_URL`: URL de tu proyecto de Supabase
    - `VITE_SUPABASE_ANON_KEY`: Clave anónima de Supabase
+4. Haz clic en "Deploy" para desplegar la aplicación.
+5. Una vez desplegada, configura el dominio personalizado si lo deseas.
 
 ### GitHub
 El código fuente se aloja en GitHub en [https://github.com/MrGeorge88/AgendaPlus](https://github.com/MrGeorge88/AgendaPlus).

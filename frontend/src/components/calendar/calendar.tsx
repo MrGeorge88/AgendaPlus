@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
@@ -8,54 +8,44 @@ import { Button } from "../ui/button";
 import { Plus } from "lucide-react";
 import { AppointmentForm } from "./appointment-form";
 import { Modal } from "../ui/modal";
-
-// Mock data for staff members
-const mockStaff = [
-  { id: 1, name: "Ana García", color: "#4f46e5", avatar: "https://i.pravatar.cc/150?img=1" },
-  { id: 2, name: "Carlos Rodríguez", color: "#ec4899", avatar: "https://i.pravatar.cc/150?img=2" },
-  { id: 3, name: "Elena Martínez", color: "#10b981", avatar: "https://i.pravatar.cc/150?img=3" },
-];
-
-// Mock data for appointments
-const mockAppointments = [
-  {
-    id: "1",
-    title: "Corte de cabello",
-    start: "2023-05-01T10:00:00",
-    end: "2023-05-01T11:00:00",
-    resourceId: 1,
-    backgroundColor: "#4f46e5",
-    borderColor: "#4f46e5",
-    extendedProps: {
-      client: "Juan Pérez",
-      service: "Corte de cabello",
-      price: 25,
-      status: "confirmed",
-    },
-  },
-  {
-    id: "2",
-    title: "Manicura",
-    start: "2023-05-01T11:30:00",
-    end: "2023-05-01T12:30:00",
-    resourceId: 2,
-    backgroundColor: "#ec4899",
-    borderColor: "#ec4899",
-    extendedProps: {
-      client: "María López",
-      service: "Manicura",
-      price: 20,
-      status: "confirmed",
-    },
-  },
-];
+import { useAuth } from "../../contexts/auth-context";
+import { staffService, StaffMember } from "../../services/staff";
+import { appointmentsService, Appointment } from "../../services/appointments";
 
 export function Calendar() {
-  const [selectedStaff, setSelectedStaff] = useState<number[]>(mockStaff.map(staff => staff.id));
-  const [appointments, setAppointments] = useState(mockAppointments);
+  const { user } = useAuth();
+  const [staffMembers, setStaffMembers] = useState<StaffMember[]>([]);
+  const [selectedStaff, setSelectedStaff] = useState<number[]>([]);
+  const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
+  const [loading, setLoading] = useState(true);
   const calendarRef = useRef<any>(null);
+
+  // Cargar datos del personal y citas
+  useEffect(() => {
+    const loadData = async () => {
+      if (user) {
+        setLoading(true);
+        try {
+          // Cargar personal
+          const staff = await staffService.getStaffMembers(user.id);
+          setStaffMembers(staff);
+          setSelectedStaff(staff.map(s => s.id));
+
+          // Cargar citas
+          const appts = await appointmentsService.getAppointments(user.id);
+          setAppointments(appts);
+        } catch (error) {
+          console.error("Error al cargar datos:", error);
+        } finally {
+          setLoading(false);
+        }
+      }
+    };
+
+    loadData();
+  }, [user]);
 
   const handleStaffFilterChange = (staffId: number) => {
     setSelectedStaff(prev => {
@@ -72,21 +62,46 @@ export function Calendar() {
     setShowForm(true);
   };
 
-  const handleEventClick = (clickInfo: any) => {
+  const handleEventClick = async (clickInfo: any) => {
     if (confirm(`¿Deseas eliminar la cita '${clickInfo.event.title}'?`)) {
-      clickInfo.event.remove();
-      setAppointments(prev => prev.filter(appointment => appointment.id !== clickInfo.event.id));
+      try {
+        // Eliminar la cita de Supabase
+        if (user) {
+          const success = await appointmentsService.deleteAppointment(clickInfo.event.id);
+          if (success) {
+            clickInfo.event.remove();
+            setAppointments(prev => prev.filter(appointment => appointment.id !== clickInfo.event.id));
+          }
+        }
+      } catch (error) {
+        console.error("Error al eliminar la cita:", error);
+      }
     }
   };
 
-  const handleSaveAppointment = (appointment: any) => {
-    const newAppointment = {
-      ...appointment,
-      id: String(appointments.length + 1),
-    };
+  const handleSaveAppointment = async (appointmentData: any) => {
+    try {
+      if (user) {
+        // Preparar los datos de la cita
+        const newAppointmentData = {
+          ...appointmentData,
+          extendedProps: {
+            ...appointmentData.extendedProps,
+            userId: user.id
+          }
+        };
 
-    setAppointments(prev => [...prev, newAppointment]);
-    setShowForm(false);
+        // Guardar la cita en Supabase
+        const newAppointment = await appointmentsService.createAppointment(newAppointmentData, user.id);
+
+        if (newAppointment) {
+          setAppointments(prev => [...prev, newAppointment]);
+        }
+      }
+      setShowForm(false);
+    } catch (error) {
+      console.error("Error al guardar la cita:", error);
+    }
   };
 
   const filteredEvents = appointments.filter(event =>
@@ -94,99 +109,103 @@ export function Calendar() {
   );
 
   return (
-    <div style={{display: 'flex', flexDirection: 'column', gap: '16px'}}>
-      <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
-        <div style={{display: 'flex', gap: '8px'}}>
-          {mockStaff.map((staffMember) => {
-            const isSelected = selectedStaff.includes(staffMember.id);
-            return (
-              <button
-                key={staffMember.id}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  padding: '4px 12px',
-                  borderRadius: '20px',
-                  backgroundColor: isSelected ? staffMember.color : 'transparent',
-                  color: isSelected ? 'white' : '#64748b',
-                  border: isSelected ? 'none' : `1px solid ${staffMember.color}`,
-                  cursor: 'pointer'
-                }}
-                onClick={() => handleStaffFilterChange(staffMember.id)}
-              >
-                <img
-                  src={staffMember.avatar}
-                  alt={staffMember.name}
-                  style={{
-                    width: '24px',
-                    height: '24px',
-                    borderRadius: '50%',
-                    marginRight: '8px'
-                  }}
-                />
-                <span>{staffMember.name}</span>
-              </button>
-            );
-          })}
+    <div className="flex flex-col gap-4">
+      {loading ? (
+        <div className="flex h-64 items-center justify-center">
+          <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
+          <span className="ml-2">Cargando...</span>
         </div>
-        <button
-          onClick={() => setShowForm(true)}
-          className="btn btn-primary"
-          style={{display: 'flex', alignItems: 'center', gap: '4px'}}
-        >
-          <Plus style={{width: '16px', height: '16px'}} /> Nueva cita
-        </button>
-      </div>
+      ) : (
+        <>
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div className="flex flex-wrap gap-2">
+              {staffMembers.map((staffMember) => {
+                const isSelected = selectedStaff.includes(staffMember.id);
+                return (
+                  <button
+                    key={staffMember.id}
+                    className={`flex items-center rounded-full px-3 py-1.5 text-sm transition-colors ${
+                      isSelected
+                        ? 'text-white'
+                        : 'text-slate-600 border'
+                    }`}
+                    style={{
+                      backgroundColor: isSelected ? staffMember.color : 'transparent',
+                      borderColor: isSelected ? 'transparent' : staffMember.color
+                    }}
+                    onClick={() => handleStaffFilterChange(staffMember.id)}
+                  >
+                    <img
+                      src={staffMember.avatar}
+                      alt={staffMember.name}
+                      className="mr-2 h-6 w-6 rounded-full object-cover"
+                    />
+                    <span>{staffMember.name}</span>
+                  </button>
+                );
+              })}
+            </div>
+            <Button
+              onClick={() => setShowForm(true)}
+              className="flex items-center gap-1"
+            >
+              <Plus className="h-4 w-4" /> Nueva cita
+            </Button>
+          </div>
+        </>
+      )}
 
-      <div className="card" style={{padding: '0'}}>
-        <div style={{height: '600px', padding: '16px'}}>
-          <FullCalendar
-            ref={calendarRef}
-            plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
-            initialView="timeGridDay"
-            headerToolbar={{
-              left: "",
-              center: "title",
-              right: "timeGridDay,timeGridWeek",
-            }}
-            slotMinTime="08:00:00"
-            slotMaxTime="20:00:00"
-            height="100%"
-            allDaySlot={false}
-            events={filteredEvents}
-            editable={true}
-            selectable={true}
-            selectMirror={true}
-            dayMaxEvents={true}
-            weekends={true}
-            nowIndicator={true}
-            locale="es"
-            buttonText={{
-              day: "Día",
-              week: "Semana",
-            }}
-            slotLabelFormat={{
-              hour: "numeric",
-              minute: "2-digit",
-              omitZeroMinute: false,
-            }}
-            eventTimeFormat={{
-              hour: "numeric",
-              minute: "2-digit",
-              meridiem: false,
-            }}
-            select={handleDateSelect}
-            eventClick={handleEventClick}
-            eventContent={(eventInfo) => (
-              <div style={{padding: '4px', fontSize: '12px'}}>
-                <div style={{fontWeight: 'bold'}}>{eventInfo.event.title}</div>
-                <div>{eventInfo.event.extendedProps.client}</div>
-                <div>{eventInfo.event.extendedProps.price}€</div>
-              </div>
-            )}
-          />
+      {!loading && (
+        <div className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
+          <div className="h-[600px] p-4">
+            <FullCalendar
+              ref={calendarRef}
+              plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
+              initialView="timeGridDay"
+              headerToolbar={{
+                left: "",
+                center: "title",
+                right: "timeGridDay,timeGridWeek",
+              }}
+              slotMinTime="08:00:00"
+              slotMaxTime="20:00:00"
+              height="100%"
+              allDaySlot={false}
+              events={filteredEvents}
+              editable={true}
+              selectable={true}
+              selectMirror={true}
+              dayMaxEvents={true}
+              weekends={true}
+              nowIndicator={true}
+              locale="es"
+              buttonText={{
+                day: "Día",
+                week: "Semana",
+              }}
+              slotLabelFormat={{
+                hour: "numeric",
+                minute: "2-digit",
+                omitZeroMinute: false,
+              }}
+              eventTimeFormat={{
+                hour: "numeric",
+                minute: "2-digit",
+                meridiem: false,
+              }}
+              select={handleDateSelect}
+              eventClick={handleEventClick}
+              eventContent={(eventInfo) => (
+                <div className="p-1.5 text-xs">
+                  <div className="font-medium">{eventInfo.event.title}</div>
+                  <div>{eventInfo.event.extendedProps.client}</div>
+                  <div>{eventInfo.event.extendedProps.price}€</div>
+                </div>
+              )}
+            />
+          </div>
         </div>
-      </div>
+      )}
 
       <Modal
         isOpen={showForm}
@@ -196,7 +215,7 @@ export function Calendar() {
         <AppointmentForm
           onClose={() => setShowForm(false)}
           onSave={handleSaveAppointment}
-          staffMembers={mockStaff}
+          staffMembers={staffMembers}
           date={selectedDate}
         />
       </Modal>
