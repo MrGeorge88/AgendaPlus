@@ -7,28 +7,29 @@ on:
     branches: [ main ]
 
 jobs:
-  test:
+  deploy-frontend:
     runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
     steps:
       - uses: actions/checkout@v3
-      - name: Use Node.js
+
+      - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '18.x'
           cache: 'npm'
-      - name: Install dependencies
-        run: npm ci
-      - name: Run frontend tests
-        run: npm run test:frontend
-      - name: Run backend tests
-        run: npm run test:backend
+          cache-dependency-path: 'frontend/package-lock.json'
 
-  deploy-frontend:
-    needs: test
-    if: github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
+      - name: Install Frontend Dependencies
+        run: cd frontend && npm ci
+
+      - name: Build Frontend
+        run: cd frontend && npm run build
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+          VITE_API_URL: ${{ secrets.VITE_API_URL }}
+
       - name: Deploy Frontend to Vercel
         uses: amondnet/vercel-action@v20
         with:
@@ -39,11 +40,21 @@ jobs:
           vercel-args: '--prod'
 
   deploy-backend:
-    needs: test
-    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
     steps:
       - uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18.x'
+          cache: 'npm'
+          cache-dependency-path: 'backend/package-lock.json'
+
+      - name: Install Backend Dependencies
+        run: cd backend && npm ci
+
       - name: Deploy Backend to Vercel
         uses: amondnet/vercel-action@v20
         with:

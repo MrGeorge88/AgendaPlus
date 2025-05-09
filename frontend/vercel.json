@@ -19,5 +19,10 @@
       "src": "/(.*)",
       "dest": "/index.html"
     }
-  ]
+  ],
+  "github": {
+    "enabled": true,
+    "silent": false,
+    "autoJobCancelation": true
+  }
 }
