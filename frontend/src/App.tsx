@@ -5,18 +5,10 @@ import { Clients } from './pages/clients';
 import { Services } from './pages/services';
 import { Staff } from './pages/staff';
 import { Income } from './pages/income';
-import { Clients as ClientsNew } from './pages/clients-new';
-import { Services as ServicesNew } from './pages/services-new';
 import { Login } from './pages/login';
 import { Register } from './pages/register';
 import { AuthCallback } from './pages/auth-callback';
 import { ProtectedRoute } from './components/auth/protected-route';
-import { TestPage } from './pages/test-page';
-import { LoginSimple } from './pages/login-simple';
-import { LoginDebug } from './pages/login-debug';
-import { LoginConsole } from './pages/login-console';
-import { LoginBasic } from './pages/login-basic';
-import { LoginTest } from './pages/login-test';
 import './index.css';
 import { AppProvider } from './contexts/app-context';
 import { NotificationProvider } from './components/ui/notification';
@@ -49,19 +41,9 @@ function App() {
                       <Clients />
                     </ProtectedRoute>
                   } />
-                  <Route path="/clients-new" element={
-                    <ProtectedRoute>
-                      <ClientsNew />
-                    </ProtectedRoute>
-                  } />
                   <Route path="/services" element={
                     <ProtectedRoute>
                       <Services />
-                    </ProtectedRoute>
-                  } />
-                  <Route path="/services-new" element={
-                    <ProtectedRoute>
-                      <ServicesNew />
                     </ProtectedRoute>
                   } />
                   <Route path="/staff" element={
@@ -74,12 +56,7 @@ function App() {
                       <Income />
                     </ProtectedRoute>
                   } />
-                  <Route path="/test" element={<TestPage />} />
-                  <Route path="/login-simple" element={<LoginSimple />} />
-                  <Route path="/login-debug" element={<LoginDebug />} />
-                  <Route path="/login-console" element={<LoginConsole />} />
-                  <Route path="/login-basic" element={<LoginBasic />} />
-                  <Route path="/login-test" element={<LoginTest />} />
+                  {/* Ruta de fallback */}
                   <Route path="*" element={<Navigate to="/" replace />} />
                 </Routes>
               </Router>

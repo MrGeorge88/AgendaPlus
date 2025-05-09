@@ -2,7 +2,7 @@ import React, { createContext, useContext, useReducer, ReactNode } from 'react';
 
 // Define types for our state
 export interface Client {
-  id: number;
+  id: string;
   name: string;
   email: string;
   phone: string;
@@ -13,7 +13,7 @@ export interface Client {
 }
 
 export interface Service {
-  id: number;
+  id: string;
   name: string;
   description: string;
   duration: number;
@@ -22,7 +22,7 @@ export interface Service {
 }
 
 export interface StaffMember {
-  id: number;
+  id: string;
   name: string;
   email: string;
   phone?: string;
@@ -32,11 +32,11 @@ export interface StaffMember {
 }
 
 export interface Appointment {
-  id: number;
+  id: string;
   title: string;
   start: string;
   end: string;
-  resourceId: number;
+  resourceId: string;
   backgroundColor?: string;
   borderColor?: string;
   extendedProps: {
@@ -67,19 +67,19 @@ type AppAction =
   | { type: 'SET_CLIENTS'; payload: Client[] }
   | { type: 'ADD_CLIENT'; payload: Client }
   | { type: 'UPDATE_CLIENT'; payload: Client }
-  | { type: 'DELETE_CLIENT'; payload: number }
+  | { type: 'DELETE_CLIENT'; payload: string }
   | { type: 'SET_SERVICES'; payload: Service[] }
   | { type: 'ADD_SERVICE'; payload: Service }
   | { type: 'UPDATE_SERVICE'; payload: Service }
-  | { type: 'DELETE_SERVICE'; payload: number }
+  | { type: 'DELETE_SERVICE'; payload: string }
   | { type: 'SET_STAFF'; payload: StaffMember[] }
   | { type: 'ADD_STAFF'; payload: StaffMember }
   | { type: 'UPDATE_STAFF'; payload: StaffMember }
-  | { type: 'DELETE_STAFF'; payload: number }
+  | { type: 'DELETE_STAFF'; payload: string }
   | { type: 'SET_APPOINTMENTS'; payload: Appointment[] }
   | { type: 'ADD_APPOINTMENT'; payload: Appointment }
   | { type: 'UPDATE_APPOINTMENT'; payload: Appointment }
-  | { type: 'DELETE_APPOINTMENT'; payload: number }
+  | { type: 'DELETE_APPOINTMENT'; payload: string }
   | { type: 'SET_LOADING'; payload: { key: keyof AppState['isLoading']; value: boolean } }
   | { type: 'SET_ERROR'; payload: string | null };
 

@@ -1,5 +1,5 @@
 import { api, API_ENDPOINTS } from '../config/api';
-import { supabase } from '../lib/supabase';
+import { supabase, supabaseUrl } from '../lib/supabase';
 
 export interface User {
   id: string;
@@ -56,19 +56,7 @@ export const authService = {
     } catch (error) {
       console.error('Error en signIn:', error);
 
-      // En desarrollo, podemos usar datos simulados para pruebas
-      if (process.env.NODE_ENV === 'development') {
-        console.log('Usando datos simulados para desarrollo');
-        return {
-          user: {
-            id: '1',
-            email,
-            name: 'Usuario Demo',
-            avatar_url: 'https://github.com/shadcn.png',
-          },
-          error: null,
-        };
-      }
+      // No usar datos simulados en producción
 
       return {
         user: null,
@@ -121,19 +109,7 @@ export const authService = {
     } catch (error) {
       console.error('Error en signUp:', error);
 
-      // En desarrollo, podemos usar datos simulados para pruebas
-      if (process.env.NODE_ENV === 'development' && !supabaseUrl.includes('supabase.co')) {
-        console.log('Usando datos simulados para desarrollo');
-        return {
-          user: {
-            id: '1',
-            email,
-            name: name || 'Usuario Demo',
-            avatar_url: 'https://github.com/shadcn.png',
-          },
-          error: null,
-        };
-      }
+      // No usar datos simulados en producción
 
       return {
         user: null,
@@ -188,19 +164,7 @@ export const authService = {
     } catch (error) {
       console.error('Error en getCurrentUser:', error);
 
-      // En desarrollo, podemos usar datos simulados para pruebas
-      if (process.env.NODE_ENV === 'development') {
-        console.log('Usando datos simulados para desarrollo');
-        return {
-          user: {
-            id: '1',
-            email: 'usuario@demo.com',
-            name: 'Usuario Demo',
-            avatar_url: 'https://github.com/shadcn.png',
-          },
-          error: null,
-        };
-      }
+      // No usar datos simulados en producción
 
       return {
         user: null,

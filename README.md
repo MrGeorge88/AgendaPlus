@@ -32,7 +32,7 @@ Este proyecto es un monorepo que contiene:
 
 1. Clona el repositorio:
 ```bash
-git clone https://github.com/tu-usuario/AgendaPlus.git
+git clone https://github.com/MrGeorge88/AgendaPlus.git
 cd AgendaPlus
 ```
 
@@ -41,10 +41,10 @@ cd AgendaPlus
 npm install
 ```
 
-3. Configura las variables de entorno:
+3. Configura Supabase y las variables de entorno:
 ```bash
-cp backend/.env.example backend/.env
-# Edita el archivo .env con tus credenciales
+node deploy.js
+# Sigue las instrucciones para configurar Supabase
 ```
 
 ## Desarrollo
@@ -86,21 +86,62 @@ npm run dev:backend
 
 ## Despliegue
 
+### Configuración de Supabase
+
+1. Crea una cuenta en [Supabase](https://supabase.com) si aún no tienes una.
+2. Crea un nuevo proyecto en Supabase.
+3. Obtén las credenciales de tu proyecto (URL y claves API) desde la sección "Settings > API".
+4. Ejecuta el script de configuración:
+   ```bash
+   node deploy.js
+   ```
+5. Configura el esquema de la base de datos:
+   - Ve a la sección "SQL Editor" en el panel de Supabase.
+   - Copia y pega el contenido del archivo `supabase-schema.sql`.
+   - Ejecuta el script para crear las tablas necesarias.
+6. (Opcional) Inserta datos de ejemplo:
+   - Copia y pega el contenido del archivo `supabase-seed.sql`.
+   - Ejecuta el script para insertar datos de ejemplo.
+7. Configura la autenticación por email:
+   - Ve a "Authentication > Providers" y asegúrate de que "Email" esté habilitado.
+   - Configura las plantillas de email en "Authentication > Email Templates".
+
+### Prueba de Conexión con Supabase
+
+Para verificar que la conexión con Supabase funciona correctamente:
+```bash
+node test-supabase.js
+```
+
+### Despliegue en Vercel
+
+1. Crea una cuenta en [Vercel](https://vercel.com) si aún no tienes una.
+2. Instala la CLI de Vercel:
+   ```bash
+   npm install -g vercel
+   ```
+3. Inicia sesión en Vercel:
+   ```bash
+   vercel login
+   ```
+4. Despliega el frontend:
+   ```bash
+   cd frontend
+   vercel
+   ```
+5. Configura las variables de entorno en Vercel:
+   - `VITE_SUPABASE_URL`: URL de tu proyecto de Supabase
+   - `VITE_SUPABASE_ANON_KEY`: Clave anónima de Supabase
+
 ### GitHub
-El código fuente se aloja en GitHub. Para contribuir al proyecto:
+El código fuente se aloja en GitHub en [https://github.com/MrGeorge88/AgendaPlus](https://github.com/MrGeorge88/AgendaPlus).
+
+Para contribuir al proyecto:
 1. Haz un fork del repositorio
 2. Crea una rama para tu funcionalidad (`git checkout -b feature/nueva-funcionalidad`)
 3. Haz commit de tus cambios (`git commit -am 'Añadir nueva funcionalidad'`)
 4. Haz push a la rama (`git push origin feature/nueva-funcionalidad`)
 5. Crea un Pull Request
-
-### Vercel
-El frontend se despliega automáticamente en Vercel con cada push a la rama principal.
-URL de producción: [https://agenda-plus.vercel.app](https://agenda-plus.vercel.app)
-
-### Supabase
-La base de datos y autenticación se gestionan a través de Supabase.
-Para acceder al panel de administración: [https://app.supabase.io](https://app.supabase.io)
 
 ## Licencia
 
