@@ -76,7 +76,7 @@ export function Topbar({ title, onMenuToggle, isMobile = false }: TopbarProps) {
             onClick={toggleUserMenu}
             className="cursor-pointer"
           >
-            <AvatarImage src={user?.avatar_url || "https://github.com/shadcn.png"} alt="User" />
+            <AvatarImage src={user?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || 'User')}&background=random`} alt={user?.name || "User"} />
             <AvatarFallback>{user?.name?.charAt(0) || "U"}</AvatarFallback>
           </Avatar>
 

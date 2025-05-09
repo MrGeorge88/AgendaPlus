@@ -1,24 +1,47 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Layout } from '../components/layout/layout';
 import { Button } from '../components/ui/button';
 import { Card } from '../components/ui/card';
 import { Modal } from '../components/ui/modal';
 import { Plus, Search, Edit, Trash2, Phone, Mail } from 'lucide-react';
-
-// Datos de ejemplo para clientes
-const mockClients = [
-  { id: 1, name: "Juan Pérez", email: "juan@example.com", phone: "123-456-7890", lastVisit: "2023-04-15", totalSpent: 150 },
-  { id: 2, name: "María López", email: "maria@example.com", phone: "123-456-7891", lastVisit: "2023-04-20", totalSpent: 200 },
-  { id: 3, name: "Carlos Gómez", email: "carlos@example.com", phone: "123-456-7892", lastVisit: "2023-04-25", totalSpent: 100 },
-  { id: 4, name: "Ana Martínez", email: "ana@example.com", phone: "123-456-7893", lastVisit: "2023-04-30", totalSpent: 300 },
-  { id: 5, name: "Pedro Sánchez", email: "pedro@example.com", phone: "123-456-7894", lastVisit: "2023-05-01", totalSpent: 250 },
-];
+import { useAuth } from '../contexts/auth-context';
+import { useLanguage } from '../contexts/language-context';
+import { useNotification } from '../components/ui/notification';
+import { clientsService, Client } from '../services/clients';
 
 export function Clients() {
+  const { t } = useLanguage();
+  const { user } = useAuth();
+  const { showNotification } = useNotification();
   const [searchTerm, setSearchTerm] = useState('');
-  const [clients, setClients] = useState(mockClients);
+  const [clients, setClients] = useState<Client[]>([]);
+  const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
-  const [currentClient, setCurrentClient] = useState<any>(null);
+  const [currentClient, setCurrentClient] = useState<Client | null>(null);
+
+  // Cargar datos de clientes
+  useEffect(() => {
+    const loadClients = async () => {
+      if (user) {
+        try {
+          setLoading(true);
+          const clientsData = await clientsService.getClients(user.id);
+          setClients(clientsData);
+        } catch (error) {
+          console.error('Error al cargar los clientes:', error);
+          showNotification({
+            title: t('common.error'),
+            message: t('clients.errorLoading'),
+            type: 'error'
+          });
+        } finally {
+          setLoading(false);
+        }
+      }
+    };
+
+    loadClients();
+  }, [user, t, showNotification]);
 
   const filteredClients = clients.filter(client =>
     client.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -31,219 +54,226 @@ export function Clients() {
     setShowForm(true);
   };
 
-  const handleEditClient = (client: any) => {
+  const handleEditClient = (client: Client) => {
     setCurrentClient(client);
     setShowForm(true);
   };
 
-  const handleDeleteClient = (id: number) => {
-    if (confirm('¿Estás seguro de que deseas eliminar este cliente?')) {
-      setClients(prev => prev.filter(client => client.id !== id));
+  const handleDeleteClient = async (id: string) => {
+    if (confirm(t('clients.deleteConfirm'))) {
+      try {
+        const success = await clientsService.deleteClient(id);
+        if (success) {
+          setClients(prev => prev.filter(client => client.id !== id));
+          showNotification({
+            title: t('common.success'),
+            message: t('clients.deleteSuccess'),
+            type: 'success'
+          });
+        } else {
+          throw new Error('Error al eliminar');
+        }
+      } catch (error) {
+        console.error('Error al eliminar el cliente:', error);
+        showNotification({
+          title: t('common.error'),
+          message: t('clients.deleteError'),
+          type: 'error'
+        });
+      }
+    }
+  };
+
+  const handleSubmitForm = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const form = e.target as HTMLFormElement;
+    const formData = new FormData(form);
+
+    try {
+      if (user) {
+        const clientData = {
+          name: formData.get('name') as string,
+          email: formData.get('email') as string,
+          phone: formData.get('phone') as string,
+          notes: formData.get('notes') as string,
+          userId: user.id
+        };
+
+        let result;
+        if (currentClient) {
+          // Actualizar cliente existente
+          result = await clientsService.updateClient({
+            ...clientData,
+            id: currentClient.id,
+            lastVisit: currentClient.lastVisit,
+            totalSpent: currentClient.totalSpent
+          });
+          if (result) {
+            setClients(prev => prev.map(client => client.id === currentClient.id ? result! : client));
+            showNotification({
+              title: t('common.success'),
+              message: t('clients.updateSuccess'),
+              type: 'success'
+            });
+          }
+        } else {
+          // Añadir nuevo cliente
+          result = await clientsService.createClient(clientData, user.id);
+          if (result) {
+            setClients(prev => [...prev, result!]);
+            showNotification({
+              title: t('common.success'),
+              message: t('clients.createSuccess'),
+              type: 'success'
+            });
+          }
+        }
+
+        if (!result) throw new Error('Error en la operación');
+        setShowForm(false);
+      }
+    } catch (error) {
+      console.error('Error al guardar el cliente:', error);
+      showNotification({
+        title: t('common.error'),
+        message: currentClient ? t('clients.updateError') : t('clients.createError'),
+        type: 'error'
+      });
     }
   };
 
   return (
     <Layout title="Clientes">
-      <div style={{marginBottom: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
-        <div style={{position: 'relative', width: '250px'}}>
-          <Search style={{position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', width: '16px', height: '16px', color: '#94a3b8'}} />
+      <div className="mb-6 flex flex-col justify-between gap-4 md:flex-row md:items-center">
+        <div className="relative w-full md:w-64">
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
           <input
             type="text"
-            placeholder="Buscar clientes..."
-            style={{
-              width: '100%',
-              padding: '8px 12px 8px 36px',
-              border: '1px solid #e2e8f0',
-              borderRadius: '8px'
-            }}
+            placeholder={t('clients.searchPlaceholder')}
+            className="w-full rounded-lg border border-slate-300 py-2 pl-10 pr-4"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
-        <button
-          onClick={handleAddClient}
-          className="btn btn-primary"
-          style={{display: 'flex', alignItems: 'center', gap: '4px'}}
-        >
-          <Plus style={{width: '16px', height: '16px'}} /> Nuevo cliente
-        </button>
+        <Button onClick={handleAddClient} className="flex items-center gap-1">
+          <Plus className="h-4 w-4" /> {t('clients.newClient')}
+        </Button>
       </div>
 
-      <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '16px'}}>
-        {filteredClients.map(client => (
-          <div key={client.id} className="card" style={{display: 'flex', flexDirection: 'column'}}>
-            <div style={{display: 'flex', justifyContent: 'space-between', padding: '16px'}}>
-              <div>
-                <h3 style={{fontSize: '18px', fontWeight: 'bold'}}>{client.name}</h3>
-                <div style={{marginTop: '8px'}}>
-                  <div style={{display: 'flex', alignItems: 'center', marginBottom: '4px'}}>
-                    <Phone style={{marginRight: '8px', width: '16px', height: '16px'}} /> {client.phone}
+      {loading ? (
+        <div className="flex h-64 items-center justify-center">
+          <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
+          <span className="ml-2">{t('common.loading')}</span>
+        </div>
+      ) : (
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {filteredClients.map(client => (
+            <Card key={client.id} className="flex flex-col">
+              <div className="flex items-start justify-between p-4">
+                <div>
+                  <h3 className="text-lg font-bold">{client.name}</h3>
+                  <div className="mt-2 space-y-1">
+                    <div className="flex items-center text-sm text-slate-500">
+                      <Phone className="mr-2 h-4 w-4" /> {client.phone}
+                    </div>
+                    <div className="flex items-center text-sm text-slate-500">
+                      <Mail className="mr-2 h-4 w-4" /> {client.email}
+                    </div>
                   </div>
-                  <div style={{display: 'flex', alignItems: 'center'}}>
-                    <Mail style={{marginRight: '8px', width: '16px', height: '16px'}} /> {client.email}
+                </div>
+                <div className="flex space-x-2">
+                  <button
+                    onClick={() => handleEditClient(client)}
+                    className="rounded-full p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+                  >
+                    <Edit className="h-4 w-4" />
+                  </button>
+                  <button
+                    onClick={() => handleDeleteClient(client.id)}
+                    className="rounded-full p-1 text-slate-400 hover:bg-red-100 hover:text-red-600"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+                </div>
+              </div>
+              <div className="mt-auto border-t p-4">
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-slate-500">{t('clients.lastVisit')}:</span>
+                    <span>{client.lastVisit}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-slate-500">{t('clients.totalSpent')}:</span>
+                    <span className="font-medium">{client.totalSpent}€</span>
                   </div>
                 </div>
               </div>
-              <div style={{display: 'flex', gap: '8px'}}>
-                <button
-                  onClick={() => handleEditClient(client)}
-                  style={{
-                    borderRadius: '50%',
-                    padding: '4px',
-                    color: '#94a3b8',
-                    cursor: 'pointer'
-                  }}
-                >
-                  <Edit style={{width: '16px', height: '16px'}} />
-                </button>
-                <button
-                  onClick={() => handleDeleteClient(client.id)}
-                  style={{
-                    borderRadius: '50%',
-                    padding: '4px',
-                    color: '#94a3b8',
-                    cursor: 'pointer'
-                  }}
-                >
-                  <Trash2 style={{width: '16px', height: '16px'}} />
-                </button>
-              </div>
-            </div>
-            <div style={{marginTop: 'auto', borderTop: '1px solid #e2e8f0', padding: '16px'}}>
-              <div style={{display: 'flex', justifyContent: 'space-between', fontSize: '14px', marginBottom: '4px'}}>
-                <span style={{color: '#64748b'}}>Última visita:</span>
-                <span>{client.lastVisit}</span>
-              </div>
-              <div style={{display: 'flex', justifyContent: 'space-between', fontSize: '14px'}}>
-                <span style={{color: '#64748b'}}>Total gastado:</span>
-                <span style={{fontWeight: '500'}}>{client.totalSpent}€</span>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
+            </Card>
+          ))}
+        </div>
+      )}
 
-      {filteredClients.length === 0 && (
-        <div style={{marginTop: '32px', textAlign: 'center'}}>
-          <p style={{color: '#64748b'}}>No se encontraron clientes que coincidan con la búsqueda.</p>
+      {!loading && filteredClients.length === 0 && (
+        <div className="mt-8 text-center">
+          <p className="text-slate-500">{t('clients.noResults')}</p>
         </div>
       )}
 
       <Modal
         isOpen={showForm}
         onClose={() => setShowForm(false)}
-        title={currentClient ? 'Editar cliente' : 'Nuevo cliente'}
+        title={currentClient ? t('clients.editClient') : t('clients.newClient')}
       >
-
-            <form style={{display: 'flex', flexDirection: 'column', gap: '16px'}} onSubmit={(e) => {
-              e.preventDefault();
-              const form = e.target as HTMLFormElement;
-              const formData = new FormData(form);
-
-              const clientData = {
-                id: currentClient?.id || clients.length + 1,
-                name: formData.get('name') as string,
-                email: formData.get('email') as string,
-                phone: formData.get('phone') as string,
-                notes: formData.get('notes') as string,
-                lastVisit: currentClient?.lastVisit || 'Nunca',
-                totalSpent: currentClient?.totalSpent || 0,
-                avatar: currentClient?.avatar || `https://i.pravatar.cc/150?img=${clients.length + 1}`
-              };
-
-              if (currentClient) {
-                // Update existing client
-                setClients(prev =>
-                  prev.map(client => client.id === currentClient.id ? clientData : client)
-                );
-              } else {
-                // Add new client
-                setClients(prev => [...prev, clientData]);
-              }
-
-              setShowForm(false);
-            }}>
+            <form className="space-y-4" onSubmit={handleSubmitForm}>
               <div>
-                <label style={{display: 'block', marginBottom: '4px', fontSize: '14px', fontWeight: '500'}}>
-                  Nombre completo
-                </label>
+                <label className="mb-1 block text-sm font-medium">{t('clients.name')}</label>
                 <input
                   type="text"
                   name="name"
-                  style={{
-                    width: '100%',
-                    padding: '8px 12px',
-                    border: '1px solid #e2e8f0',
-                    borderRadius: '8px'
-                  }}
+                  className="w-full rounded-lg border border-slate-300 p-2"
                   defaultValue={currentClient?.name || ''}
                   required
                 />
               </div>
 
               <div>
-                <label style={{display: 'block', marginBottom: '4px', fontSize: '14px', fontWeight: '500'}}>
-                  Email
-                </label>
+                <label className="mb-1 block text-sm font-medium">{t('clients.email')}</label>
                 <input
                   type="email"
                   name="email"
-                  style={{
-                    width: '100%',
-                    padding: '8px 12px',
-                    border: '1px solid #e2e8f0',
-                    borderRadius: '8px'
-                  }}
+                  className="w-full rounded-lg border border-slate-300 p-2"
                   defaultValue={currentClient?.email || ''}
                 />
               </div>
 
               <div>
-                <label style={{display: 'block', marginBottom: '4px', fontSize: '14px', fontWeight: '500'}}>
-                  Teléfono
-                </label>
+                <label className="mb-1 block text-sm font-medium">{t('clients.phone')}</label>
                 <input
                   type="tel"
                   name="phone"
-                  style={{
-                    width: '100%',
-                    padding: '8px 12px',
-                    border: '1px solid #e2e8f0',
-                    borderRadius: '8px'
-                  }}
+                  className="w-full rounded-lg border border-slate-300 p-2"
                   defaultValue={currentClient?.phone || ''}
                   required
                 />
               </div>
 
               <div>
-                <label style={{display: 'block', marginBottom: '4px', fontSize: '14px', fontWeight: '500'}}>
-                  Notas
-                </label>
+                <label className="mb-1 block text-sm font-medium">{t('clients.notes')}</label>
                 <textarea
                   name="notes"
-                  style={{
-                    width: '100%',
-                    padding: '8px 12px',
-                    border: '1px solid #e2e8f0',
-                    borderRadius: '8px',
-                    minHeight: '80px'
-                  }}
+                  className="w-full rounded-lg border border-slate-300 p-2"
+                  rows={4}
                   defaultValue={currentClient?.notes || ''}
                 ></textarea>
               </div>
 
-              <div style={{display: 'flex', justifyContent: 'flex-end', gap: '8px', marginTop: '8px'}}>
-                <button
-                  type="button"
-                  className="btn btn-outline"
-                  onClick={() => setShowForm(false)}
-                >
-                  Cancelar
-                </button>
-                <button type="submit" className="btn btn-primary">
-                  {currentClient ? 'Actualizar' : 'Guardar'}
-                </button>
+              <div className="flex justify-end space-x-2">
+                <Button type="button" variant="outline" onClick={() => setShowForm(false)}>
+                  {t('common.cancel')}
+                </Button>
+                <Button type="submit">
+                  {currentClient ? t('common.update') : t('common.save')}
+                </Button>
               </div>
             </form>
       </Modal>

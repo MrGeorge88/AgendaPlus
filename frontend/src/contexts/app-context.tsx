@@ -10,6 +10,7 @@ export interface Client {
   totalSpent?: number;
   notes?: string;
   avatar?: string;
+  userId?: string;
 }
 
 export interface Service {

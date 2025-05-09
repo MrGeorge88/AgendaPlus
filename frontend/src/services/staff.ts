@@ -1,11 +1,14 @@
 import { supabase } from '../lib/supabase';
 
 export interface StaffMember {
-  id: number;
+  id: string; // Cambiado a string para UUID
   name: string;
   color: string;
   avatar: string;
   userId: string;
+  email?: string;
+  phone?: string;
+  specialty?: string;
 }
 
 export const staffService = {
@@ -20,30 +23,22 @@ export const staffService = {
       if (error) throw error;
 
       if (!data || data.length === 0) {
-        // Si no hay datos, devolver datos de ejemplo
-        return [
-          { id: 1, name: "Ana García", color: "#4f46e5", avatar: "https://i.pravatar.cc/150?img=1", userId },
-          { id: 2, name: "Carlos Rodríguez", color: "#ec4899", avatar: "https://i.pravatar.cc/150?img=2", userId },
-          { id: 3, name: "Elena Martínez", color: "#10b981", avatar: "https://i.pravatar.cc/150?img=3", userId },
-        ];
+        return []; // No devolver datos de ejemplo
       }
 
       return data.map(staff => ({
         id: staff.id,
         name: staff.name,
-        color: staff.color,
-        avatar: staff.avatar_url || `https://i.pravatar.cc/150?img=${staff.id}`,
-        userId: staff.user_id
+        color: staff.color || "#4f46e5",
+        avatar: staff.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(staff.name)}&background=random`,
+        userId: staff.user_id,
+        email: staff.email,
+        phone: staff.phone,
+        specialty: staff.specialty
       }));
     } catch (error) {
       console.error('Error al obtener el personal:', error);
-      
-      // En caso de error, devolver datos de ejemplo
-      return [
-        { id: 1, name: "Ana García", color: "#4f46e5", avatar: "https://i.pravatar.cc/150?img=1", userId },
-        { id: 2, name: "Carlos Rodríguez", color: "#ec4899", avatar: "https://i.pravatar.cc/150?img=2", userId },
-        { id: 3, name: "Elena Martínez", color: "#10b981", avatar: "https://i.pravatar.cc/150?img=3", userId },
-      ];
+      return []; // No devolver datos de ejemplo en caso de error
     }
   },
 
@@ -56,6 +51,9 @@ export const staffService = {
           name: staffMember.name,
           color: staffMember.color,
           avatar_url: staffMember.avatar,
+          email: staffMember.email,
+          phone: staffMember.phone,
+          specialty: staffMember.specialty,
           user_id: userId
         })
         .select()
@@ -67,8 +65,11 @@ export const staffService = {
         id: data.id,
         name: data.name,
         color: data.color,
-        avatar: data.avatar_url || `https://i.pravatar.cc/150?img=${data.id}`,
-        userId: data.user_id
+        avatar: data.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(data.name)}&background=random`,
+        userId: data.user_id,
+        email: data.email,
+        phone: data.phone,
+        specialty: data.specialty
       };
     } catch (error) {
       console.error('Error al crear el miembro del personal:', error);
@@ -84,7 +85,10 @@ export const staffService = {
         .update({
           name: staffMember.name,
           color: staffMember.color,
-          avatar_url: staffMember.avatar
+          avatar_url: staffMember.avatar,
+          email: staffMember.email,
+          phone: staffMember.phone,
+          specialty: staffMember.specialty
         })
         .eq('id', staffMember.id)
         .select()
@@ -96,8 +100,11 @@ export const staffService = {
         id: data.id,
         name: data.name,
         color: data.color,
-        avatar: data.avatar_url || `https://i.pravatar.cc/150?img=${data.id}`,
-        userId: data.user_id
+        avatar: data.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(data.name)}&background=random`,
+        userId: data.user_id,
+        email: data.email,
+        phone: data.phone,
+        specialty: data.specialty
       };
     } catch (error) {
       console.error('Error al actualizar el miembro del personal:', error);
@@ -106,7 +113,7 @@ export const staffService = {
   },
 
   // Eliminar un miembro del personal
-  deleteStaffMember: async (id: number): Promise<boolean> => {
+  deleteStaffMember: async (id: string): Promise<boolean> => {
     try {
       const { error } = await supabase
         .from('staff')

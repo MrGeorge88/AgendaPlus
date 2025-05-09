@@ -33,18 +33,22 @@ export function AppointmentForm({ onClose, onSave, staffMembers, date = new Date
     const startDateTime = new Date(`${formData.date}T${formData.startTime}`);
     const endDateTime = new Date(`${formData.date}T${formData.endTime}`);
 
+    const staffMember = staffMembers.find(staff => staff.id === formData.staffId);
+
     const appointment = {
       title: formData.title,
       start: startDateTime.toISOString(),
       end: endDateTime.toISOString(),
-      resourceId: parseInt(formData.staffId.toString()),
-      backgroundColor: staffMembers.find(staff => staff.id === parseInt(formData.staffId.toString()))?.color || "#4f46e5",
-      borderColor: staffMembers.find(staff => staff.id === parseInt(formData.staffId.toString()))?.color || "#4f46e5",
+      resourceId: formData.staffId,
+      backgroundColor: staffMember?.color || "#4f46e5",
+      borderColor: staffMember?.color || "#4f46e5",
       extendedProps: {
         client: formData.clientName,
         service: formData.title,
-        price: parseFloat(formData.price),
-        status: formData.status,
+        price: parseFloat(formData.price) || 0,
+        status: formData.status as 'confirmed' | 'pending' | 'cancelled' | 'no-show' | 'scheduled',
+        userId: '',
+        notes: '',
       },
     };
 

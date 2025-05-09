@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Layout } from '../components/layout/layout';
 import { Button } from '../components/ui/button';
 import { Card } from '../components/ui/card';
@@ -6,21 +6,43 @@ import { Avatar, AvatarFallback, AvatarImage } from '../components/ui/avatar';
 import { Modal } from '../components/ui/modal';
 import { Plus, Search, Edit, Trash2, Phone, Mail, Briefcase } from 'lucide-react';
 import { useLanguage } from '../contexts/language-context';
-
-// Datos de ejemplo para el personal
-const mockStaff = [
-  { id: 1, name: "Ana García", email: "ana@example.com", phone: "123-456-7890", specialty: "Peluquería", color: "#4f46e5", avatar: "https://i.pravatar.cc/150?img=1" },
-  { id: 2, name: "Carlos Rodríguez", email: "carlos@example.com", phone: "123-456-7891", specialty: "Manicura y Pedicura", color: "#ec4899", avatar: "https://i.pravatar.cc/150?img=2" },
-  { id: 3, name: "Elena Martínez", email: "elena@example.com", phone: "123-456-7892", specialty: "Masajes", color: "#10b981", avatar: "https://i.pravatar.cc/150?img=3" },
-  { id: 4, name: "David López", email: "david@example.com", phone: "123-456-7893", specialty: "Estética", color: "#f59e0b", avatar: "https://i.pravatar.cc/150?img=4" },
-];
+import { useAuth } from '../contexts/auth-context';
+import { staffService, StaffMember } from '../services/staff';
+import { useNotification } from '../components/ui/notification';
 
 export function Staff() {
   const { t } = useLanguage();
+  const { user } = useAuth();
+  const { showNotification } = useNotification();
   const [searchTerm, setSearchTerm] = useState('');
-  const [staff, setStaff] = useState(mockStaff);
+  const [staff, setStaff] = useState<StaffMember[]>([]);
+  const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
-  const [currentStaff, setCurrentStaff] = useState<any>(null);
+  const [currentStaff, setCurrentStaff] = useState<StaffMember | null>(null);
+
+  // Cargar datos del personal
+  useEffect(() => {
+    const loadStaff = async () => {
+      if (user) {
+        try {
+          setLoading(true);
+          const staffData = await staffService.getStaffMembers(user.id);
+          setStaff(staffData);
+        } catch (error) {
+          console.error('Error al cargar el personal:', error);
+          showNotification({
+            title: t('common.error'),
+            message: t('staff.errorLoading'),
+            type: 'error'
+          });
+        } finally {
+          setLoading(false);
+        }
+      }
+    };
+
+    loadStaff();
+  }, [user, t, showNotification]);
 
   const filteredStaff = staff.filter(person =>
     person.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -33,14 +55,91 @@ export function Staff() {
     setShowForm(true);
   };
 
-  const handleEditStaff = (person: any) => {
+  const handleEditStaff = (person: StaffMember) => {
     setCurrentStaff(person);
     setShowForm(true);
   };
 
-  const handleDeleteStaff = (id: number) => {
+  const handleDeleteStaff = async (id: string) => {
     if (confirm(t('staff.deleteConfirm'))) {
-      setStaff(prev => prev.filter(person => person.id !== id));
+      try {
+        const success = await staffService.deleteStaffMember(id);
+        if (success) {
+          setStaff(prev => prev.filter(person => person.id !== id));
+          showNotification({
+            title: t('common.success'),
+            message: t('staff.deleteSuccess'),
+            type: 'success'
+          });
+        } else {
+          throw new Error('Error al eliminar');
+        }
+      } catch (error) {
+        console.error('Error al eliminar el miembro del personal:', error);
+        showNotification({
+          title: t('common.error'),
+          message: t('staff.deleteError'),
+          type: 'error'
+        });
+      }
+    }
+  };
+
+  const handleSubmitForm = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const form = e.target as HTMLFormElement;
+    const formData = new FormData(form);
+
+    try {
+      if (user) {
+        const staffData = {
+          name: formData.get('name') as string,
+          specialty: formData.get('specialty') as string,
+          email: formData.get('email') as string,
+          phone: formData.get('phone') as string,
+          color: formData.get('color') as string,
+          avatar: currentStaff?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(formData.get('name') as string)}&background=random`,
+          userId: user.id
+        };
+
+        let result;
+        if (currentStaff) {
+          // Actualizar miembro existente
+          result = await staffService.updateStaffMember({
+            ...staffData,
+            id: currentStaff.id
+          });
+          if (result) {
+            setStaff(prev => prev.map(person => person.id === currentStaff.id ? result! : person));
+            showNotification({
+              title: t('common.success'),
+              message: t('staff.updateSuccess'),
+              type: 'success'
+            });
+          }
+        } else {
+          // Añadir nuevo miembro
+          result = await staffService.createStaffMember(staffData, user.id);
+          if (result) {
+            setStaff(prev => [...prev, result!]);
+            showNotification({
+              title: t('common.success'),
+              message: t('staff.createSuccess'),
+              type: 'success'
+            });
+          }
+        }
+
+        if (!result) throw new Error('Error en la operación');
+        setShowForm(false);
+      }
+    } catch (error) {
+      console.error('Error al guardar el miembro del personal:', error);
+      showNotification({
+        title: t('common.error'),
+        message: currentStaff ? t('staff.updateError') : t('staff.createError'),
+        type: 'error'
+      });
     }
   };
 
@@ -62,51 +161,58 @@ export function Staff() {
         </Button>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {filteredStaff.map(person => (
-          <Card key={person.id} className="flex flex-col">
-            <div className="flex items-start justify-between p-4">
-              <div className="flex items-center">
-                <Avatar className="mr-3 h-12 w-12">
-                  <AvatarImage src={person.avatar} alt={person.name} />
-                  <AvatarFallback style={{ backgroundColor: person.color, color: "white" }}>
-                    {person.name.split(" ").map(n => n[0]).join("")}
-                  </AvatarFallback>
-                </Avatar>
-                <div>
-                  <h3 className="text-lg font-bold">{person.name}</h3>
-                  <div className="flex items-center text-sm text-slate-500">
-                    <Briefcase className="mr-1 h-3 w-3" /> {person.specialty}
+      {loading ? (
+        <div className="flex h-64 items-center justify-center">
+          <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
+          <span className="ml-2">{t('common.loading')}</span>
+        </div>
+      ) : (
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {filteredStaff.map(person => (
+            <Card key={person.id} className="flex flex-col">
+              <div className="flex items-start justify-between p-4">
+                <div className="flex items-center">
+                  <Avatar className="mr-3 h-10 w-10">
+                    <AvatarImage src={person.avatar} alt={person.name} />
+                    <AvatarFallback style={{ backgroundColor: person.color, color: "white" }}>
+                      {person.name.split(" ").map(n => n[0]).join("")}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <h3 className="text-lg font-bold">{person.name}</h3>
+                    <div className="flex items-center text-sm text-slate-500">
+                      <Briefcase className="mr-1 h-3 w-3" /> {person.specialty}
+                    </div>
+                  </div>
+                </div>
+                <div className="flex space-x-2">
+                  <button
+                    onClick={() => handleEditStaff(person)}
+                    className="rounded-full p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+                  >
+                    <Edit className="h-4 w-4" />
+                  </button>
+                  <button
+                    onClick={() => handleDeleteStaff(person.id)}
+                    className="rounded-full p-1 text-slate-400 hover:bg-red-100 hover:text-red-600"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+                </div>
+              </div>
+              <div className="mt-auto border-t p-4">
+                <div className="space-y-1 text-sm">
+                  <div className="flex items-center text-slate-500">
+                    <Phone className="mr-2 h-4 w-4" /> {person.phone}
+                  </div>
+                  <div className="flex items-center text-slate-500">
+                    <Mail className="mr-2 h-4 w-4" /> {person.email}
                   </div>
                 </div>
               </div>
-              <div className="flex space-x-2">
-                <button
-                  onClick={() => handleEditStaff(person)}
-                  className="rounded-full p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
-                >
-                  <Edit className="h-4 w-4" />
-                </button>
-                <button
-                  onClick={() => handleDeleteStaff(person.id)}
-                  className="rounded-full p-1 text-slate-400 hover:bg-red-100 hover:text-red-600"
-                >
-                  <Trash2 className="h-4 w-4" />
-                </button>
-              </div>
-            </div>
-            <div className="mt-auto border-t p-4">
-              <div className="space-y-1 text-sm">
-                <div className="flex items-center text-slate-500">
-                  <Phone className="mr-2 h-4 w-4" /> {person.phone}
-                </div>
-                <div className="flex items-center text-slate-500">
-                  <Mail className="mr-2 h-4 w-4" /> {person.email}
-                </div>
-              </div>
-            </div>
-          </Card>
-        ))}
+            </Card>
+          ))
+        }
       </div>
 
       {filteredStaff.length === 0 && (
@@ -120,34 +226,7 @@ export function Staff() {
         onClose={() => setShowForm(false)}
         title={currentStaff ? t('staff.editStaff') : t('staff.newStaff')}
       >
-
-            <form className="space-y-4" onSubmit={(e) => {
-              e.preventDefault();
-              const form = e.target as HTMLFormElement;
-              const formData = new FormData(form);
-
-              const staffData = {
-                id: currentStaff?.id || staff.length + 1,
-                name: formData.get('name') as string,
-                specialty: formData.get('specialty') as string,
-                email: formData.get('email') as string,
-                phone: formData.get('phone') as string,
-                color: formData.get('color') as string,
-                avatar: currentStaff?.avatar || `https://i.pravatar.cc/150?img=${staff.length + 1}`
-              };
-
-              if (currentStaff) {
-                // Update existing staff
-                setStaff(prev =>
-                  prev.map(person => person.id === currentStaff.id ? staffData : person)
-                );
-              } else {
-                // Add new staff
-                setStaff(prev => [...prev, staffData]);
-              }
-
-              setShowForm(false);
-            }}>
+            <form className="space-y-4" onSubmit={handleSubmitForm}>
               <div>
                 <label className="mb-1 block text-sm font-medium">{t('staff.name')}</label>
                 <input

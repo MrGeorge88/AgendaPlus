@@ -25,16 +25,18 @@ const mapSupabaseClient = (client: SupabaseClient): Client => ({
   lastVisit: client.last_visit ? formatDate(new Date(client.last_visit)) : 'Nunca',
   totalSpent: client.total_spent || 0,
   notes: client.notes || '',
+  userId: client.user_id,
 });
 
 // Servicio de clientes
 export const clientsService = {
   // Obtener todos los clientes
-  getClients: async (): Promise<Client[]> => {
+  getClients: async (userId: string): Promise<Client[]> => {
     try {
       const { data, error } = await supabase
         .from('clients')
         .select('*')
+        .eq('user_id', userId)
         .order('name', { ascending: true });
 
       if (error) throw error;
@@ -42,7 +44,7 @@ export const clientsService = {
       return data.map(mapSupabaseClient);
     } catch (error) {
       console.error('Error al obtener los clientes:', error);
-      throw new Error('No se pudieron cargar los clientes. Por favor, inténtalo de nuevo.');
+      return []; // Devolver un array vacío en lugar de lanzar un error
     }
   },
 
@@ -66,7 +68,7 @@ export const clientsService = {
   },
 
   // Crear un nuevo cliente
-  createClient: async (client: Omit<Client, 'id'>): Promise<Client> => {
+  createClient: async (client: Omit<Client, 'id'>, userId: string): Promise<Client | null> => {
     try {
       // Convertir al formato de Supabase
       const supabaseClient = {
@@ -77,7 +79,8 @@ export const clientsService = {
         total_spent: client.totalSpent || 0,
         last_visit: client.lastVisit && client.lastVisit !== 'Nunca'
           ? new Date(client.lastVisit).toISOString()
-          : null
+          : null,
+        user_id: userId
       };
 
       const { data, error } = await supabase
@@ -87,26 +90,30 @@ export const clientsService = {
         .single();
 
       if (error) throw error;
-      if (!data) throw new Error('No se pudo crear el cliente');
+      if (!data) return null;
 
       return mapSupabaseClient(data);
     } catch (error) {
       console.error('Error al crear el cliente:', error);
-      throw new Error('No se pudo crear el cliente. Por favor, inténtalo de nuevo.');
+      return null;
     }
   },
 
   // Actualizar un cliente existente
-  updateClient: async (id: string, client: Partial<Client>): Promise<Client> => {
+  updateClient: async (client: Client): Promise<Client | null> => {
     try {
       // Convertir al formato de Supabase
-      const supabaseClient: any = {};
+      const supabaseClient: any = {
+        name: client.name,
+        email: client.email || null,
+        phone: client.phone || null,
+        notes: client.notes || null
+      };
 
-      if (client.name !== undefined) supabaseClient.name = client.name;
-      if (client.email !== undefined) supabaseClient.email = client.email || null;
-      if (client.phone !== undefined) supabaseClient.phone = client.phone || null;
-      if (client.notes !== undefined) supabaseClient.notes = client.notes || null;
-      if (client.totalSpent !== undefined) supabaseClient.total_spent = client.totalSpent;
+      if (client.totalSpent !== undefined) {
+        supabaseClient.total_spent = client.totalSpent;
+      }
+
       if (client.lastVisit !== undefined) {
         supabaseClient.last_visit = client.lastVisit && client.lastVisit !== 'Nunca'
           ? new Date(client.lastVisit).toISOString()
@@ -116,22 +123,22 @@ export const clientsService = {
       const { data, error } = await supabase
         .from('clients')
         .update(supabaseClient)
-        .eq('id', id)
+        .eq('id', client.id)
         .select()
         .single();
 
       if (error) throw error;
-      if (!data) throw new Error(`Cliente con ID ${id} no encontrado`);
+      if (!data) return null;
 
       return mapSupabaseClient(data);
     } catch (error) {
-      console.error(`Error al actualizar el cliente con ID ${id}:`, error);
-      throw new Error('No se pudo actualizar el cliente. Por favor, inténtalo de nuevo.');
+      console.error(`Error al actualizar el cliente con ID ${client.id}:`, error);
+      return null;
     }
   },
 
   // Eliminar un cliente
-  deleteClient: async (id: string): Promise<void> => {
+  deleteClient: async (id: string): Promise<boolean> => {
     try {
       const { error } = await supabase
         .from('clients')
@@ -139,18 +146,20 @@ export const clientsService = {
         .eq('id', id);
 
       if (error) throw error;
+      return true;
     } catch (error) {
       console.error(`Error al eliminar el cliente con ID ${id}:`, error);
-      throw new Error('No se pudo eliminar el cliente. Por favor, inténtalo de nuevo.');
+      return false;
     }
   },
 
   // Buscar clientes
-  searchClients: async (query: string): Promise<Client[]> => {
+  searchClients: async (query: string, userId: string): Promise<Client[]> => {
     try {
       const { data, error } = await supabase
         .from('clients')
         .select('*')
+        .eq('user_id', userId)
         .or(`name.ilike.%${query}%,email.ilike.%${query}%,phone.ilike.%${query}%`)
         .order('name', { ascending: true });
 
@@ -159,7 +168,7 @@ export const clientsService = {
       return data.map(mapSupabaseClient);
     } catch (error) {
       console.error('Error al buscar clientes:', error);
-      throw new Error('No se pudieron buscar los clientes. Por favor, inténtalo de nuevo.');
+      return [];
     }
   },
 };

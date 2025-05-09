@@ -15,7 +15,7 @@ import { appointmentsService, Appointment } from "../../services/appointments";
 export function Calendar() {
   const { user } = useAuth();
   const [staffMembers, setStaffMembers] = useState<StaffMember[]>([]);
-  const [selectedStaff, setSelectedStaff] = useState<number[]>([]);
+  const [selectedStaff, setSelectedStaff] = useState<string[]>([]);
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
@@ -47,7 +47,7 @@ export function Calendar() {
     loadData();
   }, [user]);
 
-  const handleStaffFilterChange = (staffId: number) => {
+  const handleStaffFilterChange = (staffId: string) => {
     setSelectedStaff(prev => {
       if (prev.includes(staffId)) {
         return prev.filter(id => id !== staffId);
@@ -138,7 +138,12 @@ export function Calendar() {
                     <img
                       src={staffMember.avatar}
                       alt={staffMember.name}
-                      className="mr-2 h-6 w-6 rounded-full object-cover"
+                      className="mr-2 h-5 w-5 rounded-full object-cover"
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.onerror = null;
+                        target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(staffMember.name)}&background=random`;
+                      }}
                     />
                     <span>{staffMember.name}</span>
                   </button>
