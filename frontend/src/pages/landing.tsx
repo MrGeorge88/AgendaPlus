@@ -9,7 +9,7 @@ export function Landing() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-indigo-50 to-white">
       <header className="container mx-auto flex items-center justify-between p-4">
-        <div className="text-2xl font-bold text-primary">{t('common.appName')} - v2.0</div>
+        <div className="text-2xl font-bold text-primary">{t('common.appName')} - v2.1</div>
         <div className="flex items-center space-x-4">
           <LanguageSwitcher variant="minimal" />
           <Link to="/login">
