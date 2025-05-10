@@ -94,12 +94,13 @@ export function Staff() {
       if (user) {
         const staffData = {
           name: formData.get('name') as string,
-          email: formData.get('email') as string,
-          phone: formData.get('phone') as string,
           color: formData.get('color') as string,
           avatar: currentStaff?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(formData.get('name') as string)}&background=random`,
           userId: user.id,
-          specialty: '' // Set a default empty string since the column doesn't exist
+          // Include these fields in the frontend model but don't send to database
+          email: formData.get('email') as string,
+          phone: formData.get('phone') as string,
+          specialty: ''
         };
 
         let result;
@@ -245,24 +246,22 @@ export function Staff() {
               {/* Specialty field removed as it doesn't exist in the database */}
 
               <div>
-                <label className="mb-1 block text-sm font-medium">{t('staff.email')}</label>
+                <label className="mb-1 block text-sm font-medium">{t('staff.email')} ({t('common.optional')})</label>
                 <input
                   type="email"
                   name="email"
                   className="w-full rounded-lg border border-slate-300 p-2"
                   defaultValue={currentStaff?.email || ''}
-                  required
                 />
               </div>
 
               <div>
-                <label className="mb-1 block text-sm font-medium">{t('staff.phone')}</label>
+                <label className="mb-1 block text-sm font-medium">{t('staff.phone')} ({t('common.optional')})</label>
                 <input
                   type="tel"
                   name="phone"
                   className="w-full rounded-lg border border-slate-300 p-2"
                   defaultValue={currentStaff?.phone || ''}
-                  required
                 />
               </div>
 
