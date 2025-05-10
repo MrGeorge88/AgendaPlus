@@ -9,7 +9,6 @@ import { Login } from './pages/login';
 import { Register } from './pages/register';
 import { AuthCallback } from './pages/auth-callback';
 import { ProtectedRoute } from './components/auth/protected-route';
-import './index.css';
 import { AppProvider } from './contexts/app-context';
 import { NotificationProvider } from './components/ui/notification';
 import { ThemeProvider } from './contexts/theme-context';
