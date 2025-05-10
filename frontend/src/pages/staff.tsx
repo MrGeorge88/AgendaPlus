@@ -247,7 +247,6 @@ export function Staff() {
                   name="specialty"
                   className="w-full rounded-lg border border-slate-300 p-2"
                   defaultValue={currentStaff?.specialty || ''}
-                  required
                 />
               </div>
 

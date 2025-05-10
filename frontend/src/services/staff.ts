@@ -45,21 +45,33 @@ export const staffService = {
   // Crear un nuevo miembro del personal
   createStaffMember: async (staffMember: Omit<StaffMember, 'id'>, userId: string): Promise<StaffMember | null> => {
     try {
+      // Prepare the staff data
+      const staffData = {
+        name: staffMember.name,
+        color: staffMember.color,
+        avatar_url: staffMember.avatar,
+        email: staffMember.email,
+        phone: staffMember.phone,
+        user_id: userId
+      };
+
+      // Only add specialty if it's defined
+      if (staffMember.specialty) {
+        Object.assign(staffData, { specialty: staffMember.specialty });
+      }
+
+      console.log('Inserting staff member with data:', staffData);
+
       const { data, error } = await supabase
         .from('staff')
-        .insert({
-          name: staffMember.name,
-          color: staffMember.color,
-          avatar_url: staffMember.avatar,
-          email: staffMember.email,
-          phone: staffMember.phone,
-          specialty: staffMember.specialty,
-          user_id: userId
-        })
+        .insert(staffData)
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase error details:', error);
+        throw error;
+      }
 
       return {
         id: data.id,
@@ -80,21 +92,33 @@ export const staffService = {
   // Actualizar un miembro del personal existente
   updateStaffMember: async (staffMember: StaffMember): Promise<StaffMember | null> => {
     try {
+      // Prepare the staff data
+      const staffData = {
+        name: staffMember.name,
+        color: staffMember.color,
+        avatar_url: staffMember.avatar,
+        email: staffMember.email,
+        phone: staffMember.phone
+      };
+
+      // Only add specialty if it's defined
+      if (staffMember.specialty) {
+        Object.assign(staffData, { specialty: staffMember.specialty });
+      }
+
+      console.log('Updating staff member with data:', staffData);
+
       const { data, error } = await supabase
         .from('staff')
-        .update({
-          name: staffMember.name,
-          color: staffMember.color,
-          avatar_url: staffMember.avatar,
-          email: staffMember.email,
-          phone: staffMember.phone,
-          specialty: staffMember.specialty
-        })
+        .update(staffData)
         .eq('id', staffMember.id)
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase error details:', error);
+        throw error;
+      }
 
       return {
         id: data.id,
