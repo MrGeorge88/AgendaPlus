@@ -83,6 +83,17 @@ export const servicesService = {
 
       console.log('Creando servicio con datos:', supabaseService);
 
+      // Verificar si la tabla existe
+      const { error: tableCheckError } = await supabase
+        .from('services')
+        .select('count(*)', { count: 'exact', head: true });
+
+      if (tableCheckError) {
+        console.error('Error al verificar la tabla services:', tableCheckError);
+        throw new Error(`La tabla services no existe o no es accesible: ${tableCheckError.message}`);
+      }
+
+      // Intentar insertar el servicio
       const { data, error } = await supabase
         .from('services')
         .insert(supabaseService)
@@ -91,14 +102,23 @@ export const servicesService = {
 
       if (error) {
         console.error('Supabase error details:', error);
+        console.error('Error code:', error.code);
+        console.error('Error message:', error.message);
+        console.error('Error details:', error.details);
         throw error;
       }
+
       if (!data) throw new Error('No se pudo crear el servicio');
 
+      console.log('Servicio creado exitosamente:', data);
       return mapSupabaseService(data);
     } catch (error) {
       console.error('Error al crear el servicio:', error);
-      throw new Error('No se pudo crear el servicio. Por favor, inténtalo de nuevo.');
+      if (error instanceof Error) {
+        throw new Error(`No se pudo crear el servicio: ${error.message}`);
+      } else {
+        throw new Error('No se pudo crear el servicio. Por favor, inténtalo de nuevo.');
+      }
     }
   },
 

@@ -3,12 +3,13 @@ import { Layout } from '../components/layout/layout';
 import { Button } from '../components/ui/button';
 import { Card } from '../components/ui/card';
 import { Modal } from '../components/ui/modal';
-import { Plus, Search, Edit, Trash2, Clock, DollarSign } from 'lucide-react';
+import { Plus, Search, Edit, Trash2, Clock, DollarSign, Bug } from 'lucide-react';
 import { servicesService } from '../services/services';
 import { Service } from '../contexts/app-context';
 import { useAuth } from '../contexts/auth-context';
 import { useNotification } from '../components/ui/notification';
 import { useLanguage } from '../contexts/language-context';
+import { testSupabaseConnection, testCreateService, listSupabaseTables } from '../tests/supabase-test';
 
 export function Services() {
   const { t } = useLanguage();
@@ -97,9 +98,84 @@ export function Services() {
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
-        <Button onClick={handleAddService} className="flex items-center gap-1">
-          <Plus className="h-4 w-4" /> {t('services.new')}
-        </Button>
+        <div className="flex gap-2">
+          {process.env.NODE_ENV === 'development' && (
+            <Button
+              variant="outline"
+              onClick={async () => {
+                if (user) {
+                  // Verificar la conexión a Supabase
+                  const connectionTest = await testSupabaseConnection();
+                  if (connectionTest.success) {
+                    showNotification({
+                      title: 'Conexión exitosa',
+                      message: 'La conexión a Supabase funciona correctamente',
+                      type: 'success'
+                    });
+
+                    // Verificar las tablas disponibles
+                    const tablesTest = await listSupabaseTables();
+                    if (tablesTest.success) {
+                      console.log('Estado de las tablas:', tablesTest.data);
+
+                      // Verificar si la tabla services existe
+                      if (tablesTest.data.services && tablesTest.data.services.exists) {
+                        showNotification({
+                          title: 'Tabla services',
+                          message: 'La tabla services existe y es accesible',
+                          type: 'success'
+                        });
+
+                        // Intentar crear un servicio de prueba
+                        const createTest = await testCreateService(user.id);
+                        if (createTest.success) {
+                          showNotification({
+                            title: 'Prueba exitosa',
+                            message: 'Se creó un servicio de prueba correctamente',
+                            type: 'success'
+                          });
+                          // Recargar servicios
+                          const data = await servicesService.getServices(user.id);
+                          setServices(data);
+                        } else {
+                          showNotification({
+                            title: 'Error en prueba',
+                            message: `Error al crear servicio: ${createTest.error?.message || 'Error desconocido'}`,
+                            type: 'error'
+                          });
+                        }
+                      } else {
+                        showNotification({
+                          title: 'Error de tabla',
+                          message: 'La tabla services no existe o no es accesible. Ejecuta el script SQL para crearla.',
+                          type: 'error'
+                        });
+                      }
+                    } else {
+                      showNotification({
+                        title: 'Error al verificar tablas',
+                        message: `Error: ${tablesTest.error?.message || 'Error desconocido'}`,
+                        type: 'error'
+                      });
+                    }
+                  } else {
+                    showNotification({
+                      title: 'Error de conexión',
+                      message: `Error al conectar con Supabase: ${connectionTest.error?.message || 'Error desconocido'}`,
+                      type: 'error'
+                    });
+                  }
+                }
+              }}
+              className="flex items-center gap-1"
+            >
+              <Bug className="h-4 w-4" /> Test
+            </Button>
+          )}
+          <Button onClick={handleAddService} className="flex items-center gap-1">
+            <Plus className="h-4 w-4" /> {t('services.new')}
+          </Button>
+        </div>
       </div>
 
       {loading ? (
@@ -178,20 +254,50 @@ export function Services() {
               const formData = new FormData(form);
 
               try {
+                console.log('Formulario enviado');
+
+                // Validar datos del formulario
+                const name = formData.get('name') as string;
+                const category = formData.get('category') as string;
+                const priceStr = formData.get('price') as string;
+                const durationStr = formData.get('duration') as string;
+                const description = formData.get('description') as string;
+
+                if (!name || !category || !priceStr || !durationStr) {
+                  throw new Error('Todos los campos obligatorios deben estar completos');
+                }
+
+                const price = Number(priceStr);
+                const duration = Number(durationStr);
+
+                if (isNaN(price) || price <= 0) {
+                  throw new Error('El precio debe ser un número mayor que cero');
+                }
+
+                if (isNaN(duration) || duration <= 0) {
+                  throw new Error('La duración debe ser un número mayor que cero');
+                }
+
                 const serviceData = {
-                  name: formData.get('name') as string,
-                  category: formData.get('category') as string,
-                  price: Number(formData.get('price')),
-                  duration: Number(formData.get('duration')),
-                  description: formData.get('description') as string,
+                  name,
+                  category,
+                  price,
+                  duration,
+                  description,
                 };
+
+                console.log('Datos del servicio a guardar:', serviceData);
 
                 let result;
                 if (user) {
+                  console.log('Usuario autenticado:', user.id);
+
                   if (currentService) {
                     // Actualizar servicio existente
+                    console.log('Actualizando servicio existente con ID:', currentService.id);
                     result = await servicesService.updateService(currentService.id, serviceData);
                     if (result) {
+                      console.log('Servicio actualizado:', result);
                       setServices(prev => prev.map(service => service.id === currentService.id ? result! : service));
                       showNotification({
                         title: t('common.success'),
@@ -201,8 +307,10 @@ export function Services() {
                     }
                   } else {
                     // Añadir nuevo servicio
+                    console.log('Creando nuevo servicio para usuario:', user.id);
                     result = await servicesService.createService(serviceData, user.id);
                     if (result) {
+                      console.log('Servicio creado:', result);
                       setServices(prev => [...prev, result!]);
                       showNotification({
                         title: t('common.success'),
@@ -212,6 +320,7 @@ export function Services() {
                     }
                   }
                 } else {
+                  console.error('No hay usuario autenticado');
                   throw new Error('Usuario no autenticado');
                 }
 
@@ -219,9 +328,15 @@ export function Services() {
                 setShowForm(false);
               } catch (error) {
                 console.error('Error al guardar el servicio:', error);
+                let errorMessage = currentService ? t('services.updateError') : t('services.createError');
+
+                if (error instanceof Error) {
+                  errorMessage = error.message;
+                }
+
                 showNotification({
                   title: t('common.error'),
-                  message: currentService ? t('services.updateError') : t('services.createError'),
+                  message: errorMessage,
                   type: 'error'
                 });
               }
