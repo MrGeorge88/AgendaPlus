@@ -1,8 +1,0 @@
-<h2>Confirma tu nuevo email en AgendaPlus</h2>
-<p>Haz clic en el siguiente enlace para confirmar tu nuevo email:</p>
-<p><a href="{{ .ConfirmationURL }}">Confirmar nuevo email</a></p>
-<p>O copia y pega esta URL en tu navegador:</p>
-<p>{{ .ConfirmationURL }}</p>
-<p>El enlace expirará en {{ .ExpirationTime }}.</p>
-<p>Si no has solicitado este cambio, por favor contacta con soporte inmediatamente.</p>
-<p>--<br>AgendaPlus</p>

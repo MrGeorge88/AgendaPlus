@@ -117,7 +117,6 @@ export const appointmentsService = {
   // Crear una nueva cita
   createAppointment: async (appointment: Omit<Appointment, 'id'>, userId: string): Promise<Appointment | null> => {
     try {
-      console.log('Creating appointment with data:', appointment);
 
       // Manejar el staff_id correctamente
       let staffId = appointment.resourceId;
@@ -125,17 +124,7 @@ export const appointmentsService = {
       // Convertir el staff_id a número si es posible
       if (typeof staffId === 'string' && /^\d+$/.test(staffId)) {
         staffId = parseInt(staffId, 10);
-        console.log('Converted string staff ID to number:', staffId);
       }
-
-      // Verificar si el staff_id es un número
-      if (typeof staffId !== 'number') {
-        console.warn('Staff ID is not a number:', staffId);
-      }
-
-      // Imprimir información de depuración
-      console.log('Staff ID type:', typeof staffId);
-      console.log('Staff ID value:', staffId);
 
       // Transformar el formato de la cita para Supabase
       const supabaseAppointment = {

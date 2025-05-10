@@ -111,11 +111,7 @@ export function AppointmentForm({ onClose, onSave, staffMembers, date = new Date
     const staffMember = staffMembers.find(staff => staff.id === formData.staffId);
     const selectedService = services.find(service => service.id === formData.serviceId);
 
-    // Log the staff member to debug
-    console.log('Selected staff member:', staffMember);
-    console.log('Staff ID:', formData.staffId);
-    console.log('Staff ID type:', typeof formData.staffId);
-    console.log('All staff members:', staffMembers);
+    // Verificar que se haya seleccionado un miembro del personal
 
     // Asegurarse de que se haya seleccionado un profesional
     if (!staffMember) {
@@ -127,12 +123,6 @@ export function AppointmentForm({ onClose, onSave, staffMembers, date = new Date
     let staffId = formData.staffId;
     if (typeof staffId === 'string' && /^\d+$/.test(staffId)) {
       staffId = parseInt(staffId, 10);
-      console.log('Converted string staff ID to number:', staffId);
-    }
-
-    // Verificar si el ID del staff es un número
-    if (typeof staffId !== 'number') {
-      console.warn('El ID del staff no es un número:', staffId);
     }
 
     const appointment = {
