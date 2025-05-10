@@ -1,7 +1,7 @@
 import { supabase } from '../lib/supabase';
 
 export interface StaffMember {
-  id: string; // Cambiado a string para UUID
+  id: number; // ID es un número entero
   name: string;
   color: string;
   avatar: string;

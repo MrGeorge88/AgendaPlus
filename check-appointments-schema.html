@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verificar Esquema de Citas</title>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1 {
+            color: #4f46e5;
+        }
+        .card {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        input, button {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        button {
+            background-color: #4f46e5;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            margin-top: 10px;
+        }
+        button:hover {
+            background-color: #4338ca;
+        }
+        .result {
+            background-color: #f9fafb;
+            border-radius: 4px;
+            padding: 15px;
+            margin-top: 20px;
+            white-space: pre-wrap;
+            overflow-x: auto;
+        }
+        .error {
+            color: #ef4444;
+            margin-top: 10px;
+        }
+        .success {
+            color: #10b981;
+            margin-top: 10px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+    </style>
+</head>
+<body>
+    <h1>Verificar Esquema de Citas</h1>
+
+    <div class="card">
+        <div class="form-group">
+            <label for="supabaseUrl">URL de Supabase</label>
+            <input type="text" id="supabaseUrl" placeholder="https://your-project.supabase.co">
+        </div>
+
+        <div class="form-group">
+            <label for="supabaseKey">Clave Anónima de Supabase</label>
+            <input type="text" id="supabaseKey" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...">
+        </div>
+
+        <button id="checkSchema">Verificar Esquema</button>
+        <button id="testConnection">Probar Conexión</button>
+        <button id="createAppointment">Crear Cita de Prueba</button>
+
+        <div id="status"></div>
+    </div>
+
+    <div id="result" class="result" style="display: none;"></div>
+
+    <script>
+        // Variables globales
+        let supabaseClient;
+
+        // Inicializar Supabase
+        function initSupabase() {
+            const supabaseUrl = document.getElementById('supabaseUrl').value;
+            const supabaseKey = document.getElementById('supabaseKey').value;
+
+            if (!supabaseUrl || !supabaseKey) {
+                showError('Por favor, ingresa la URL y la clave de Supabase.');
+                return null;
+            }
+
+            try {
+                return supabase.createClient(supabaseUrl, supabaseKey);
+            } catch (error) {
+                showError(`Error al inicializar Supabase: ${error.message}`);
+                return null;
+            }
+        }
+
+        // Mostrar error
+        function showError(message) {
+            const status = document.getElementById('status');
+            status.className = 'error';
+            status.textContent = message;
+        }
+
+        // Mostrar éxito
+        function showSuccess(message) {
+            const status = document.getElementById('status');
+            status.className = 'success';
+            status.textContent = message;
+        }
+
+        // Mostrar resultado
+        function showResult(data) {
+            const resultDiv = document.getElementById('result');
+            resultDiv.style.display = 'block';
+
+            if (typeof data === 'object') {
+                resultDiv.innerHTML = JSON.stringify(data, null, 2);
+            } else {
+                resultDiv.textContent = data;
+            }
+        }
+
+        // Verificar esquema
+        async function checkSchema() {
+            const client = initSupabase();
+            if (!client) return;
+
+            try {
+                showSuccess('Consultando esquema de la tabla appointments...');
+
+                // Obtener información de columnas usando el método estándar de Supabase
+                // Primero obtenemos una fila para ver las columnas disponibles
+                const { data, error } = await client
+                    .from('appointments')
+                    .select('*')
+                    .limit(1);
+
+                if (error) throw error;
+
+                // Mostrar resultado en formato tabla
+                let tableHtml = '<h2>Columnas de la tabla appointments</h2>';
+                tableHtml += '<table>';
+                tableHtml += '<tr><th>Columna</th><th>Valor de ejemplo</th></tr>';
+
+                if (data && data.length > 0) {
+                    const row = data[0];
+                    for (const [key, value] of Object.entries(row)) {
+                        tableHtml += `<tr>
+                            <td>${key}</td>
+                            <td>${value !== null ? value : 'null'}</td>
+                        </tr>`;
+                    }
+                } else {
+                    // Si no hay datos, intentamos obtener la estructura de la tabla
+                    tableHtml += '<tr><td colspan="2">No se encontraron datos. Mostrando estructura de tabla:</td></tr>';
+
+                    // Obtener la definición de la tabla
+                    try {
+                        const { data: definition, error: defError } = await client
+                            .from('appointments')
+                            .select('*')
+                            .limit(0);
+
+                        if (!defError) {
+                            const columns = Object.keys(definition.length > 0 ? definition[0] : {});
+                            columns.forEach(column => {
+                                tableHtml += `<tr><td>${column}</td><td>No hay datos</td></tr>`;
+                            });
+                        } else {
+                            tableHtml += `<tr><td colspan="2">Error al obtener la estructura: ${defError.message}</td></tr>`;
+                        }
+                    } catch (e) {
+                        tableHtml += `<tr><td colspan="2">Error al obtener la estructura: ${e.message}</td></tr>`;
+                    }
+                }
+
+                tableHtml += '</table>';
+
+                showResult(tableHtml);
+                showSuccess('Esquema consultado correctamente.');
+            } catch (error) {
+                console.error('Error:', error);
+                showError(`Error al consultar el esquema: ${error.message}`);
+            }
+        }
+
+        // Probar conexión
+        async function testConnection() {
+            const client = initSupabase();
+            if (!client) return;
+
+            try {
+                showSuccess('Probando conexión...');
+
+                // Intentar obtener una cita
+                const { data, error } = await client
+                    .from('appointments')
+                    .select('*')
+                    .limit(1);
+
+                if (error) throw error;
+
+                showResult(data);
+                showSuccess('Conexión exitosa. Se muestra una cita de ejemplo.');
+            } catch (error) {
+                console.error('Error:', error);
+                showError(`Error al probar la conexión: ${error.message}`);
+            }
+        }
+
+        // Crear cita de prueba
+        async function createAppointment() {
+            const client = initSupabase();
+            if (!client) return;
+
+            try {
+                showSuccess('Creando cita de prueba...');
+
+                // Primero obtener un staff_id válido
+                const { data: staffData, error: staffError } = await client
+                    .from('staff')
+                    .select('id')
+                    .limit(1);
+
+                if (staffError) throw staffError;
+
+                if (!staffData || staffData.length === 0) {
+                    showError('No se encontró ningún profesional. Crea uno primero.');
+                    return;
+                }
+
+                const staffId = staffData[0].id;
+
+                // Crear cita de prueba
+                const { data, error } = await client
+                    .from('appointments')
+                    .insert({
+                        title: 'Cita de prueba',
+                        start_time: new Date().toISOString(),
+                        end_time: new Date(Date.now() + 3600000).toISOString(), // 1 hora después
+                        staff_id: staffId,
+                        color: '#4f46e5',
+                        price: 25,
+                        status: 'confirmed',
+                        user_id: (await client.auth.getUser()).data.user.id
+                    })
+                    .select();
+
+                if (error) throw error;
+
+                showResult(data);
+                showSuccess('Cita creada correctamente.');
+            } catch (error) {
+                console.error('Error:', error);
+                showError(`Error al crear la cita: ${error.message}`);
+            }
+        }
+
+        // Event listeners
+        document.getElementById('checkSchema').addEventListener('click', checkSchema);
+        document.getElementById('testConnection').addEventListener('click', testConnection);
+        document.getElementById('createAppointment').addEventListener('click', createAppointment);
+
+        // Cargar valores de URL y clave desde localStorage si existen
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedUrl = localStorage.getItem('supabaseUrl');
+            const savedKey = localStorage.getItem('supabaseKey');
+
+            if (savedUrl) document.getElementById('supabaseUrl').value = savedUrl;
+            if (savedKey) document.getElementById('supabaseKey').value = savedKey;
+        });
+
+        // Guardar valores en localStorage cuando cambian
+        document.getElementById('supabaseUrl').addEventListener('change', (e) => {
+            localStorage.setItem('supabaseUrl', e.target.value);
+        });
+
+        document.getElementById('supabaseKey').addEventListener('change', (e) => {
+            localStorage.setItem('supabaseKey', e.target.value);
+        });
+    </script>
+</body>
+</html>

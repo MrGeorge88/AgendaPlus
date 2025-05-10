@@ -5,7 +5,7 @@ export interface Appointment {
   title: string;
   start: string;
   end: string;
-  resourceId: string; // Cambiado a string para UUID
+  resourceId: number; // ID del staff como número entero
   backgroundColor?: string;
   borderColor?: string;
   extendedProps: {
@@ -117,17 +117,33 @@ export const appointmentsService = {
   // Crear una nueva cita
   createAppointment: async (appointment: Omit<Appointment, 'id'>, userId: string): Promise<Appointment | null> => {
     try {
+      console.log('Creating appointment with data:', appointment);
+
+      // Manejar el staff_id correctamente
+      let staffId = appointment.resourceId;
+
+      // Convertir el staff_id a número si es posible
+      if (typeof staffId === 'string' && /^\d+$/.test(staffId)) {
+        staffId = parseInt(staffId, 10);
+        console.log('Converted string staff ID to number:', staffId);
+      }
+
+      // Verificar si el staff_id es un número
+      if (typeof staffId !== 'number') {
+        console.warn('Staff ID is not a number:', staffId);
+      }
+
+      // Imprimir información de depuración
+      console.log('Staff ID type:', typeof staffId);
+      console.log('Staff ID value:', staffId);
+
       // Transformar el formato de la cita para Supabase
       const supabaseAppointment = {
         title: appointment.title,
         start_time: appointment.start,
         end_time: appointment.end,
-        staff_id: appointment.resourceId,
+        staff_id: staffId,
         color: appointment.backgroundColor || '#4f46e5',
-        client_name: appointment.extendedProps.client,
-        service_name: appointment.extendedProps.service,
-        client_id: appointment.extendedProps.clientId || null,
-        service_id: appointment.extendedProps.serviceId || null,
         price: appointment.extendedProps.price,
         status: appointment.extendedProps.status,
         payment_status: appointment.extendedProps.paymentStatus || 'pending',
@@ -136,13 +152,63 @@ export const appointmentsService = {
         user_id: userId
       };
 
+      // Verificar si la tabla tiene las columnas client_name y service_name
+      try {
+        // Primero intentamos con client_name y service_name
+        const appointmentWithClientAndService = {
+          ...supabaseAppointment,
+          client_name: appointment.extendedProps.client,
+          service_name: appointment.extendedProps.service,
+        };
+
+        const { data, error } = await supabase
+          .from('appointments')
+          .insert(appointmentWithClientAndService)
+          .select()
+          .single();
+
+        if (!error) {
+          console.log('Appointment created successfully with client_name and service_name');
+          return {
+            id: data.id,
+            title: data.title,
+            start: data.start_time,
+            end: data.end_time,
+            resourceId: data.staff_id,
+            backgroundColor: data.color,
+            borderColor: data.color,
+            extendedProps: {
+              client: data.client_name || '',
+              service: data.service_name || '',
+              price: data.price,
+              status: data.status,
+              paymentStatus: data.payment_status || 'pending',
+              totalPaid: data.total_paid || 0,
+              userId: data.user_id,
+              notes: data.notes || '',
+              clientId: data.client_id || '',
+              serviceId: data.service_id || ''
+            }
+          };
+        }
+      } catch (clientNameError) {
+        console.error('Error trying with client_name:', clientNameError);
+      }
+
+      // Si llegamos aquí, intentamos sin client_name y service_name
+      console.log('Trying without client_name and service_name');
       const { data, error } = await supabase
         .from('appointments')
         .insert(supabaseAppointment)
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error creating appointment:', error);
+        throw error;
+      }
+
+      console.log('Appointment created successfully without client_name and service_name');
 
       // Transformar la respuesta al formato de FullCalendar
       return {
@@ -154,16 +220,16 @@ export const appointmentsService = {
         backgroundColor: data.color,
         borderColor: data.color,
         extendedProps: {
-          client: data.client_name,
-          service: data.service_name,
+          client: appointment.extendedProps.client, // Use the value from the input since it's not in DB
+          service: appointment.extendedProps.service, // Use the value from the input since it's not in DB
           price: data.price,
           status: data.status,
           paymentStatus: data.payment_status || 'pending',
           totalPaid: data.total_paid || 0,
           userId: data.user_id,
-          notes: data.notes,
-          clientId: data.client_id,
-          serviceId: data.service_id
+          notes: data.notes || '',
+          clientId: '',
+          serviceId: appointment.extendedProps.serviceId || ''
         }
       };
     } catch (error) {
