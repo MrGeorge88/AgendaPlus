@@ -5,7 +5,7 @@ import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import { StaffFilter } from "./staff-filter";
 import { Button } from "../ui/button";
-import { Plus } from "lucide-react";
+import { Plus, Users } from "lucide-react";
 import { AppointmentForm } from "./appointment-form";
 import { Modal } from "../ui/modal";
 import { useAuth } from "../../contexts/auth-context";
