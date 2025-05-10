@@ -20,10 +20,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const checkUser = async () => {
       setLoading(true);
       try {
-        const { user } = await authService.getCurrentUser();
-        setUser(user);
+        console.log('Verificando usuario actual...');
+        const { user, error } = await authService.getCurrentUser();
+
+        if (error) {
+          console.error('Error al obtener el usuario actual:', error);
+          setUser(null);
+        } else {
+          console.log('Usuario autenticado:', user);
+          setUser(user);
+        }
       } catch (error) {
-        console.error('Error al obtener el usuario actual:', error);
+        console.error('Excepción al obtener el usuario actual:', error);
         setUser(null);
       } finally {
         setLoading(false);

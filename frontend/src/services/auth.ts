@@ -138,16 +138,49 @@ export const authService = {
   // Obtener el usuario actual
   getCurrentUser: async (): Promise<AuthResponse> => {
     try {
-      // Obtener el usuario actual de Supabase
-      const { data, error } = await supabase.auth.getUser();
-      if (error) throw error;
+      console.log('Obteniendo usuario actual desde Supabase...');
 
-      if (!data.user) {
+      // Obtener la sesión actual primero
+      const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+
+      if (sessionError) {
+        console.error('Error al obtener la sesión:', sessionError);
+        return {
+          user: null,
+          error: sessionError,
+        };
+      }
+
+      console.log('Sesión actual:', sessionData);
+
+      if (!sessionData.session) {
+        console.log('No hay sesión activa');
         return {
           user: null,
           error: null,
         };
       }
+
+      // Obtener el usuario actual de Supabase
+      const { data, error } = await supabase.auth.getUser();
+
+      if (error) {
+        console.error('Error al obtener el usuario:', error);
+        return {
+          user: null,
+          error: error,
+        };
+      }
+
+      if (!data.user) {
+        console.log('No se encontró usuario');
+        return {
+          user: null,
+          error: null,
+        };
+      }
+
+      console.log('Usuario encontrado:', data.user);
 
       // Convertir el usuario de Supabase a nuestro formato de usuario
       const user: User = {
@@ -162,9 +195,7 @@ export const authService = {
         error: null,
       };
     } catch (error) {
-      console.error('Error en getCurrentUser:', error);
-
-      // No usar datos simulados en producción
+      console.error('Excepción en getCurrentUser:', error);
 
       return {
         user: null,
