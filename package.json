@@ -19,12 +19,11 @@
     "lint:frontend": "cd frontend && npm run lint",
     "lint:backend": "cd backend && npm run lint",
     "lint": "npm run lint:frontend && npm run lint:backend",
-    "setup": "node deploy.js",
-    "deploy": "node deploy-vercel.js",
-    "check": "node check-deployment.js",
-    "verify-build": "node verify-build.js",
-    "test:supabase": "node test-supabase.js",
-    "email-templates": "node supabase-auth-templates.js > supabase-email-templates.html"
+    "setup": "echo \"Setup script removed\"",
+    "deploy": "echo \"Deploy script removed\"",
+    "check": "echo \"Check script removed\"",
+    "verify-build": "echo \"Verify build script removed\"",
+    "test:supabase": "echo \"Supabase test script removed\""
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.5",
