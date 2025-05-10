@@ -85,20 +85,20 @@ export function Services() {
   };
 
   return (
-    <Layout title="Servicios">
+    <Layout title={t('services.title')}>
       <div className="mb-6 flex flex-col justify-between gap-4 md:flex-row md:items-center">
         <div className="relative w-full md:w-64">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
           <input
             type="text"
-            placeholder="Buscar servicios..."
+            placeholder={t('services.searchPlaceholder')}
             className="w-full rounded-lg border border-slate-300 py-2 pl-10 pr-4"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
         <Button onClick={handleAddService} className="flex items-center gap-1">
-          <Plus className="h-4 w-4" /> Nuevo servicio
+          <Plus className="h-4 w-4" /> {t('services.new')}
         </Button>
       </div>
 
@@ -169,7 +169,7 @@ export function Services() {
       <Modal
         isOpen={showForm}
         onClose={() => setShowForm(false)}
-        title={currentService ? 'Editar servicio' : 'Nuevo servicio'}
+        title={currentService ? t('services.edit') : t('services.new')}
       >
 
             <form className="space-y-4" onSubmit={async (e) => {
@@ -227,7 +227,7 @@ export function Services() {
               }
             }}>
               <div>
-                <label className="mb-1 block text-sm font-medium">Nombre del servicio</label>
+                <label className="mb-1 block text-sm font-medium">{t('services.nameLabel')}</label>
                 <input
                   type="text"
                   name="name"
@@ -238,7 +238,7 @@ export function Services() {
               </div>
 
               <div>
-                <label className="mb-1 block text-sm font-medium">Categoría</label>
+                <label className="mb-1 block text-sm font-medium">{t('services.categoryLabel')}</label>
                 <input
                   type="text"
                   name="category"
@@ -250,7 +250,7 @@ export function Services() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="mb-1 block text-sm font-medium">Precio (€)</label>
+                  <label className="mb-1 block text-sm font-medium">{t('services.priceLabel')}</label>
                   <input
                     type="number"
                     name="price"
@@ -260,7 +260,7 @@ export function Services() {
                   />
                 </div>
                 <div>
-                  <label className="mb-1 block text-sm font-medium">Duración (min)</label>
+                  <label className="mb-1 block text-sm font-medium">{t('services.durationLabel')}</label>
                   <input
                     type="number"
                     name="duration"
@@ -272,7 +272,7 @@ export function Services() {
               </div>
 
               <div>
-                <label className="mb-1 block text-sm font-medium">Descripción</label>
+                <label className="mb-1 block text-sm font-medium">{t('services.descriptionLabel')}</label>
                 <textarea
                   name="description"
                   className="w-full rounded-lg border border-slate-300 p-2"
@@ -283,10 +283,10 @@ export function Services() {
 
               <div className="flex justify-end space-x-2">
                 <Button type="button" variant="outline" onClick={() => setShowForm(false)}>
-                  Cancelar
+                  {t('common.cancel')}
                 </Button>
                 <Button type="submit">
-                  {currentService ? 'Actualizar' : 'Guardar'}
+                  {currentService ? t('common.update') : t('common.save')}
                 </Button>
               </div>
             </form>

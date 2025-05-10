@@ -8,7 +8,6 @@ interface SupabaseService {
   description: string | null;
   duration: number;
   price: number;
-  cost: number | null;
   category: string | null;
   created_at: string;
   updated_at: string;
@@ -79,9 +78,10 @@ export const servicesService = {
         duration: service.duration,
         price: service.price,
         category: service.category || null,
-        cost: 0, // Valor por defecto
         user_id: userId
       };
+
+      console.log('Creando servicio con datos:', supabaseService);
 
       const { data, error } = await supabase
         .from('services')
@@ -89,7 +89,10 @@ export const servicesService = {
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase error details:', error);
+        throw error;
+      }
       if (!data) throw new Error('No se pudo crear el servicio');
 
       return mapSupabaseService(data);
@@ -111,6 +114,8 @@ export const servicesService = {
       if (service.price !== undefined) supabaseService.price = service.price;
       if (service.category !== undefined) supabaseService.category = service.category || null;
 
+      console.log('Actualizando servicio con datos:', supabaseService);
+
       const { data, error } = await supabase
         .from('services')
         .update(supabaseService)
@@ -118,7 +123,10 @@ export const servicesService = {
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase error details:', error);
+        throw error;
+      }
       if (!data) throw new Error(`Servicio con ID ${id} no encontrado`);
 
       return mapSupabaseService(data);
