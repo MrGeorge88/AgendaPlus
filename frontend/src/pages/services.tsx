@@ -217,7 +217,7 @@ export function Services() {
                       <Clock className="mr-1 h-4 w-4" /> {service.duration} min
                     </div>
                     <div className="flex items-center font-medium">
-                      <DollarSign className="h-4 w-4 text-primary" /> {service.price}€
+                      <DollarSign className="h-4 w-4 text-primary" /> ${service.price}
                     </div>
                   </div>
                 </div>

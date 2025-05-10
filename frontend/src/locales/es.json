@@ -51,6 +51,7 @@
     "services": "Servicios",
     "staff": "Personal",
     "income": "Ingresos",
+    "expenses": "Gastos",
     "settings": "Configuración",
     "profile": "Perfil"
   },
@@ -100,8 +101,8 @@
     "descriptionLabel": "Descripción",
     "duration": "Duración (min)",
     "durationLabel": "Duración (min)",
-    "price": "Precio (€)",
-    "priceLabel": "Precio (€)",
+    "price": "Precio ($)",
+    "priceLabel": "Precio ($)",
     "category": "Categoría",
     "categoryLabel": "Categoría",
     "minutes": "min",

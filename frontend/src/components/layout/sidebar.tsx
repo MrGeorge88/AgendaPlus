@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { Calendar, Users, Briefcase, CreditCard, BarChart3 } from "lucide-react";
+import { Calendar, Users, Briefcase, CreditCard, BarChart3, DollarSign } from "lucide-react";
 import { cn } from "../../lib/utils";
 import { useLanguage } from "../../contexts/language-context";
 
@@ -10,6 +10,7 @@ const navItems = [
   { key: "navigation.services", path: "/services", icon: Briefcase },
   { key: "navigation.staff", path: "/staff", icon: Users },
   { key: "navigation.income", path: "/income", icon: BarChart3 },
+  { key: "navigation.expenses", path: "/expenses", icon: DollarSign },
 ];
 
 interface SidebarProps {

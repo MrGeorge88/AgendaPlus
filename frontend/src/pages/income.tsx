@@ -1,49 +1,48 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Layout } from '../components/layout/layout';
 import { Card } from '../components/ui/card';
 import { BarChart3, TrendingUp, DollarSign, Calendar, Users } from 'lucide-react';
 import { useLanguage } from '../contexts/language-context';
-
-// Datos de ejemplo para ingresos
-const mockIncomeData = {
-  totalToday: 350,
-  totalWeek: 1850,
-  totalMonth: 7500,
-  appointmentsToday: 8,
-  clientsToday: 6,
-  monthlyData: [
-    { month: 'Ene', income: 6200 },
-    { month: 'Feb', income: 6800 },
-    { month: 'Mar', income: 7100 },
-    { month: 'Abr', income: 6900 },
-    { month: 'May', income: 7500 },
-    { month: 'Jun', income: 0 },
-    { month: 'Jul', income: 0 },
-    { month: 'Ago', income: 0 },
-    { month: 'Sep', income: 0 },
-    { month: 'Oct', income: 0 },
-    { month: 'Nov', income: 0 },
-    { month: 'Dic', income: 0 },
-  ],
-  topServices: [
-    { name: 'Corte de cabello', count: 45, income: 1125 },
-    { name: 'Tinte', count: 28, income: 1400 },
-    { name: 'Manicura', count: 36, income: 720 },
-    { name: 'Pedicura', count: 22, income: 550 },
-    { name: 'Masaje', count: 18, income: 720 },
-  ],
-  topStaff: [
-    { name: 'Ana García', count: 42, income: 1680 },
-    { name: 'Carlos Rodríguez', count: 38, income: 1520 },
-    { name: 'Elena Martínez', count: 35, income: 1400 },
-    { name: 'David López', count: 30, income: 1200 },
-  ],
-};
+import { useAuth } from '../contexts/auth-context';
+import { incomeService, IncomeStats } from '../services/income';
+import { toast } from 'sonner';
 
 export function Income() {
   const { t } = useLanguage();
+  const { user } = useAuth();
   const [period, setPeriod] = useState('month');
-  const [data, setData] = useState(mockIncomeData);
+  const [loading, setLoading] = useState(true);
+  const [data, setData] = useState<IncomeStats>({
+    totalToday: 0,
+    totalWeek: 0,
+    totalMonth: 0,
+    appointmentsToday: 0,
+    clientsToday: 0,
+    monthlyData: [],
+    topServices: [],
+    topStaff: []
+  });
+
+  useEffect(() => {
+    if (user) {
+      loadIncomeStats();
+    }
+  }, [user]);
+
+  const loadIncomeStats = async () => {
+    if (!user) return;
+
+    setLoading(true);
+    try {
+      const stats = await incomeService.getIncomeStats(user.id);
+      setData(stats);
+    } catch (error) {
+      console.error('Error al cargar estadísticas de ingresos:', error);
+      toast.error('Error al cargar los datos de ingresos');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Función para calcular la altura de las barras en el gráfico
   const getBarHeight = (value: number) => {
@@ -60,7 +59,7 @@ export function Income() {
           </div>
           <div>
             <p className="text-sm text-slate-500">{t('income.todayIncome')}</p>
-            <h3 className="text-2xl font-bold">{data.totalToday}€</h3>
+            <h3 className="text-2xl font-bold">${data.totalToday}</h3>
           </div>
         </div>
         <div className="card flex items-center p-4">
@@ -69,7 +68,7 @@ export function Income() {
           </div>
           <div>
             <p className="text-sm text-slate-500">{t('income.weekIncome')}</p>
-            <h3 className="text-2xl font-bold">{data.totalWeek}€</h3>
+            <h3 className="text-2xl font-bold">${data.totalWeek}</h3>
           </div>
         </div>
         <div className="card flex items-center p-4">
@@ -78,7 +77,7 @@ export function Income() {
           </div>
           <div>
             <p className="text-sm text-slate-500">{t('income.monthIncome')}</p>
-            <h3 className="text-2xl font-bold">{data.totalMonth}€</h3>
+            <h3 className="text-2xl font-bold">${data.totalMonth}</h3>
           </div>
         </div>
       </div>
@@ -153,7 +152,7 @@ export function Income() {
                   <p className="font-medium">{service.name}</p>
                   <p className="text-sm text-slate-500">{service.count} {t('income.appointments')}</p>
                 </div>
-                <p className="font-bold">{service.income}€</p>
+                <p className="font-bold">${service.income}</p>
               </div>
             ))}
           </div>
@@ -168,7 +167,7 @@ export function Income() {
                   <p className="font-medium">{staff.name}</p>
                   <p className="text-sm text-slate-500">{staff.count} {t('income.appointments')}</p>
                 </div>
-                <p className="font-bold">{staff.income}€</p>
+                <p className="font-bold">${staff.income}</p>
               </div>
             ))}
           </div>

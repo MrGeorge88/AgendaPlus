@@ -5,6 +5,7 @@ import { Clients } from './pages/clients';
 import { Services } from './pages/services';
 import { Staff } from './pages/staff';
 import { Income } from './pages/income';
+import { Expenses } from './pages/expenses';
 import { Login } from './pages/login';
 import { Register } from './pages/register';
 import { AuthCallback } from './pages/auth-callback';
@@ -53,6 +54,11 @@ function App() {
                   <Route path="/income" element={
                     <ProtectedRoute>
                       <Income />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/expenses" element={
+                    <ProtectedRoute>
+                      <Expenses />
                     </ProtectedRoute>
                   } />
                   {/* Ruta de fallback */}

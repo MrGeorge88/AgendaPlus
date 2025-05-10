@@ -5,12 +5,14 @@ import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import { StaffFilter } from "./staff-filter";
 import { Button } from "../ui/button";
-import { Plus, Users } from "lucide-react";
+import { Plus, Users, DollarSign, CheckCircle, XCircle, Clock, AlertCircle } from "lucide-react";
 import { AppointmentForm } from "./appointment-form";
+import { AppointmentPaymentForm } from "./appointment-payment-form";
 import { Modal } from "../ui/modal";
 import { useAuth } from "../../contexts/auth-context";
 import { staffService, StaffMember } from "../../services/staff";
 import { appointmentsService, Appointment } from "../../services/appointments";
+import { toast } from "sonner";
 
 export function Calendar() {
   const { user } = useAuth();
@@ -18,7 +20,9 @@ export function Calendar() {
   const [selectedStaff, setSelectedStaff] = useState<string[]>([]);
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [showForm, setShowForm] = useState(false);
+  const [showPaymentForm, setShowPaymentForm] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
+  const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null);
   const [loading, setLoading] = useState(true);
   const calendarRef = useRef<any>(null);
 
@@ -58,24 +62,76 @@ export function Calendar() {
   };
 
   const handleDateSelect = (selectInfo: any) => {
-    setSelectedDate(selectInfo.start);
+    // Guardar la fecha y hora seleccionada
+    const selectedDateTime = new Date(selectInfo.start);
+    setSelectedDate(selectedDateTime);
     setShowForm(true);
   };
 
   const handleEventClick = async (clickInfo: any) => {
-    if (confirm(`¿Deseas eliminar la cita '${clickInfo.event.title}'?`)) {
-      try {
-        // Eliminar la cita de Supabase
-        if (user) {
-          const success = await appointmentsService.deleteAppointment(clickInfo.event.id);
-          if (success) {
-            clickInfo.event.remove();
-            setAppointments(prev => prev.filter(appointment => appointment.id !== clickInfo.event.id));
-          }
+    // Encontrar la cita completa en el estado
+    const appointment = appointments.find(a => a.id === clickInfo.event.id);
+    if (!appointment) return;
+
+    // Mostrar opciones para la cita
+    const action = prompt(
+      `Cita: ${clickInfo.event.title}\nCliente: ${clickInfo.event.extendedProps.client}\n\nSelecciona una acción:\n1. Registrar pago\n2. Marcar como completada\n3. Cancelar cita\n4. Eliminar cita`
+    );
+
+    if (!action) return;
+
+    try {
+      if (user) {
+        switch (action) {
+          case "1": // Registrar pago
+            setSelectedAppointment(appointment);
+            setShowPaymentForm(true);
+            break;
+
+          case "2": // Marcar como completada
+            const completedSuccess = await appointmentsService.updateAppointmentStatus(appointment.id, "completed");
+            if (completedSuccess) {
+              toast.success("Cita marcada como completada");
+              // Actualizar la cita en el estado
+              setAppointments(prev => prev.map(a =>
+                a.id === appointment.id
+                  ? {...a, extendedProps: {...a.extendedProps, status: "completed"}}
+                  : a
+              ));
+            }
+            break;
+
+          case "3": // Cancelar cita
+            const cancelSuccess = await appointmentsService.updateAppointmentStatus(appointment.id, "cancelled");
+            if (cancelSuccess) {
+              toast.success("Cita cancelada");
+              // Actualizar la cita en el estado
+              setAppointments(prev => prev.map(a =>
+                a.id === appointment.id
+                  ? {...a, extendedProps: {...a.extendedProps, status: "cancelled"}}
+                  : a
+              ));
+            }
+            break;
+
+          case "4": // Eliminar cita
+            if (confirm(`¿Estás seguro de que deseas eliminar la cita '${clickInfo.event.title}'?`)) {
+              const deleteSuccess = await appointmentsService.deleteAppointment(clickInfo.event.id);
+              if (deleteSuccess) {
+                toast.success("Cita eliminada");
+                clickInfo.event.remove();
+                setAppointments(prev => prev.filter(a => a.id !== clickInfo.event.id));
+              }
+            }
+            break;
+
+          default:
+            break;
         }
-      } catch (error) {
-        console.error("Error al eliminar la cita:", error);
       }
+    } catch (error) {
+      console.error("Error al procesar la acción:", error);
+      toast.error("Error al procesar la acción");
     }
   };
 
@@ -96,11 +152,28 @@ export function Calendar() {
 
         if (newAppointment) {
           setAppointments(prev => [...prev, newAppointment]);
+          toast.success("Cita creada correctamente");
         }
       }
       setShowForm(false);
     } catch (error) {
       console.error("Error al guardar la cita:", error);
+      toast.error("Error al guardar la cita");
+    }
+  };
+
+  const handlePaymentRegistered = async () => {
+    setShowPaymentForm(false);
+
+    // Recargar las citas para obtener el estado actualizado
+    if (user) {
+      try {
+        const appts = await appointmentsService.getAppointments(user.id);
+        setAppointments(appts);
+        toast.success("Pago registrado correctamente");
+      } catch (error) {
+        console.error("Error al recargar las citas:", error);
+      }
     }
   };
 
@@ -216,13 +289,58 @@ export function Calendar() {
               }}
               select={handleDateSelect}
               eventClick={handleEventClick}
-              eventContent={(eventInfo) => (
-                <div className="p-1.5 text-xs">
-                  <div className="font-medium">{eventInfo.event.title}</div>
-                  <div>{eventInfo.event.extendedProps.client}</div>
-                  <div>{eventInfo.event.extendedProps.price}€</div>
-                </div>
-              )}
+              eventContent={(eventInfo) => {
+                // Determinar el color de fondo según el estado
+                let statusColor = "";
+                let statusIcon = null;
+
+                switch (eventInfo.event.extendedProps.status) {
+                  case "completed":
+                    statusColor = "bg-green-100";
+                    statusIcon = <CheckCircle className="h-3 w-3 text-green-600" />;
+                    break;
+                  case "cancelled":
+                    statusColor = "bg-red-100";
+                    statusIcon = <XCircle className="h-3 w-3 text-red-600" />;
+                    break;
+                  case "no-show":
+                    statusColor = "bg-orange-100";
+                    statusIcon = <AlertCircle className="h-3 w-3 text-orange-600" />;
+                    break;
+                  default:
+                    statusColor = "bg-blue-100";
+                    statusIcon = <Clock className="h-3 w-3 text-blue-600" />;
+                }
+
+                // Determinar el color del estado de pago
+                let paymentStatusBadge = null;
+
+                switch (eventInfo.event.extendedProps.paymentStatus) {
+                  case "paid":
+                    paymentStatusBadge = <span className="ml-1 rounded-full bg-green-100 px-1 text-[10px] text-green-600">Pagado</span>;
+                    break;
+                  case "partial":
+                    paymentStatusBadge = <span className="ml-1 rounded-full bg-yellow-100 px-1 text-[10px] text-yellow-600">Parcial</span>;
+                    break;
+                  default:
+                    paymentStatusBadge = <span className="ml-1 rounded-full bg-gray-100 px-1 text-[10px] text-gray-600">Pendiente</span>;
+                }
+
+                return (
+                  <div className={`p-1.5 text-xs ${statusColor}`}>
+                    <div className="flex items-center justify-between">
+                      <div className="font-medium">{eventInfo.event.title}</div>
+                      {statusIcon}
+                    </div>
+                    <div>{eventInfo.event.extendedProps.client}</div>
+                    <div className="flex items-center">
+                      <DollarSign className="mr-0.5 h-3 w-3" />
+                      {eventInfo.event.extendedProps.price}
+                      {paymentStatusBadge}
+                    </div>
+                  </div>
+                );
+              }}
             />
           </div>
         </div>
@@ -240,6 +358,14 @@ export function Calendar() {
           date={selectedDate}
         />
       </Modal>
+
+      {showPaymentForm && selectedAppointment && (
+        <AppointmentPaymentForm
+          appointment={selectedAppointment}
+          onClose={() => setShowPaymentForm(false)}
+          onPaymentRegistered={handlePaymentRegistered}
+        />
+      )}
     </div>
   );
 }

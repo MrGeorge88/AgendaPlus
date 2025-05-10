@@ -46,11 +46,12 @@
     "passwordHelperText": "Minimum 6 characters"
   },
   "navigation": {
-    "dashboard": "Dashboard",
+    "dashboard": "Agenda",
     "clients": "Clients",
     "services": "Services",
     "staff": "Staff",
     "income": "Income",
+    "expenses": "Expenses",
     "settings": "Settings",
     "profile": "Profile"
   },
@@ -100,8 +101,8 @@
     "descriptionLabel": "Description",
     "duration": "Duration (min)",
     "durationLabel": "Duration (min)",
-    "price": "Price (€)",
-    "priceLabel": "Price (€)",
+    "price": "Price ($)",
+    "priceLabel": "Price ($)",
     "category": "Category",
     "categoryLabel": "Category",
     "minutes": "min",
