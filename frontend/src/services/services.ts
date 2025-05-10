@@ -83,17 +83,7 @@ export const servicesService = {
 
       console.log('Creando servicio con datos:', supabaseService);
 
-      // Verificar si la tabla existe
-      const { error: tableCheckError } = await supabase
-        .from('services')
-        .select('count(*)', { count: 'exact', head: true });
-
-      if (tableCheckError) {
-        console.error('Error al verificar la tabla services:', tableCheckError);
-        throw new Error(`La tabla services no existe o no es accesible: ${tableCheckError.message}`);
-      }
-
-      // Intentar insertar el servicio
+      // Intentar insertar el servicio directamente sin verificar la tabla
       const { data, error } = await supabase
         .from('services')
         .insert(supabaseService)
@@ -105,6 +95,17 @@ export const servicesService = {
         console.error('Error code:', error.code);
         console.error('Error message:', error.message);
         console.error('Error details:', error.details);
+
+        // Si el error es de permisos, podría ser un problema de RLS
+        if (error.code === 'PGRST301' || error.message.includes('permission denied')) {
+          throw new Error('No tienes permisos para crear servicios. Verifica que estás autenticado correctamente.');
+        }
+
+        // Si el error es de violación de restricción, podría ser un problema con la columna user_id
+        if (error.code === '23502' || error.message.includes('violates not-null constraint')) {
+          throw new Error('Error al crear el servicio: La columna user_id es obligatoria.');
+        }
+
         throw error;
       }
 

@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verificar Estructura de Tabla - AgendaPlus</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1 {
+            color: #4f46e5;
+            margin-bottom: 20px;
+        }
+        .card {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        input[type="text"], 
+        input[type="password"] {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        button {
+            background-color: #4f46e5;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #4338ca;
+        }
+        pre {
+            background-color: #f5f5f5;
+            padding: 15px;
+            border-radius: 4px;
+            overflow-x: auto;
+            font-size: 14px;
+        }
+        .success {
+            color: #10b981;
+            font-weight: 500;
+        }
+        .error {
+            color: #ef4444;
+            font-weight: 500;
+        }
+        .info {
+            color: #3b82f6;
+            font-weight: 500;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f5f5f5;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <h1>Verificar Estructura de Tabla - AgendaPlus</h1>
+    
+    <div class="card">
+        <h2>Configuración de Supabase</h2>
+        
+        <div class="form-group">
+            <label for="supabaseUrl">URL de Supabase:</label>
+            <input type="text" id="supabaseUrl" placeholder="https://tu-proyecto.supabase.co" value="https://sarrfzkxijsadvvbjfge.supabase.co">
+        </div>
+        
+        <div class="form-group">
+            <label for="supabaseKey">Clave Anónima de Supabase:</label>
+            <input type="password" id="supabaseKey" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...">
+        </div>
+        
+        <button id="checkAuthBtn">Verificar Autenticación</button>
+    </div>
+    
+    <div class="card">
+        <h2>Verificar Estructura de la Tabla</h2>
+        <p>Selecciona la tabla que quieres verificar:</p>
+        
+        <div class="form-group">
+            <label for="tableName">Nombre de la tabla:</label>
+            <input type="text" id="tableName" value="services">
+        </div>
+        
+        <button id="checkTableBtn">Verificar Tabla</button>
+    </div>
+    
+    <div class="card">
+        <h2>Resultado</h2>
+        <div id="result">Esperando...</div>
+    </div>
+    
+    <!-- Cargar Supabase desde CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+    
+    <script>
+        // Variables globales
+        let supabaseClient;
+        
+        // Inicializar Supabase
+        function initSupabase() {
+            const supabaseUrl = document.getElementById('supabaseUrl').value;
+            const supabaseKey = document.getElementById('supabaseKey').value;
+            
+            if (!supabaseUrl || !supabaseKey) {
+                showError('Por favor, ingresa la URL y la clave de Supabase.');
+                return null;
+            }
+            
+            try {
+                // Crear cliente de Supabase
+                return supabase.createClient(supabaseUrl, supabaseKey);
+            } catch (error) {
+                showError(`Error al inicializar Supabase: ${error.message}`);
+                return null;
+            }
+        }
+        
+        // Verificar autenticación
+        async function checkAuth() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '<p>Verificando autenticación...</p>';
+            
+            supabaseClient = initSupabase();
+            if (!supabaseClient) return;
+            
+            try {
+                // Verificar sesión actual
+                const { data: sessionData, error: sessionError } = await supabaseClient.auth.getSession();
+                
+                if (sessionError) {
+                    showError(`Error al obtener la sesión: ${sessionError.message}`);
+                    return;
+                }
+                
+                if (!sessionData.session) {
+                    resultDiv.innerHTML = `
+                        <p class="info">No hay sesión activa. Esto no es un problema para verificar la estructura de la tabla, pero necesitarás iniciar sesión para insertar datos.</p>
+                    `;
+                    return;
+                }
+                
+                // Obtener usuario actual
+                const { data: userData, error: userError } = await supabaseClient.auth.getUser();
+                
+                if (userError) {
+                    showError(`Error al obtener el usuario: ${userError.message}`);
+                    return;
+                }
+                
+                if (!userData.user) {
+                    resultDiv.innerHTML = `
+                        <p class="error">No se encontró información del usuario a pesar de tener una sesión activa.</p>
+                    `;
+                    return;
+                }
+                
+                // Mostrar información del usuario
+                resultDiv.innerHTML = `
+                    <p class="success">¡Usuario autenticado correctamente!</p>
+                    <p>ID de usuario: <strong>${userData.user.id}</strong></p>
+                    <p>Email: <strong>${userData.user.email}</strong></p>
+                `;
+                
+            } catch (error) {
+                showError(`Error inesperado: ${error.message}`);
+            }
+        }
+        
+        // Verificar estructura de la tabla
+        async function checkTable() {
+            const resultDiv = document.getElementById('result');
+            const tableName = document.getElementById('tableName').value;
+            
+            if (!tableName) {
+                showError('Por favor, ingresa el nombre de la tabla.');
+                return;
+            }
+            
+            supabaseClient = initSupabase();
+            if (!supabaseClient) return;
+            
+            resultDiv.innerHTML = `<p>Verificando estructura de la tabla ${tableName}...</p>`;
+            
+            try {
+                // Intentar obtener un registro para verificar la estructura
+                const { data, error } = await supabaseClient
+                    .from(tableName)
+                    .select('*')
+                    .limit(1);
+                
+                if (error) {
+                    showError(`Error al acceder a la tabla ${tableName}: ${error.message}`);
+                    console.error('Detalles del error:', error);
+                    
+                    // Verificar si la tabla existe
+                    resultDiv.innerHTML += `
+                        <p>Verificando si la tabla existe...</p>
+                    `;
+                    
+                    // Intentar obtener la definición de la tabla usando RPC (si está disponible)
+                    try {
+                        const { data: definitionData, error: definitionError } = await supabaseClient
+                            .rpc('get_table_definition', { table_name: tableName });
+                        
+                        if (definitionError) {
+                            resultDiv.innerHTML += `
+                                <p class="error">No se pudo obtener la definición de la tabla: ${definitionError.message}</p>
+                                <p>Recomendación: Ejecuta el script SQL para crear o corregir la tabla ${tableName}.</p>
+                            `;
+                        } else if (definitionData) {
+                            resultDiv.innerHTML += `
+                                <p class="info">La tabla ${tableName} existe, pero no se pudo acceder a sus datos.</p>
+                                <p>Definición de la tabla:</p>
+                                <pre>${JSON.stringify(definitionData, null, 2)}</pre>
+                            `;
+                        }
+                    } catch (rpcError) {
+                        resultDiv.innerHTML += `
+                            <p class="info">No se pudo verificar la definición de la tabla usando RPC.</p>
+                            <p>Recomendación: Ejecuta el script SQL para crear o corregir la tabla ${tableName}.</p>
+                        `;
+                    }
+                    
+                    return;
+                }
+                
+                // Obtener la estructura de la tabla
+                let columns = [];
+                if (data.length > 0) {
+                    columns = Object.keys(data[0]);
+                } else {
+                    // Si no hay datos, intentar obtener la estructura de la tabla de otra manera
+                    try {
+                        // Intentar hacer una consulta que devuelva 0 filas pero con la estructura
+                        const { data: emptyData, error: emptyError } = await supabaseClient
+                            .from(tableName)
+                            .select('*')
+                            .limit(0);
+                        
+                        if (!emptyError && emptyData) {
+                            // Obtener las columnas de los metadatos de la respuesta
+                            columns = Object.keys(emptyData.length > 0 ? emptyData[0] : {});
+                        }
+                    } catch (emptyError) {
+                        console.error('Error al obtener estructura vacía:', emptyError);
+                    }
+                }
+                
+                // Mostrar estructura de la tabla
+                resultDiv.innerHTML = `
+                    <p class="success">Tabla ${tableName} accesible correctamente.</p>
+                    
+                    <h3>Columnas detectadas:</h3>
+                    <table>
+                        <tr>
+                            <th>Nombre de la columna</th>
+                        </tr>
+                        ${columns.length > 0 ? 
+                            columns.map(col => `<tr><td>${col}</td></tr>`).join('') : 
+                            '<tr><td>No se detectaron columnas</td></tr>'}
+                    </table>
+                    
+                    <h3>Datos de ejemplo:</h3>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                    
+                    <p>Columnas esperadas para la tabla services:</p>
+                    <ul>
+                        <li>id (UUID)</li>
+                        <li>name (TEXT)</li>
+                        <li>duration (INTEGER)</li>
+                        <li>price (DECIMAL)</li>
+                        <li>category (TEXT)</li>
+                        <li>description (TEXT)</li>
+                        <li>user_id (UUID)</li>
+                        <li>created_at (TIMESTAMP)</li>
+                        <li>updated_at (TIMESTAMP)</li>
+                    </ul>
+                    
+                    <p>Columnas faltantes:</p>
+                    <ul>
+                        ${!columns.includes('id') ? '<li class="error">id</li>' : ''}
+                        ${!columns.includes('name') ? '<li class="error">name</li>' : ''}
+                        ${!columns.includes('duration') ? '<li class="error">duration</li>' : ''}
+                        ${!columns.includes('price') ? '<li class="error">price</li>' : ''}
+                        ${!columns.includes('category') ? '<li class="error">category</li>' : ''}
+                        ${!columns.includes('description') ? '<li class="error">description</li>' : ''}
+                        ${!columns.includes('user_id') ? '<li class="error">user_id</li>' : ''}
+                        ${!columns.includes('created_at') ? '<li class="error">created_at</li>' : ''}
+                        ${!columns.includes('updated_at') ? '<li class="error">updated_at</li>' : ''}
+                        ${columns.includes('id') && columns.includes('name') && columns.includes('duration') && 
+                          columns.includes('price') && columns.includes('category') && columns.includes('description') && 
+                          columns.includes('user_id') && columns.includes('created_at') && columns.includes('updated_at') ? 
+                          '<li class="success">¡Todas las columnas necesarias están presentes!</li>' : ''}
+                    </ul>
+                `;
+                
+            } catch (error) {
+                showError(`Error inesperado: ${error.message}`);
+                console.error('Error completo:', error);
+            }
+        }
+        
+        // Mostrar error
+        function showError(message) {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = `<p class="error">${message}</p>`;
+        }
+        
+        // Event listeners
+        document.getElementById('checkAuthBtn').addEventListener('click', checkAuth);
+        document.getElementById('checkTableBtn').addEventListener('click', checkTable);
+    </script>
+</body>
+</html>
