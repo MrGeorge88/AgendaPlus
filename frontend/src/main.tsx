@@ -4,9 +4,12 @@ import './index.css'
 import './global-reset.css'
 import './components/ui/modal.css'
 import App from './App.tsx'
+import { ToasterProvider } from './components/ui/toaster'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <App />
+    <ToasterProvider>
+      <App />
+    </ToasterProvider>
   </StrictMode>,
 )

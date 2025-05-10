@@ -5,7 +5,7 @@ import { BarChart3, TrendingUp, DollarSign, Calendar, Users } from 'lucide-react
 import { useLanguage } from '../contexts/language-context';
 import { useAuth } from '../contexts/auth-context';
 import { incomeService, IncomeStats } from '../services/income';
-import { toast } from 'sonner';
+import { toast } from '../lib/toast';
 
 export function Income() {
   const { t } = useLanguage();

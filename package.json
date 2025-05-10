@@ -22,6 +22,7 @@
     "setup": "node deploy.js",
     "deploy": "node deploy-vercel.js",
     "check": "node check-deployment.js",
+    "verify-build": "node verify-build.js",
     "test:supabase": "node test-supabase.js",
     "email-templates": "node supabase-auth-templates.js > supabase-email-templates.html"
   },

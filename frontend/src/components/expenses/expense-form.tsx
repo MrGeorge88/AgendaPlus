@@ -3,7 +3,7 @@ import { Button } from "../ui/button";
 import { Expense, expenseCategories, expensesService } from "../../services/expenses";
 import { useAuth } from "../../contexts/auth-context";
 import { useLanguage } from "../../contexts/language-context";
-import { toast } from "sonner";
+import { toast } from "../../lib/toast";
 
 interface ExpenseFormProps {
   onClose: () => void;
@@ -15,7 +15,7 @@ export function ExpenseForm({ onClose, onSave, expense }: ExpenseFormProps) {
   const { user } = useAuth();
   const { t } = useLanguage();
   const [loading, setLoading] = useState(false);
-  
+
   const [formData, setFormData] = useState({
     category: expense?.category || expenseCategories[0],
     description: expense?.description || "",
@@ -28,7 +28,7 @@ export function ExpenseForm({ onClose, onSave, expense }: ExpenseFormProps) {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value, type } = e.target;
-    
+
     if (type === "checkbox") {
       const checked = (e.target as HTMLInputElement).checked;
       setFormData((prev) => ({ ...prev, [name]: checked }));
@@ -39,14 +39,14 @@ export function ExpenseForm({ onClose, onSave, expense }: ExpenseFormProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!user) {
       toast.error("Debes iniciar sesión para registrar un gasto");
       return;
     }
-    
+
     setLoading(true);
-    
+
     try {
       const expenseData = {
         category: formData.category,
@@ -58,9 +58,9 @@ export function ExpenseForm({ onClose, onSave, expense }: ExpenseFormProps) {
         frequency: formData.recurring ? formData.frequency : undefined,
         userId: user.id,
       };
-      
+
       let success = false;
-      
+
       if (expense) {
         // Actualizar gasto existente
         const updatedExpense = await expensesService.updateExpense(expense.id, expenseData);
@@ -70,7 +70,7 @@ export function ExpenseForm({ onClose, onSave, expense }: ExpenseFormProps) {
         const newExpense = await expensesService.createExpense(expenseData);
         success = !!newExpense;
       }
-      
+
       if (success) {
         toast.success(expense ? "Gasto actualizado correctamente" : "Gasto registrado correctamente");
         onSave();

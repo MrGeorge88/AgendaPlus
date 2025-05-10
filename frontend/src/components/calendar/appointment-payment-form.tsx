@@ -3,7 +3,7 @@ import { Button } from "../ui/button";
 import { Appointment, appointmentsService } from "../../services/appointments";
 import { useAuth } from "../../contexts/auth-context";
 import { useLanguage } from "../../contexts/language-context";
-import { toast } from "sonner";
+import { toast } from "../../lib/toast";
 
 interface AppointmentPaymentFormProps {
   appointment: Appointment;
@@ -17,7 +17,7 @@ export function AppointmentPaymentForm({ appointment, onClose, onPaymentRegister
   const [loading, setLoading] = useState(false);
   const [payments, setPayments] = useState<any[]>([]);
   const [showPaymentHistory, setShowPaymentHistory] = useState(false);
-  
+
   const [formData, setFormData] = useState({
     amount: appointment.extendedProps.price.toString(),
     paymentMethod: "efectivo",
@@ -31,14 +31,14 @@ export function AppointmentPaymentForm({ appointment, onClose, onPaymentRegister
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!user) {
       toast.error("Debes iniciar sesión para registrar un pago");
       return;
     }
-    
+
     setLoading(true);
-    
+
     try {
       const success = await appointmentsService.registerPayment(
         appointment.id,
@@ -47,7 +47,7 @@ export function AppointmentPaymentForm({ appointment, onClose, onPaymentRegister
         formData.paymentMethod,
         formData.notes
       );
-      
+
       if (success) {
         toast.success("Pago registrado correctamente");
         onPaymentRegistered();

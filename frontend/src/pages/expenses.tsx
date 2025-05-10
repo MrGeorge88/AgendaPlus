@@ -5,7 +5,7 @@ import { useAuth } from "../contexts/auth-context";
 import { useLanguage } from "../contexts/language-context";
 import { Expense, expensesService } from "../services/expenses";
 import { ExpenseForm } from "../components/expenses/expense-form";
-import { toast } from "sonner";
+import { toast } from "../lib/toast";
 import { DollarSign, Calendar, CreditCard, Trash2, Edit, Plus, Filter } from "lucide-react";
 
 export function Expenses() {
@@ -32,7 +32,7 @@ export function Expenses() {
 
   const loadExpenses = async () => {
     if (!user) return;
-    
+
     setLoading(true);
     try {
       const data = await expensesService.getExpenses(user.id);
@@ -47,7 +47,7 @@ export function Expenses() {
 
   const loadStats = async () => {
     if (!user) return;
-    
+
     try {
       const data = await expensesService.getExpenseStats(user.id, "month");
       setStats(data);
@@ -70,7 +70,7 @@ export function Expenses() {
     if (!confirm("¿Estás seguro de que deseas eliminar este gasto?")) {
       return;
     }
-    
+
     try {
       const success = await expensesService.deleteExpense(id);
       if (success) {
@@ -100,16 +100,16 @@ export function Expenses() {
   const filteredExpenses = expenses.filter(expense => {
     let matchesCategory = true;
     let matchesDate = true;
-    
+
     if (filter) {
       matchesCategory = expense.category === filter;
     }
-    
+
     if (dateFilter) {
       const expenseDate = new Date(expense.expenseDate).toISOString().split("T")[0];
       matchesDate = expenseDate === dateFilter;
     }
-    
+
     return matchesCategory && matchesDate;
   });
 
@@ -127,7 +127,7 @@ export function Expenses() {
             </div>
             <h3 className="text-2xl font-bold">${stats.total || 0}</h3>
           </div>
-          
+
           <div className="bg-white rounded-lg shadow p-4">
             <div className="flex items-center mb-2">
               <Calendar className="h-5 w-5 text-indigo-500 mr-2" />
@@ -135,7 +135,7 @@ export function Expenses() {
             </div>
             <h3 className="text-2xl font-bold">{stats.count || 0}</h3>
           </div>
-          
+
           <div className="bg-white rounded-lg shadow p-4">
             <div className="flex items-center mb-2">
               <CreditCard className="h-5 w-5 text-indigo-500 mr-2" />
@@ -165,7 +165,7 @@ export function Expenses() {
                 ))}
               </select>
             </div>
-            
+
             <div className="flex items-center">
               <Calendar className="h-4 w-4 text-gray-500 mr-2" />
               <input
@@ -184,7 +184,7 @@ export function Expenses() {
               )}
             </div>
           </div>
-          
+
           <Button onClick={handleAddExpense}>
             <Plus className="h-4 w-4 mr-2" />
             Nuevo gasto

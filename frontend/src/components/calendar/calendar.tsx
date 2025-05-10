@@ -12,7 +12,7 @@ import { Modal } from "../ui/modal";
 import { useAuth } from "../../contexts/auth-context";
 import { staffService, StaffMember } from "../../services/staff";
 import { appointmentsService, Appointment } from "../../services/appointments";
-import { toast } from "sonner";
+import { toast } from "../../lib/toast";
 
 export function Calendar() {
   const { user } = useAuth();
