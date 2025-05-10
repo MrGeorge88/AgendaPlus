@@ -15,34 +15,34 @@ export function Landing() {
   return (
     <div className="min-h-screen bg-white">
       {/* Navbar - Moderno y minimalista */}
-      <nav className="border-b border-gray-100">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="flex h-16 items-center justify-between">
-            <div className="flex items-center">
-              <Link to="/" className="flex items-center">
-                <span className="text-xl font-bold text-indigo-600">{t('common.appName')}</span>
+      <nav className="border-b border-gray-100" style={{ borderBottomWidth: '1px', borderBottomColor: '#f3f4f6' }}>
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8" style={{ maxWidth: '80rem', paddingLeft: '1rem', paddingRight: '1rem' }}>
+          <div className="flex h-16 items-center justify-between" style={{ display: 'flex', height: '4rem', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div className="flex items-center" style={{ display: 'flex', alignItems: 'center' }}>
+              <Link to="/" className="flex items-center" style={{ display: 'flex', alignItems: 'center' }}>
+                <span className="text-xl font-bold text-indigo-600" style={{ fontSize: '1.25rem', fontWeight: 'bold', color: '#4f46e5' }}>{t('common.appName')}</span>
               </Link>
             </div>
-            <div className="hidden md:block">
-              <div className="ml-10 flex items-center space-x-4">
-                <a href="#features" className="text-gray-600 hover:text-gray-900 px-3 py-2 text-sm font-medium transition duration-200">
+            <div className="hidden md:block" style={{ display: 'none', '@media (min-width: 768px)': { display: 'block' } }}>
+              <div className="ml-10 flex items-center space-x-4" style={{ marginLeft: '2.5rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                <a href="#features" className="text-gray-600 hover:text-gray-900 px-3 py-2 text-sm font-medium transition duration-200" style={{ color: '#4b5563', padding: '0.5rem 0.75rem', fontSize: '0.875rem', fontWeight: '500', transition: 'color 0.2s ease' }}>
                   {t('landing.features.title')}
                 </a>
-                <a href="#how-it-works" className="text-gray-600 hover:text-gray-900 px-3 py-2 text-sm font-medium transition duration-200">
+                <a href="#how-it-works" className="text-gray-600 hover:text-gray-900 px-3 py-2 text-sm font-medium transition duration-200" style={{ color: '#4b5563', padding: '0.5rem 0.75rem', fontSize: '0.875rem', fontWeight: '500', transition: 'color 0.2s ease' }}>
                   Cómo funciona
                 </a>
-                <a href="#testimonials" className="text-gray-600 hover:text-gray-900 px-3 py-2 text-sm font-medium transition duration-200">
+                <a href="#testimonials" className="text-gray-600 hover:text-gray-900 px-3 py-2 text-sm font-medium transition duration-200" style={{ color: '#4b5563', padding: '0.5rem 0.75rem', fontSize: '0.875rem', fontWeight: '500', transition: 'color 0.2s ease' }}>
                   Testimonios
                 </a>
                 <LanguageSwitcher variant="minimal" />
               </div>
             </div>
-            <div className="flex items-center space-x-4">
-              <Link to="/login" className="text-gray-600 hover:text-gray-900 px-3 py-2 text-sm font-medium transition duration-200">
+            <div className="flex items-center space-x-4" style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+              <Link to="/login" className="text-gray-600 hover:text-gray-900 px-3 py-2 text-sm font-medium transition duration-200" style={{ color: '#4b5563', padding: '0.5rem 0.75rem', fontSize: '0.875rem', fontWeight: '500', transition: 'color 0.2s ease' }}>
                 {t('auth.login')}
               </Link>
               <Link to="/register">
-                <Button className="bg-indigo-600 hover:bg-indigo-700 text-white transition duration-200">
+                <Button className="bg-indigo-600 hover:bg-indigo-700 text-white transition duration-200" style={{ backgroundColor: '#4f46e5', color: 'white', transition: 'background-color 0.2s ease' }}>
                   {t('auth.register')}
                 </Button>
               </Link>
@@ -52,29 +52,29 @@ export function Landing() {
       </nav>
 
       {/* Hero Section - Moderno con ilustración */}
-      <section className="relative bg-white overflow-hidden">
-        <div className="mx-auto max-w-7xl">
-          <div className="relative z-10 pb-8 bg-white sm:pb-16 md:pb-20 lg:pb-28 xl:pb-32">
-            <div className="mt-10 mx-auto max-w-7xl px-4 sm:mt-12 sm:px-6 md:mt-16 lg:mt-20 lg:px-8 xl:mt-28">
-              <div className="sm:text-center lg:text-left">
-                <h1 className="text-4xl tracking-tight font-extrabold text-gray-900 sm:text-5xl md:text-6xl">
-                  <span className="block">Gestiona tu negocio</span>
-                  <span className="block text-indigo-600">con eficiencia</span>
+      <section className="relative bg-white overflow-hidden" style={{ position: 'relative', backgroundColor: 'white', overflow: 'hidden' }}>
+        <div className="mx-auto max-w-7xl" style={{ maxWidth: '80rem', marginLeft: 'auto', marginRight: 'auto' }}>
+          <div className="relative z-10 pb-8 bg-white sm:pb-16 md:pb-20 lg:pb-28 xl:pb-32" style={{ position: 'relative', zIndex: 10, paddingBottom: '2rem', backgroundColor: 'white' }}>
+            <div className="mt-10 mx-auto max-w-7xl px-4 sm:mt-12 sm:px-6 md:mt-16 lg:mt-20 lg:px-8 xl:mt-28" style={{ marginTop: '2.5rem', maxWidth: '80rem', paddingLeft: '1rem', paddingRight: '1rem' }}>
+              <div className="sm:text-center lg:text-left" style={{ '@media (min-width: 640px)': { textAlign: 'center' }, '@media (min-width: 1024px)': { textAlign: 'left' } }}>
+                <h1 className="text-4xl tracking-tight font-extrabold text-gray-900 sm:text-5xl md:text-6xl" style={{ fontSize: '2.25rem', lineHeight: '2.5rem', fontWeight: '800', color: '#111827', letterSpacing: '-0.025em' }}>
+                  <span className="block" style={{ display: 'block' }}>Gestiona tu negocio</span>
+                  <span className="block text-indigo-600" style={{ display: 'block', color: '#4f46e5' }}>con eficiencia</span>
                 </h1>
-                <p className="mt-3 text-base text-gray-500 sm:mt-5 sm:text-lg sm:max-w-xl sm:mx-auto md:mt-5 md:text-xl lg:mx-0">
+                <p className="mt-3 text-base text-gray-500 sm:mt-5 sm:text-lg sm:max-w-xl sm:mx-auto md:mt-5 md:text-xl lg:mx-0" style={{ marginTop: '0.75rem', fontSize: '1rem', color: '#6b7280' }}>
                   La plataforma todo-en-uno para profesionales de belleza, salud y wellness. Agenda, cobros y métricas en un solo lugar.
                 </p>
-                <div className="mt-5 sm:mt-8 sm:flex sm:justify-center lg:justify-start">
-                  <div className="rounded-md shadow">
+                <div className="mt-5 sm:mt-8 sm:flex sm:justify-center lg:justify-start" style={{ marginTop: '1.25rem', '@media (min-width: 640px)': { display: 'flex', justifyContent: 'center' }, '@media (min-width: 1024px)': { justifyContent: 'flex-start' } }}>
+                  <div className="rounded-md shadow" style={{ borderRadius: '0.375rem', boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)' }}>
                     <Link to="/register">
-                      <Button className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 md:py-4 md:text-lg md:px-10 transition duration-200">
+                      <Button className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 md:py-4 md:text-lg md:px-10 transition duration-200" style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0.75rem 2rem', border: 'none', fontSize: '1rem', fontWeight: '500', borderRadius: '0.375rem', color: 'white', backgroundColor: '#4f46e5', transition: 'background-color 0.2s ease' }}>
                         Comenzar gratis
-                        <ArrowRight className="ml-2 h-5 w-5" />
+                        <ArrowRight className="ml-2 h-5 w-5" style={{ marginLeft: '0.5rem', height: '1.25rem', width: '1.25rem' }} />
                       </Button>
                     </Link>
                   </div>
-                  <div className="mt-3 sm:mt-0 sm:ml-3">
-                    <a href="#how-it-works" className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-indigo-700 bg-indigo-100 hover:bg-indigo-200 md:py-4 md:text-lg md:px-10 transition duration-200">
+                  <div className="mt-3 sm:mt-0 sm:ml-3" style={{ marginTop: '0.75rem', '@media (min-width: 640px)': { marginTop: 0, marginLeft: '0.75rem' } }}>
+                    <a href="#how-it-works" className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-indigo-700 bg-indigo-100 hover:bg-indigo-200 md:py-4 md:text-lg md:px-10 transition duration-200" style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0.75rem 2rem', border: 'none', fontSize: '1rem', fontWeight: '500', borderRadius: '0.375rem', color: '#4338ca', backgroundColor: '#e0e7ff', transition: 'background-color 0.2s ease' }}>
                       Cómo funciona
                     </a>
                   </div>
@@ -83,9 +83,10 @@ export function Landing() {
             </div>
           </div>
         </div>
-        <div className="lg:absolute lg:inset-y-0 lg:right-0 lg:w-1/2">
+        <div className="lg:absolute lg:inset-y-0 lg:right-0 lg:w-1/2" style={{ '@media (min-width: 1024px)': { position: 'absolute', top: 0, right: 0, bottom: 0, width: '50%' } }}>
           <img
             className="h-56 w-full object-cover sm:h-72 md:h-96 lg:w-full lg:h-full shadow-lg rounded-bl-2xl"
+            style={{ height: '14rem', width: '100%', objectFit: 'cover', boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)', borderBottomLeftRadius: '1rem' }}
             src={AppScreenshot || "https://placehold.co/800x600/e2e8f0/475569?text=AgendaPlus+Dashboard"}
             alt="AgendaPlus dashboard"
           />
