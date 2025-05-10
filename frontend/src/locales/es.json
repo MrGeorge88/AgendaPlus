@@ -142,6 +142,12 @@
     "addSuccess": "Miembro del personal añadido con éxito",
     "editSuccess": "Miembro del personal actualizado con éxito",
     "deleteSuccess": "Miembro del personal eliminado con éxito",
+    "createSuccess": "Miembro del personal creado con éxito",
+    "updateSuccess": "Miembro del personal actualizado con éxito",
+    "createError": "Error al crear el miembro del personal",
+    "updateError": "Error al actualizar el miembro del personal",
+    "deleteError": "Error al eliminar el miembro del personal",
+    "errorLoading": "Error al cargar los miembros del personal",
     "noResults": "No se encontraron miembros del personal que coincidan con la búsqueda."
   },
   "income": {

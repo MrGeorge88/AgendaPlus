@@ -142,6 +142,12 @@
     "addSuccess": "Staff member added successfully",
     "editSuccess": "Staff member updated successfully",
     "deleteSuccess": "Staff member deleted successfully",
+    "createSuccess": "Staff member created successfully",
+    "updateSuccess": "Staff member updated successfully",
+    "createError": "Error creating staff member",
+    "updateError": "Error updating staff member",
+    "deleteError": "Error deleting staff member",
+    "errorLoading": "Error loading staff members",
     "noResults": "No staff members found matching your search."
   },
   "income": {

@@ -37,6 +37,7 @@ CREATE TABLE IF NOT EXISTS staff (
   name TEXT NOT NULL,
   email TEXT,
   phone TEXT,
+  specialty TEXT, -- especialidad del profesional
   color TEXT, -- color para el calendario
   avatar_url TEXT,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
@@ -69,71 +70,71 @@ ALTER TABLE staff ENABLE ROW LEVEL SECURITY;
 ALTER TABLE appointments ENABLE ROW LEVEL SECURITY;
 
 -- Políticas para clientes
-CREATE POLICY "Usuarios pueden ver sus propios clientes" 
-  ON clients FOR SELECT 
+CREATE POLICY "Usuarios pueden ver sus propios clientes"
+  ON clients FOR SELECT
   USING (auth.uid() = user_id);
 
-CREATE POLICY "Usuarios pueden insertar sus propios clientes" 
-  ON clients FOR INSERT 
+CREATE POLICY "Usuarios pueden insertar sus propios clientes"
+  ON clients FOR INSERT
   WITH CHECK (auth.uid() = user_id);
 
-CREATE POLICY "Usuarios pueden actualizar sus propios clientes" 
-  ON clients FOR UPDATE 
+CREATE POLICY "Usuarios pueden actualizar sus propios clientes"
+  ON clients FOR UPDATE
   USING (auth.uid() = user_id);
 
-CREATE POLICY "Usuarios pueden eliminar sus propios clientes" 
-  ON clients FOR DELETE 
+CREATE POLICY "Usuarios pueden eliminar sus propios clientes"
+  ON clients FOR DELETE
   USING (auth.uid() = user_id);
 
 -- Políticas para servicios
-CREATE POLICY "Usuarios pueden ver sus propios servicios" 
-  ON services FOR SELECT 
+CREATE POLICY "Usuarios pueden ver sus propios servicios"
+  ON services FOR SELECT
   USING (auth.uid() = user_id);
 
-CREATE POLICY "Usuarios pueden insertar sus propios servicios" 
-  ON services FOR INSERT 
+CREATE POLICY "Usuarios pueden insertar sus propios servicios"
+  ON services FOR INSERT
   WITH CHECK (auth.uid() = user_id);
 
-CREATE POLICY "Usuarios pueden actualizar sus propios servicios" 
-  ON services FOR UPDATE 
+CREATE POLICY "Usuarios pueden actualizar sus propios servicios"
+  ON services FOR UPDATE
   USING (auth.uid() = user_id);
 
-CREATE POLICY "Usuarios pueden eliminar sus propios servicios" 
-  ON services FOR DELETE 
+CREATE POLICY "Usuarios pueden eliminar sus propios servicios"
+  ON services FOR DELETE
   USING (auth.uid() = user_id);
 
 -- Políticas para profesionales
-CREATE POLICY "Usuarios pueden ver sus propios profesionales" 
-  ON staff FOR SELECT 
+CREATE POLICY "Usuarios pueden ver sus propios profesionales"
+  ON staff FOR SELECT
   USING (auth.uid() = user_id);
 
-CREATE POLICY "Usuarios pueden insertar sus propios profesionales" 
-  ON staff FOR INSERT 
+CREATE POLICY "Usuarios pueden insertar sus propios profesionales"
+  ON staff FOR INSERT
   WITH CHECK (auth.uid() = user_id);
 
-CREATE POLICY "Usuarios pueden actualizar sus propios profesionales" 
-  ON staff FOR UPDATE 
+CREATE POLICY "Usuarios pueden actualizar sus propios profesionales"
+  ON staff FOR UPDATE
   USING (auth.uid() = user_id);
 
-CREATE POLICY "Usuarios pueden eliminar sus propios profesionales" 
-  ON staff FOR DELETE 
+CREATE POLICY "Usuarios pueden eliminar sus propios profesionales"
+  ON staff FOR DELETE
   USING (auth.uid() = user_id);
 
 -- Políticas para citas
-CREATE POLICY "Usuarios pueden ver sus propias citas" 
-  ON appointments FOR SELECT 
+CREATE POLICY "Usuarios pueden ver sus propias citas"
+  ON appointments FOR SELECT
   USING (auth.uid() = user_id);
 
-CREATE POLICY "Usuarios pueden insertar sus propias citas" 
-  ON appointments FOR INSERT 
+CREATE POLICY "Usuarios pueden insertar sus propias citas"
+  ON appointments FOR INSERT
   WITH CHECK (auth.uid() = user_id);
 
-CREATE POLICY "Usuarios pueden actualizar sus propias citas" 
-  ON appointments FOR UPDATE 
+CREATE POLICY "Usuarios pueden actualizar sus propias citas"
+  ON appointments FOR UPDATE
   USING (auth.uid() = user_id);
 
-CREATE POLICY "Usuarios pueden eliminar sus propias citas" 
-  ON appointments FOR DELETE 
+CREATE POLICY "Usuarios pueden eliminar sus propias citas"
+  ON appointments FOR DELETE
   USING (auth.uid() = user_id);
 
 -- Índices para mejorar el rendimiento

@@ -46,8 +46,8 @@ export function Staff() {
 
   const filteredStaff = staff.filter(person =>
     person.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    person.specialty.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    person.email.toLowerCase().includes(searchTerm.toLowerCase())
+    (person.specialty && person.specialty.toLowerCase().includes(searchTerm.toLowerCase())) ||
+    (person.email && person.email.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
   const handleAddStaff = () => {
