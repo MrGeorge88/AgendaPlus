@@ -94,12 +94,12 @@ export function Staff() {
       if (user) {
         const staffData = {
           name: formData.get('name') as string,
-          specialty: formData.get('specialty') as string,
           email: formData.get('email') as string,
           phone: formData.get('phone') as string,
           color: formData.get('color') as string,
           avatar: currentStaff?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(formData.get('name') as string)}&background=random`,
-          userId: user.id
+          userId: user.id,
+          specialty: '' // Set a default empty string since the column doesn't exist
         };
 
         let result;
@@ -181,9 +181,11 @@ export function Staff() {
                     </Avatar>
                     <div>
                       <h3 className="text-lg font-bold">{person.name}</h3>
-                      <div className="flex items-center text-sm text-slate-500">
-                        <Briefcase className="mr-1 h-3 w-3" /> {person.specialty}
-                      </div>
+                      {person.specialty && (
+                        <div className="flex items-center text-sm text-slate-500">
+                          <Briefcase className="mr-1 h-3 w-3" /> {person.specialty}
+                        </div>
+                      )}
                     </div>
                   </div>
                   <div className="flex space-x-2">
@@ -240,15 +242,7 @@ export function Staff() {
                 />
               </div>
 
-              <div>
-                <label className="mb-1 block text-sm font-medium">{t('staff.specialty')}</label>
-                <input
-                  type="text"
-                  name="specialty"
-                  className="w-full rounded-lg border border-slate-300 p-2"
-                  defaultValue={currentStaff?.specialty || ''}
-                />
-              </div>
+              {/* Specialty field removed as it doesn't exist in the database */}
 
               <div>
                 <label className="mb-1 block text-sm font-medium">{t('staff.email')}</label>

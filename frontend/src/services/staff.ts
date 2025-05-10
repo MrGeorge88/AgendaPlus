@@ -34,7 +34,7 @@ export const staffService = {
         userId: staff.user_id,
         email: staff.email,
         phone: staff.phone,
-        specialty: staff.specialty
+        specialty: '' // Set a default empty string since the column doesn't exist
       }));
     } catch (error) {
       console.error('Error al obtener el personal:', error);
@@ -45,7 +45,7 @@ export const staffService = {
   // Crear un nuevo miembro del personal
   createStaffMember: async (staffMember: Omit<StaffMember, 'id'>, userId: string): Promise<StaffMember | null> => {
     try {
-      // Prepare the staff data
+      // Prepare the staff data - exclude specialty as it seems to not exist in the database
       const staffData = {
         name: staffMember.name,
         color: staffMember.color,
@@ -54,11 +54,6 @@ export const staffService = {
         phone: staffMember.phone,
         user_id: userId
       };
-
-      // Only add specialty if it's defined
-      if (staffMember.specialty) {
-        Object.assign(staffData, { specialty: staffMember.specialty });
-      }
 
       console.log('Inserting staff member with data:', staffData);
 
@@ -81,7 +76,7 @@ export const staffService = {
         userId: data.user_id,
         email: data.email,
         phone: data.phone,
-        specialty: data.specialty
+        specialty: '' // Set a default empty string since the column doesn't exist
       };
     } catch (error) {
       console.error('Error al crear el miembro del personal:', error);
@@ -92,7 +87,7 @@ export const staffService = {
   // Actualizar un miembro del personal existente
   updateStaffMember: async (staffMember: StaffMember): Promise<StaffMember | null> => {
     try {
-      // Prepare the staff data
+      // Prepare the staff data - exclude specialty as it seems to not exist in the database
       const staffData = {
         name: staffMember.name,
         color: staffMember.color,
@@ -100,11 +95,6 @@ export const staffService = {
         email: staffMember.email,
         phone: staffMember.phone
       };
-
-      // Only add specialty if it's defined
-      if (staffMember.specialty) {
-        Object.assign(staffData, { specialty: staffMember.specialty });
-      }
 
       console.log('Updating staff member with data:', staffData);
 
@@ -128,7 +118,7 @@ export const staffService = {
         userId: data.user_id,
         email: data.email,
         phone: data.phone,
-        specialty: data.specialty
+        specialty: '' // Set a default empty string since the column doesn't exist
       };
     } catch (error) {
       console.error('Error al actualizar el miembro del personal:', error);
