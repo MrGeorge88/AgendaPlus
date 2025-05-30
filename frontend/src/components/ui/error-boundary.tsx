@@ -26,7 +26,7 @@ export class ErrorBoundary extends Component<Props, State> {
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     console.error('Error capturado por ErrorBoundary:', error, errorInfo);
-    
+
     this.setState({
       error,
       errorInfo
@@ -74,6 +74,17 @@ interface ErrorFallbackProps {
 export const DefaultErrorFallback: React.FC<ErrorFallbackProps> = ({ error, resetError }) => {
   const isDevelopment = process.env.NODE_ENV === 'development';
 
+  // Log detailed error information
+  console.error('🚨 Error Boundary Caught:', {
+    message: error.message,
+    stack: error.stack,
+    name: error.name,
+    cause: error.cause,
+    timestamp: new Date().toISOString(),
+    url: window.location.href,
+    userAgent: navigator.userAgent
+  });
+
   const handleReload = () => {
     window.location.reload();
   };
@@ -91,7 +102,7 @@ export const DefaultErrorFallback: React.FC<ErrorFallbackProps> = ({ error, rese
       url: window.location.href,
       timestamp: new Date().toISOString()
     };
-    
+
     console.log('Error Report:', errorReport);
     // Aquí se podría enviar a un servicio de reporte de errores
   };
@@ -111,33 +122,34 @@ export const DefaultErrorFallback: React.FC<ErrorFallbackProps> = ({ error, rese
           </p>
         </div>
 
-        {isDevelopment && (
-          <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded text-left">
-            <h3 className="font-medium text-red-800 mb-2">Información del error (solo en desarrollo):</h3>
-            <p className="text-sm text-red-700 font-mono break-all">
-              {error.message}
-            </p>
-            {error.stack && (
-              <details className="mt-2">
-                <summary className="text-sm text-red-600 cursor-pointer">Ver stack trace</summary>
-                <pre className="text-xs text-red-600 mt-2 overflow-auto max-h-32">
-                  {error.stack}
-                </pre>
-              </details>
-            )}
-          </div>
-        )}
+        {/* Mostrar información del error temporalmente en producción para debug */}
+        <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded text-left">
+          <h3 className="font-medium text-red-800 mb-2">
+            Información del error {isDevelopment ? '(desarrollo)' : '(debug temporal)'}:
+          </h3>
+          <p className="text-sm text-red-700 font-mono break-all">
+            {error.message}
+          </p>
+          {error.stack && (
+            <details className="mt-2">
+              <summary className="text-sm text-red-600 cursor-pointer">Ver stack trace</summary>
+              <pre className="text-xs text-red-600 mt-2 overflow-auto max-h-32">
+                {error.stack}
+              </pre>
+            </details>
+          )}
+        </div>
 
         <div className="space-y-3">
           <div className="flex space-x-3">
-            <Button 
+            <Button
               onClick={resetError}
               className="flex-1 flex items-center justify-center space-x-2"
             >
               <RefreshCw className="w-4 h-4" />
               <span>Reintentar</span>
             </Button>
-            <Button 
+            <Button
               variant="outline"
               onClick={handleReload}
               className="flex-1 flex items-center justify-center space-x-2"
@@ -146,9 +158,9 @@ export const DefaultErrorFallback: React.FC<ErrorFallbackProps> = ({ error, rese
               <span>Recargar</span>
             </Button>
           </div>
-          
+
           <div className="flex space-x-3">
-            <Button 
+            <Button
               variant="outline"
               onClick={handleGoHome}
               className="flex-1 flex items-center justify-center space-x-2"
@@ -156,7 +168,7 @@ export const DefaultErrorFallback: React.FC<ErrorFallbackProps> = ({ error, rese
               <Home className="w-4 h-4" />
               <span>Ir al inicio</span>
             </Button>
-            <Button 
+            <Button
               variant="outline"
               onClick={handleReportError}
               className="flex-1 flex items-center justify-center space-x-2"
@@ -210,7 +222,7 @@ export const ComponentErrorBoundary: React.FC<{
 export const useErrorHandler = () => {
   const handleError = (error: Error, errorInfo?: string) => {
     console.error('Error manejado:', error);
-    
+
     // En desarrollo, mostrar en consola
     if (process.env.NODE_ENV === 'development') {
       console.group('🚨 Error Handler');
