@@ -140,10 +140,48 @@ export function AppointmentPaymentForm({ appointment, onClose, onPaymentRegister
                   onChange={handleChange}
                   step="0.01"
                   min="0"
-                  max={appointment.extendedProps.price}
+                  max="10000"
                   className="w-full pl-7 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   required
                 />
+              </div>
+              <div className="mt-2 space-y-2">
+                <div className="text-xs text-gray-500">
+                  <p>Precio del servicio: <span className="font-medium">${appointment.extendedProps.price}</span></p>
+                  <p>Puedes registrar descuentos (menor al precio) o propinas (mayor al precio)</p>
+                </div>
+
+                {/* Botones de acceso rápido */}
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setFormData(prev => ({ ...prev, amount: (appointment.extendedProps.price * 0.9).toFixed(2) }))}
+                    className="px-2 py-1 text-xs bg-orange-100 text-orange-700 rounded hover:bg-orange-200 transition-colors"
+                  >
+                    -10% (${(appointment.extendedProps.price * 0.9).toFixed(2)})
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setFormData(prev => ({ ...prev, amount: appointment.extendedProps.price.toString() }))}
+                    className="px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded hover:bg-blue-200 transition-colors"
+                  >
+                    Precio completo (${appointment.extendedProps.price})
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setFormData(prev => ({ ...prev, amount: (appointment.extendedProps.price * 1.1).toFixed(2) }))}
+                    className="px-2 py-1 text-xs bg-green-100 text-green-700 rounded hover:bg-green-200 transition-colors"
+                  >
+                    +10% (${(appointment.extendedProps.price * 1.1).toFixed(2)})
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setFormData(prev => ({ ...prev, amount: (appointment.extendedProps.price * 1.2).toFixed(2) }))}
+                    className="px-2 py-1 text-xs bg-green-100 text-green-700 rounded hover:bg-green-200 transition-colors"
+                  >
+                    +20% (${(appointment.extendedProps.price * 1.2).toFixed(2)})
+                  </button>
+                </div>
               </div>
             </div>
 
