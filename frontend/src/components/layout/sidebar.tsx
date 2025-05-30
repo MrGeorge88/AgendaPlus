@@ -32,12 +32,22 @@ interface SidebarProps {
 
 export function Sidebar({ isOpen = false, onClose, onCollapseChange }: SidebarProps) {
   const location = useLocation();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const isMobile = useIsMobile();
   const isTouch = useIsTouchDevice();
   const sidebarRef = useRef<HTMLElement>(null);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [expandedItems, setExpandedItems] = useState<string[]>(['/dashboard']);
+
+  // Traducciones manuales para evitar problemas con i18n
+  const translations = {
+    'navigation.dashboard': language === 'es' ? 'Dashboard' : 'Dashboard',
+    'navigation.clients': language === 'es' ? 'Clientes' : 'Clients',
+    'navigation.services': language === 'es' ? 'Servicios' : 'Services',
+    'navigation.staff': language === 'es' ? 'Personal' : 'Staff',
+    'navigation.income': language === 'es' ? 'Ingresos' : 'Income',
+    'navigation.expenses': language === 'es' ? 'Gastos' : 'Expenses',
+  };
 
   // Manejar gestos de swipe en dispositivos táctiles
   useEffect(() => {
@@ -162,7 +172,7 @@ export function Sidebar({ isOpen = false, onClose, onCollapseChange }: SidebarPr
               const isActive = location.pathname === item.path;
               const isExpanded = expandedItems.includes(item.path);
               const Icon = item.icon;
-              const itemName = item.suffix ? t(item.key) + item.suffix : t(item.key);
+              const itemName = item.suffix ? translations[item.key] + item.suffix : translations[item.key];
               const hasSubItems = item.subItems && item.subItems.length > 0;
 
               return (

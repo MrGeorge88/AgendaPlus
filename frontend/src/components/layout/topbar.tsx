@@ -67,7 +67,7 @@ export function Topbar({ title, onMenuToggle, isMobile = false }: TopbarProps) {
       </div>
       <div className="flex items-center gap-4">
         <Button variant="outline" onClick={handleTodayClick}>
-          {t('common.today')}
+          {language === 'es' ? 'Hoy' : 'Today'}
         </Button>
         <LanguageSwitcher variant="minimal" className="hidden sm:flex" />
         <ThemeToggle />
@@ -83,7 +83,7 @@ export function Topbar({ title, onMenuToggle, isMobile = false }: TopbarProps) {
           {showUserMenu && (
             <div className="user-menu">
               <div className="user-menu-header">
-                <p>{user?.name || t('common.user')}</p>
+                <p>{user?.name || (language === 'es' ? 'Usuario' : 'User')}</p>
                 <p>{user?.email}</p>
               </div>
               <button
@@ -91,7 +91,7 @@ export function Topbar({ title, onMenuToggle, isMobile = false }: TopbarProps) {
                 onClick={handleSignOut}
               >
                 <LogOut />
-                {t('auth.logout')}
+                {language === 'es' ? 'Cerrar sesión' : 'Logout'}
               </button>
             </div>
           )}
