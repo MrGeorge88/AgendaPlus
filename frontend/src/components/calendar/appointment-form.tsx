@@ -33,7 +33,7 @@ export function AppointmentForm({ onClose, onSave, staffMembers, date = new Date
     title: "",
     serviceId: "",
     clientName: "",
-    staffId: staffMembers[0]?.id || "",
+    staffId: staffMembers[0]?.id?.toString() || "",
     date: date.toISOString().split("T")[0],
     startTime: formatTimeForInput(date),
     endTime: formatTimeForInput(new Date(date.getTime() + 60 * 60 * 1000)), // Por defecto 1 hora después
@@ -144,30 +144,31 @@ export function AppointmentForm({ onClose, onSave, staffMembers, date = new Date
     const startDateTime = new Date(`${formData.date}T${formData.startTime}`);
     const endDateTime = new Date(`${formData.date}T${formData.endTime}`);
 
-    const staffMember = staffMembers.find(staff => staff.id === formData.staffId);
+    // Buscar el miembro del personal comparando tanto string como number
+    const staffMember = staffMembers.find(staff =>
+      staff.id === formData.staffId ||
+      staff.id === parseInt(formData.staffId.toString()) ||
+      staff.id.toString() === formData.staffId.toString()
+    );
+
     const selectedService = services.find(service => service.id === formData.serviceId);
 
     // Verificar que se haya seleccionado un miembro del personal
-
-    // Asegurarse de que se haya seleccionado un profesional
     if (!staffMember) {
       alert('Por favor, selecciona un profesional válido');
       return;
     }
 
-    // Convertir el ID a número si es posible
-    let staffId = formData.staffId;
-    if (typeof staffId === 'string' && /^\d+$/.test(staffId)) {
-      staffId = parseInt(staffId, 10);
-    }
+    // Usar el ID del staff member encontrado
+    const staffId = staffMember.id;
 
     const appointment = {
       title: formData.title,
       start: startDateTime.toISOString(),
       end: endDateTime.toISOString(),
-      resourceId: staffId, // Usar el ID convertido a número
-      backgroundColor: staffMember?.color || "#4f46e5",
-      borderColor: staffMember?.color || "#4f46e5",
+      resourceId: staffId,
+      backgroundColor: staffMember.color || "#4f46e5",
+      borderColor: staffMember.color || "#4f46e5",
       extendedProps: {
         client: formData.clientName,
         service: formData.title,
@@ -331,21 +332,15 @@ export function AppointmentForm({ onClose, onSave, staffMembers, date = new Date
                 name="endTime"
                 value={formData.endTime}
                 onChange={handleChange}
-                className={`w-full px-3 py-2 border border-slate-200 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
-                  formData.serviceId ? 'bg-slate-50 cursor-not-allowed' : ''
-                }`}
-                readOnly={!!formData.serviceId}
+                className="w-full px-3 py-2 border border-slate-200 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 required
               />
-              {formData.serviceId ? (
-                <p className="mt-1 text-xs text-slate-500">
-                  Calculado automáticamente según la duración del servicio
-                </p>
-              ) : (
-                <p className="mt-1 text-xs text-slate-500">
-                  Puedes editar la hora de fin manualmente
-                </p>
-              )}
+              <p className="mt-1 text-xs text-slate-500">
+                {formData.serviceId
+                  ? 'Calculado automáticamente, pero puedes editarlo'
+                  : 'Puedes editar la hora de fin manualmente'
+                }
+              </p>
             </div>
 
             <div>
@@ -362,22 +357,16 @@ export function AppointmentForm({ onClose, onSave, staffMembers, date = new Date
                   step="0.01"
                   min="0"
                   placeholder="0.00"
-                  className={`w-full px-3 py-2 pl-7 border border-slate-200 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
-                    formData.serviceId ? 'bg-slate-50 cursor-not-allowed' : ''
-                  }`}
-                  readOnly={!!formData.serviceId}
+                  className="w-full px-3 py-2 pl-7 border border-slate-200 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   required
                 />
               </div>
-              {formData.serviceId ? (
-                <p className="mt-1 text-xs text-slate-500">
-                  Precio del servicio seleccionado
-                </p>
-              ) : (
-                <p className="mt-1 text-xs text-slate-500">
-                  Puedes editar el precio manualmente
-                </p>
-              )}
+              <p className="mt-1 text-xs text-slate-500">
+                {formData.serviceId
+                  ? 'Precio del servicio seleccionado, pero puedes editarlo'
+                  : 'Puedes editar el precio manualmente'
+                }
+              </p>
             </div>
           </div>
 
