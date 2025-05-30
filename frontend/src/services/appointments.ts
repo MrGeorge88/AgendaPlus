@@ -157,7 +157,6 @@ export const appointmentsService = {
           .single();
 
         if (!error) {
-          console.log('Appointment created successfully with client_name and service_name');
           return {
             id: data.id,
             title: data.title,
@@ -181,11 +180,10 @@ export const appointmentsService = {
           };
         }
       } catch (clientNameError) {
-        console.error('Error trying with client_name:', clientNameError);
+        // Error trying with client_name, fallback to basic structure
       }
 
       // Si llegamos aquí, intentamos sin client_name y service_name
-      console.log('Trying without client_name and service_name');
       const { data, error } = await supabase
         .from('appointments')
         .insert(supabaseAppointment)
@@ -193,11 +191,8 @@ export const appointmentsService = {
         .single();
 
       if (error) {
-        console.error('Error creating appointment:', error);
         throw error;
       }
-
-      console.log('Appointment created successfully without client_name and service_name');
 
       // Transformar la respuesta al formato de FullCalendar
       return {

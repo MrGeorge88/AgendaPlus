@@ -58,7 +58,7 @@ export const staffService = {
         Object.assign(staffData, { avatar_url: staffMember.avatar });
       }
 
-      console.log('Inserting staff member with data:', staffData);
+
 
       const { data, error } = await supabase
         .from('staff')
@@ -67,7 +67,6 @@ export const staffService = {
         .single();
 
       if (error) {
-        console.error('Supabase error details:', error);
         throw error;
       }
 
@@ -101,7 +100,7 @@ export const staffService = {
         Object.assign(staffData, { avatar_url: staffMember.avatar });
       }
 
-      console.log('Updating staff member with data:', staffData);
+
 
       const { data, error } = await supabase
         .from('staff')
@@ -111,7 +110,6 @@ export const staffService = {
         .single();
 
       if (error) {
-        console.error('Supabase error details:', error);
         throw error;
       }
 

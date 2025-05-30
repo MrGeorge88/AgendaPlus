@@ -26,20 +26,22 @@ export default defineConfig({
     postcss: './postcss.config.js'
   },
   build: {
-    sourcemap: true,
+    sourcemap: false, // Desactivar sourcemaps en producción
+    minify: 'terser',
     rollupOptions: {
       output: {
         manualChunks: {
           vendor: ['react', 'react-dom', 'react-router-dom', 'sonner'],
           ui: ['@radix-ui/react-avatar', '@radix-ui/react-dialog', '@radix-ui/react-dropdown-menu', '@radix-ui/react-slot'],
           calendar: ['@fullcalendar/core', '@fullcalendar/daygrid', '@fullcalendar/timegrid', '@fullcalendar/interaction', '@fullcalendar/react'],
+          supabase: ['@supabase/supabase-js'],
         },
       },
-      external: [],
     },
     commonjsOptions: {
       include: [/node_modules/],
     },
+    chunkSizeWarningLimit: 1000,
   },
   optimizeDeps: {
     include: ['sonner'],

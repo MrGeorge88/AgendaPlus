@@ -20,18 +20,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const checkUser = async () => {
       setLoading(true);
       try {
-        console.log('Verificando usuario actual...');
         const { user, error } = await authService.getCurrentUser();
 
         if (error) {
-          console.error('Error al obtener el usuario actual:', error);
           setUser(null);
         } else {
-          console.log('Usuario autenticado:', user);
           setUser(user);
         }
       } catch (error) {
-        console.error('Excepción al obtener el usuario actual:', error);
         setUser(null);
       } finally {
         setLoading(false);
@@ -48,7 +44,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (error) throw error;
       setUser(user);
     } catch (error) {
-      console.error('Error al iniciar sesión:', error);
       throw error;
     } finally {
       setLoading(false);
@@ -70,7 +65,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(response.user);
       return response;
     } catch (error) {
-      console.error('Error al registrarse:', error);
       throw error;
     } finally {
       setLoading(false);
@@ -84,7 +78,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (error) throw error;
       setUser(null);
     } catch (error) {
-      console.error('Error al cerrar sesión:', error);
       throw error;
     } finally {
       setLoading(false);
