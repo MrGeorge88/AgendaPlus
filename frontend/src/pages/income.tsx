@@ -192,8 +192,9 @@ export function Income() {
             ))}
           </div>
         </div>
-            </>
-          )}
+      </div>
+          </>
+        )}
       </ComponentErrorBoundary>
     </Layout>
   );
