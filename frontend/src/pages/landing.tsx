@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { Button } from '../components/ui/button';
-import { useTranslation } from 'react-i18next';
+import { useSafeTranslation } from '../hooks/use-safe-translation';
 import { LanguageSwitcher } from '../components/ui/language-switcher';
 import { ArrowRight, Calendar, Bell, BarChart2, CreditCard, ChevronRight } from 'lucide-react';
 import { useState } from 'react';
@@ -9,15 +9,8 @@ import { useState } from 'react';
 const AppScreenshot = 'https://images.unsplash.com/photo-1551434678-e076c223a692?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80';
 
 export function Landing() {
-  const { t, ready } = useTranslation();
+  const { t, ready } = useSafeTranslation();
   const [activeTestimonial, setActiveTestimonial] = useState(0);
-
-  // Fallback function for translations
-  const getText = (key: string, fallback: string) => {
-    if (!ready) return fallback;
-    const translation = t(key);
-    return translation === key ? fallback : translation;
-  };
 
   return (
     <div className="min-h-screen bg-white">
@@ -33,7 +26,7 @@ export function Landing() {
             <div className="hidden md:block" style={{ display: 'none', '@media (min-width: 768px)': { display: 'block' } }}>
               <div className="ml-10 flex items-center space-x-4" style={{ marginLeft: '2.5rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
                 <a href="#features" className="text-gray-600 hover:text-gray-900 px-3 py-2 text-sm font-medium transition duration-200" style={{ color: '#4b5563', padding: '0.5rem 0.75rem', fontSize: '0.875rem', fontWeight: '500', transition: 'color 0.2s ease' }}>
-                  {getText('landing.features.title', 'Características')}
+                  {t('landing.features.title', 'Características')}
                 </a>
                 <a href="#how-it-works" className="text-gray-600 hover:text-gray-900 px-3 py-2 text-sm font-medium transition duration-200" style={{ color: '#4b5563', padding: '0.5rem 0.75rem', fontSize: '0.875rem', fontWeight: '500', transition: 'color 0.2s ease' }}>
                   Cómo funciona
@@ -46,11 +39,11 @@ export function Landing() {
             </div>
             <div className="flex items-center space-x-4" style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
               <Link to="/login" className="text-gray-600 hover:text-gray-900 px-3 py-2 text-sm font-medium transition duration-200" style={{ color: '#4b5563', padding: '0.5rem 0.75rem', fontSize: '0.875rem', fontWeight: '500', transition: 'color 0.2s ease' }}>
-                {getText('auth.login', 'Iniciar sesión')}
+                {t('auth.login', 'Iniciar sesión')}
               </Link>
               <Link to="/register">
                 <Button className="bg-indigo-600 hover:bg-indigo-700 text-white transition duration-200" style={{ backgroundColor: '#4f46e5', color: 'white', transition: 'background-color 0.2s ease' }}>
-                  {getText('auth.register', 'Registrarse')}
+                  {t('auth.register', 'Registrarse')}
                 </Button>
               </Link>
             </div>
