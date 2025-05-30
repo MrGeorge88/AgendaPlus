@@ -4,6 +4,8 @@ import { QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { Landing } from './pages/landing';
 import { Dashboard } from './pages/dashboard';
+import { Agenda } from './pages/agenda';
+import { Analytics } from './pages/analytics';
 import { Clients } from './pages/clients';
 import { Services } from './pages/services';
 import { Staff } from './pages/staff';
@@ -41,7 +43,7 @@ function App() {
                     {/* Protected Routes */}
                     <Route path="/agenda" element={
                       <ProtectedRoute>
-                        <Dashboard />
+                        <Agenda />
                       </ProtectedRoute>
                     } />
                     <Route path="/dashboard" element={
@@ -51,7 +53,7 @@ function App() {
                     } />
                     <Route path="/analytics" element={
                       <ProtectedRoute>
-                        <Dashboard />
+                        <Analytics />
                       </ProtectedRoute>
                     } />
                     <Route path="/clients" element={

@@ -1,18 +1,25 @@
 import { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/auth-context';
-import { useLanguage } from '../contexts/language-context';
+import { useTranslation } from 'react-i18next';
 import { email as emailValidator, required } from '../utils/validation';
 
 export function Login() {
   const navigate = useNavigate();
   const location = useLocation();
   const { signIn } = useAuth();
-  const { t } = useLanguage();
+  const { t, ready } = useTranslation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Fallback function for translations
+  const getText = (key: string, fallback: string) => {
+    if (!ready) return fallback;
+    const translation = t(key);
+    return translation === key ? fallback : translation;
+  };
 
   // Get the intended destination from location state, or default to agenda
   const from = (location.state as { from?: { pathname: string } })?.from?.pathname || '/agenda';
@@ -52,10 +59,10 @@ export function Login() {
       }}>
         <div style={{ marginBottom: '1.5rem', textAlign: 'center' }}>
           <h1 style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#4f46e5' }}>
-            {t('common.appName')}
+            AgendaPlus
           </h1>
           <p style={{ marginTop: '0.5rem', color: '#64748b' }}>
-            {t('auth.loginTitle')}
+            {getText('auth.loginTitle', 'Inicia sesión en tu cuenta')}
           </p>
         </div>
 
@@ -80,7 +87,7 @@ export function Login() {
               fontSize: '0.875rem',
               fontWeight: '500'
             }}>
-              {t('auth.email')}
+              {getText('auth.email', 'Correo electrónico')}
             </label>
             <input
               type="email"
@@ -105,7 +112,7 @@ export function Login() {
               fontSize: '0.875rem',
               fontWeight: '500'
             }}>
-              {t('auth.password')}
+              {getText('auth.password', 'Contraseña')}
             </label>
             <input
               type="password"
@@ -139,23 +146,23 @@ export function Login() {
                 opacity: isSubmitting ? '0.7' : '1'
               }}
             >
-              {isSubmitting ? t('auth.loggingIn') : t('auth.login')}
+              {isSubmitting ? getText('auth.loggingIn', 'Iniciando sesión...') : getText('auth.login', 'Iniciar sesión')}
             </button>
           </div>
         </form>
 
         <div style={{ marginTop: '1rem', textAlign: 'center', fontSize: '0.875rem' }}>
           <p style={{ color: '#64748b' }}>
-            {t('auth.noAccount')}{' '}
+            {getText('auth.noAccount', '¿No tienes cuenta?')}{' '}
             <Link to="/register" style={{ color: '#4f46e5', textDecoration: 'none' }}>
-              {t('auth.register')}
+              {getText('auth.register', 'Regístrate')}
             </Link>
           </p>
         </div>
 
         <div style={{ marginTop: '1.5rem', textAlign: 'center' }}>
           <Link to="/" style={{ fontSize: '0.875rem', color: '#64748b', textDecoration: 'none' }}>
-            {t('auth.backToHome')}
+            {getText('auth.backToHome', 'Volver al inicio')}
           </Link>
         </div>
       </div>

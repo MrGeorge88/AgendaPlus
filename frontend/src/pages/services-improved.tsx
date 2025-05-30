@@ -6,14 +6,14 @@ import { DataTable, Column } from '../components/ui/data-table';
 import { ServiceForm } from '../components/forms/service-form';
 import { Plus, Edit, Trash2, Clock, DollarSign } from 'lucide-react';
 import { useServices, useDeleteService } from '../hooks/use-services';
-import { useLanguage } from '../contexts/language-context';
+import { useTranslation } from 'react-i18next';
 import { Service } from '../contexts/app-context';
 import { ComponentErrorBoundary, DataErrorFallback } from '../components/ui/error-boundary';
 import { EmptyServices } from '../components/ui/empty-state';
 import { normalizeQueryState } from '../hooks/useAsyncState';
 
 export function ServicesImproved() {
-  const { t } = useLanguage();
+  const { t } = useTranslation();
   const [showForm, setShowForm] = useState(false);
   const [currentService, setCurrentService] = useState<Service | null>(null);
 

@@ -4,6 +4,7 @@ import './index.css'
 import './global-reset.css'
 import './components/ui/modal.css'
 import './calendar-styles.css'
+import './i18n' // Initialize i18n before rendering the app
 import App from './App.tsx'
 import { ToasterProvider } from './components/ui/toaster'
 

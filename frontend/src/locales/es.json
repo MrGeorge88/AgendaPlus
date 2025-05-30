@@ -54,6 +54,9 @@
     "redirectingToLogin": "Redirigiendo al login en unos segundos..."
   },
   "navigation": {
+    "agenda": "Agenda",
+    "overview": "Resumen",
+    "analytics": "Analytics",
     "dashboard": "Agenda del día",
     "clients": "Clientes",
     "services": "Servicios",

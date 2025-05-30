@@ -3,7 +3,7 @@ import { Card } from '../../components/ui/card';
 import { Button } from '../../components/ui/button';
 import { Badge } from '../../components/ui/badge';
 import { MessageCircle, Settings, Inbox, Calendar, CheckCircle, AlertCircle, Clock, Send, Copy } from 'lucide-react';
-import { useLanguage } from '../../contexts/language-context';
+import { useTranslation } from 'react-i18next';
 import { Layout } from '../../components/layout/layout';
 import { useWhatsAppConfig } from './hooks/use-whatsapp-config';
 import { useWhatsAppMessages } from './hooks/use-whatsapp-messages';
@@ -12,7 +12,8 @@ import { WhatsAppTester } from './components/whatsapp-tester';
 import { toast } from 'sonner';
 
 export function WhatsAppIntegration() {
-  const { t, language } = useLanguage();
+  const { t, i18n } = useTranslation();
+  const language = i18n.language;
   const [activeTab, setActiveTab] = useState<'config' | 'messages' | 'appointments' | 'testing'>('config');
 
   // Configuration state

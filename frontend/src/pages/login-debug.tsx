@@ -13,12 +13,12 @@ export function LoginDebug() {
   const navigate = useNavigate();
   const [debugInfo, setDebugInfo] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
-  
+
   // Intentar cargar los contextos y capturar errores
   let authContext = null;
   let languageContext = null;
   let formHook = null;
-  
+
   try {
     authContext = useAuth();
     debugInfo.push("Auth context loaded successfully");
@@ -27,7 +27,7 @@ export function LoginDebug() {
     debugInfo.push(`Error loading auth context: ${errorMessage}`);
     setError(`Error loading auth context: ${errorMessage}`);
   }
-  
+
   try {
     languageContext = useLanguage();
     debugInfo.push("Language context loaded successfully");
@@ -36,13 +36,13 @@ export function LoginDebug() {
     debugInfo.push(`Error loading language context: ${errorMessage}`);
     setError(`Error loading language context: ${errorMessage}`);
   }
-  
+
   // Solo intentar usar useForm si no hay errores previos
   if (authContext && languageContext && !error) {
     try {
       const { signIn } = authContext;
       const { t } = languageContext;
-      
+
       formHook = useForm({
         initialValues: {
           email: '',
@@ -61,7 +61,7 @@ export function LoginDebug() {
           }
         },
       });
-      
+
       debugInfo.push("Form hook loaded successfully");
     } catch (e) {
       const errorMessage = e instanceof Error ? e.message : String(e);
@@ -69,7 +69,7 @@ export function LoginDebug() {
       setError(`Error initializing form hook: ${errorMessage}`);
     }
   }
-  
+
   // Renderizar información de depuración si hay errores
   if (error) {
     return (
@@ -98,20 +98,20 @@ export function LoginDebug() {
       </div>
     );
   }
-  
+
   // Si todo está bien, renderizar el formulario normal
   if (formHook && authContext && languageContext) {
     const { values, errors, handleChange, handleBlur, handleSubmit, isSubmitting } = formHook;
     const { t } = languageContext;
-    
+
     return (
       <div className="flex min-h-screen items-center justify-center bg-slate-50 p-4">
         <Card className="w-full max-w-md p-6">
           <div className="mb-6 text-center">
-            <h1 className="text-2xl font-bold text-primary">{t('common.appName')}</h1>
+            <h1 className="text-2xl font-bold text-primary">AgendaPlus</h1>
             <p className="mt-2 text-slate-500">{t('auth.loginTitle')}</p>
           </div>
-          
+
           <Form
             onSubmit={handleSubmit}
             error={errors.form}
@@ -129,7 +129,7 @@ export function LoginDebug() {
                 required
               />
             </FormGroup>
-            
+
             <FormGroup>
               <Input
                 label={t('auth.password')}
@@ -143,14 +143,14 @@ export function LoginDebug() {
                 required
               />
             </FormGroup>
-            
+
             <FormActions>
               <Button type="submit" className="w-full" disabled={isSubmitting}>
                 {isSubmitting ? t('auth.loggingIn') : t('auth.login')}
               </Button>
             </FormActions>
           </Form>
-          
+
           <div className="mt-4 text-center text-sm">
             <p className="text-slate-500">
               {t('auth.noAccount')}{' '}
@@ -159,7 +159,7 @@ export function LoginDebug() {
               </Link>
             </p>
           </div>
-          
+
           <div className="mt-6 text-center">
             <Link to="/" className="text-sm text-slate-500 hover:underline">
               {t('auth.backToHome')}
@@ -169,7 +169,7 @@ export function LoginDebug() {
       </div>
     );
   }
-  
+
   // Fallback si algo salió mal pero no se capturó un error específico
   return (
     <div className="flex min-h-screen items-center justify-center bg-slate-50 p-4">

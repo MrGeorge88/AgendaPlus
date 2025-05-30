@@ -26,7 +26,8 @@ interface SidebarProps {
 
 export function Sidebar({ isOpen = false, onClose, onCollapseChange }: SidebarProps) {
   const location = useLocation();
-  const { t, language } = useLanguage();
+  const { i18n } = useTranslation();
+  const language = i18n.language;
   const isMobile = useIsMobile();
   const isTouch = useIsTouchDevice();
   const sidebarRef = useRef<HTMLElement>(null);

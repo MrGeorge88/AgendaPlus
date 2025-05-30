@@ -1,16 +1,23 @@
 import { Link } from 'react-router-dom';
 import { Button } from '../components/ui/button';
-import { useLanguage } from '../contexts/language-context';
+import { useTranslation } from 'react-i18next';
 import { LanguageSwitcher } from '../components/ui/language-switcher';
 import { ArrowRight, Calendar, Bell, BarChart2, CreditCard, ChevronRight } from 'lucide-react';
 import { useState } from 'react';
 
-// Imágenes (estas rutas deberán ajustarse según la estructura de tu proyecto)
-const AppScreenshot = '/assets/app-screenshot.png'; // Placeholder - crear esta imagen
+// Imagen del dashboard - usando una imagen más representativa
+const AppScreenshot = 'https://images.unsplash.com/photo-1551434678-e076c223a692?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80';
 
 export function Landing() {
-  const { t } = useLanguage();
+  const { t, ready } = useTranslation();
   const [activeTestimonial, setActiveTestimonial] = useState(0);
+
+  // Fallback function for translations
+  const getText = (key: string, fallback: string) => {
+    if (!ready) return fallback;
+    const translation = t(key);
+    return translation === key ? fallback : translation;
+  };
 
   return (
     <div className="min-h-screen bg-white">
@@ -20,13 +27,13 @@ export function Landing() {
           <div className="flex h-16 items-center justify-between" style={{ display: 'flex', height: '4rem', alignItems: 'center', justifyContent: 'space-between' }}>
             <div className="flex items-center" style={{ display: 'flex', alignItems: 'center' }}>
               <Link to="/" className="flex items-center" style={{ display: 'flex', alignItems: 'center' }}>
-                <span className="text-xl font-bold text-indigo-600" style={{ fontSize: '1.25rem', fontWeight: 'bold', color: '#4f46e5' }}>{t('common.appName')}</span>
+                <span className="text-xl font-bold text-indigo-600" style={{ fontSize: '1.25rem', fontWeight: 'bold', color: '#4f46e5' }}>AgendaPlus</span>
               </Link>
             </div>
             <div className="hidden md:block" style={{ display: 'none', '@media (min-width: 768px)': { display: 'block' } }}>
               <div className="ml-10 flex items-center space-x-4" style={{ marginLeft: '2.5rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
                 <a href="#features" className="text-gray-600 hover:text-gray-900 px-3 py-2 text-sm font-medium transition duration-200" style={{ color: '#4b5563', padding: '0.5rem 0.75rem', fontSize: '0.875rem', fontWeight: '500', transition: 'color 0.2s ease' }}>
-                  {t('landing.features.title')}
+                  {getText('landing.features.title', 'Características')}
                 </a>
                 <a href="#how-it-works" className="text-gray-600 hover:text-gray-900 px-3 py-2 text-sm font-medium transition duration-200" style={{ color: '#4b5563', padding: '0.5rem 0.75rem', fontSize: '0.875rem', fontWeight: '500', transition: 'color 0.2s ease' }}>
                   Cómo funciona
@@ -39,11 +46,11 @@ export function Landing() {
             </div>
             <div className="flex items-center space-x-4" style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
               <Link to="/login" className="text-gray-600 hover:text-gray-900 px-3 py-2 text-sm font-medium transition duration-200" style={{ color: '#4b5563', padding: '0.5rem 0.75rem', fontSize: '0.875rem', fontWeight: '500', transition: 'color 0.2s ease' }}>
-                {t('auth.login')}
+                {getText('auth.login', 'Iniciar sesión')}
               </Link>
               <Link to="/register">
                 <Button className="bg-indigo-600 hover:bg-indigo-700 text-white transition duration-200" style={{ backgroundColor: '#4f46e5', color: 'white', transition: 'background-color 0.2s ease' }}>
-                  {t('auth.register')}
+                  {getText('auth.register', 'Registrarse')}
                 </Button>
               </Link>
             </div>
@@ -87,7 +94,7 @@ export function Landing() {
           <img
             className="h-56 w-full object-cover sm:h-72 md:h-96 lg:w-full lg:h-full shadow-lg rounded-bl-2xl"
             style={{ height: '14rem', width: '100%', objectFit: 'cover', boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)', borderBottomLeftRadius: '1rem' }}
-            src={AppScreenshot || "https://placehold.co/800x600/e2e8f0/475569?text=AgendaPlus+Dashboard"}
+            src={AppScreenshot}
             alt="AgendaPlus dashboard"
           />
         </div>
@@ -311,7 +318,7 @@ export function Landing() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div>
-              <div className="text-2xl font-bold text-white">{t('common.appName')}</div>
+              <div className="text-2xl font-bold text-white">AgendaPlus</div>
               <p className="mt-2 text-gray-400">{t('landing.footer.subtitle')}</p>
             </div>
             <div>

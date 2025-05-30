@@ -53,7 +53,7 @@ export function AuthCallback() {
     <div className="flex min-h-screen items-center justify-center bg-slate-50 p-4">
       <Card className="w-full max-w-md p-6">
         <div className="mb-6 text-center">
-          <h1 className="text-2xl font-bold text-primary">{t('common.appName')}</h1>
+          <h1 className="text-2xl font-bold text-primary">AgendaPlus</h1>
           <p className="mt-2 text-slate-500">{t('auth.emailConfirmation')}</p>
         </div>
 

@@ -25,7 +25,7 @@ interface LanguageProviderProps {
 // Create the provider component
 export function LanguageProvider({
   children,
-  defaultLanguage = 'en',
+  defaultLanguage = 'es', // Changed default to Spanish
   storageKey = 'agenda-plus-language',
   ...props
 }: LanguageProviderProps) {
@@ -35,26 +35,30 @@ export function LanguageProvider({
   );
 
   // Get the translation function from i18next
-  const { t } = useTranslation();
+  const { t, i18n: i18nInstance } = useTranslation();
 
   // Update the language when it changes
   const setLanguage = (newLanguage: Language) => {
     localStorage.setItem(storageKey, newLanguage);
-    i18n.changeLanguage(newLanguage);
+    i18nInstance.changeLanguage(newLanguage);
     setLanguageState(newLanguage);
   };
 
   // Initialize the language on mount
   useEffect(() => {
     const storedLanguage = localStorage.getItem(storageKey) as Language;
-    if (storedLanguage) {
-      i18n.changeLanguage(storedLanguage);
-      setLanguageState(storedLanguage);
-    } else {
-      i18n.changeLanguage(defaultLanguage);
+    const targetLanguage = storedLanguage || defaultLanguage;
+
+    if (i18nInstance.language !== targetLanguage) {
+      i18nInstance.changeLanguage(targetLanguage);
+    }
+
+    if (!storedLanguage) {
       localStorage.setItem(storageKey, defaultLanguage);
     }
-  }, [defaultLanguage, storageKey]);
+
+    setLanguageState(targetLanguage);
+  }, [defaultLanguage, storageKey, i18nInstance]);
 
   // Create the context value
   const value = {

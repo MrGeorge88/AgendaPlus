@@ -6,14 +6,14 @@ import { Input } from '../components/ui/input';
 import { Form, FormGroup, FormActions } from '../components/ui/form';
 import { AlertWithIcon } from '../components/ui/alert';
 import { useAuth } from '../contexts/auth-context';
-import { useLanguage } from '../contexts/language-context';
+import { useTranslation } from 'react-i18next';
 import { useForm } from '../hooks/use-form';
 import { email as emailValidator, required, minLength, match } from '../utils/validation';
 
 export function Register() {
   const navigate = useNavigate();
   const { signUp } = useAuth();
-  const { t } = useLanguage();
+  const { t, ready } = useTranslation();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -22,6 +22,13 @@ export function Register() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [registrationSuccess, setRegistrationSuccess] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
+
+  // Fallback function for translations
+  const getText = (key: string, fallback: string) => {
+    if (!ready) return fallback;
+    const translation = t(key);
+    return translation === key ? fallback : translation;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -81,20 +88,20 @@ export function Register() {
     <div className="flex min-h-screen items-center justify-center bg-slate-50 p-4">
       <Card className="w-full max-w-md p-6">
         <div className="mb-6 text-center">
-          <h1 className="text-2xl font-bold text-primary">{t('common.appName')}</h1>
-          <p className="mt-2 text-slate-500">{t('auth.registerTitle')}</p>
+          <h1 className="text-2xl font-bold text-primary">AgendaPlus</h1>
+          <p className="mt-2 text-slate-500">{getText('auth.registerTitle', 'Crea tu cuenta')}</p>
         </div>
 
         {registrationSuccess ? (
           <div className="text-center">
             <AlertWithIcon variant="success" className="mb-4">
-              {successMessage || t('auth.emailConfirmationSent')}
+              {successMessage || getText('auth.emailConfirmationSent', 'Se ha enviado un correo de confirmación')}
             </AlertWithIcon>
             <p className="mb-4 text-slate-600">
-              {t('auth.checkEmailInstructions')}
+              {getText('auth.checkEmailInstructions', 'Revisa tu correo electrónico y haz clic en el enlace de confirmación para activar tu cuenta.')}
             </p>
             <Button asChild className="mt-4">
-              <Link to="/login">{t('auth.backToLogin')}</Link>
+              <Link to="/login">{getText('auth.backToLogin', 'Volver al login')}</Link>
             </Button>
           </div>
         ) : (
@@ -128,7 +135,7 @@ export function Register() {
             <form onSubmit={handleSubmit} className="space-y-4">
               <FormGroup>
                 <Input
-                  label={t('auth.name')}
+                  label={getText('auth.name', 'Nombre')}
                   type="text"
                   name="name"
                   id="name"
@@ -140,7 +147,7 @@ export function Register() {
 
               <FormGroup>
                 <Input
-                  label={t('auth.email')}
+                  label={getText('auth.email', 'Correo electrónico')}
                   type="email"
                   name="email"
                   id="email"
@@ -152,20 +159,20 @@ export function Register() {
 
               <FormGroup>
                 <Input
-                  label={t('auth.password')}
+                  label={getText('auth.password', 'Contraseña')}
                   type="password"
                   name="password"
                   id="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  helperText={t('auth.passwordHelperText')}
+                  helperText={getText('auth.passwordHelperText', 'Mínimo 6 caracteres')}
                   required
                 />
               </FormGroup>
 
               <FormGroup>
                 <Input
-                  label={t('auth.confirmPassword')}
+                  label={getText('auth.confirmPassword', 'Confirmar contraseña')}
                   type="password"
                   name="confirmPassword"
                   id="confirmPassword"
@@ -177,16 +184,16 @@ export function Register() {
 
               <FormActions>
                 <Button type="submit" className="w-full" disabled={isSubmitting}>
-                  {isSubmitting ? t('auth.registering') : t('auth.register')}
+                  {isSubmitting ? getText('auth.registering', 'Registrando...') : getText('auth.register', 'Registrarse')}
                 </Button>
               </FormActions>
             </form>
 
             <div className="mt-4 text-center text-sm">
               <p className="text-slate-500">
-                {t('auth.haveAccount')}{' '}
+                {getText('auth.haveAccount', '¿Ya tienes cuenta?')}{' '}
                 <Link to="/login" className="text-primary hover:underline">
-                  {t('auth.login')}
+                  {getText('auth.login', 'Inicia sesión')}
                 </Link>
               </p>
             </div>
@@ -195,7 +202,7 @@ export function Register() {
 
         <div className="mt-6 text-center">
           <Link to="/" className="text-sm text-slate-500 hover:underline">
-            {t('auth.backToHome')}
+            {getText('auth.backToHome', 'Volver al inicio')}
           </Link>
         </div>
       </Card>

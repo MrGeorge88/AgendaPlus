@@ -19,13 +19,18 @@ i18n
         translation: esTranslation
       }
     },
-    fallbackLng: 'en',
+    fallbackLng: 'es',
+    lng: 'es', // Set default language to Spanish
+    debug: process.env.NODE_ENV === 'development',
     interpolation: {
       escapeValue: false // React already escapes values
     },
     detection: {
       order: ['localStorage', 'navigator'],
       caches: ['localStorage']
+    },
+    react: {
+      useSuspense: false // Disable suspense to avoid hydration issues
     }
   });
 
