@@ -12,6 +12,7 @@ import { Expenses } from './pages/expenses';
 import { Login } from './pages/login';
 import { Register } from './pages/register';
 import { AuthCallback } from './pages/auth-callback';
+import { WhatsAppIntegration } from './pages/whatsapp';
 import { ProtectedRoute } from './components/auth/protected-route';
 import { AppProvider } from './contexts/app-context';
 import { NotificationProvider } from './components/ui/notification';
@@ -38,7 +39,17 @@ function App() {
                     <Route path="/auth/callback" element={<AuthCallback />} />
 
                     {/* Protected Routes */}
+                    <Route path="/agenda" element={
+                      <ProtectedRoute>
+                        <Dashboard />
+                      </ProtectedRoute>
+                    } />
                     <Route path="/dashboard" element={
+                      <ProtectedRoute>
+                        <Dashboard />
+                      </ProtectedRoute>
+                    } />
+                    <Route path="/analytics" element={
                       <ProtectedRoute>
                         <Dashboard />
                       </ProtectedRoute>
@@ -68,8 +79,13 @@ function App() {
                         <Expenses />
                       </ProtectedRoute>
                     } />
+                    <Route path="/whatsapp" element={
+                      <ProtectedRoute>
+                        <WhatsAppIntegration />
+                      </ProtectedRoute>
+                    } />
                     {/* Ruta de fallback */}
-                    <Route path="*" element={<Navigate to="/" replace />} />
+                    <Route path="*" element={<Navigate to="/agenda" replace />} />
                   </Routes>
                 </Router>
 

@@ -52,6 +52,46 @@
 
 .fc-timegrid-event {
   margin: 1px;
+  min-height: 20px !important;
+}
+
+/* Mejorar la visualización de eventos */
+.fc-event {
+  border: none !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.fc-event-main {
+  padding: 0 !important;
+}
+
+.fc-event-title {
+  padding: 0 !important;
+}
+
+/* Evitar superposición de texto en eventos */
+.fc-timegrid-event .fc-event-main {
+  overflow: hidden;
+}
+
+/* Mejorar el cursor para eventos editables */
+.fc-event.fc-event-draggable {
+  cursor: move;
+}
+
+.fc-event.fc-event-resizable {
+  cursor: ns-resize;
+}
+
+/* Estilos para eventos en vista mensual */
+.fc-daygrid-event {
+  margin-bottom: 1px;
+  border-radius: 3px;
+}
+
+/* Mejorar la visualización de eventos superpuestos */
+.fc-timegrid-event-harness {
+  margin-right: 1px;
 }
 
 .fc-timegrid-now-indicator-line {
@@ -108,4 +148,35 @@
   .staff-filter-name {
     display: none;
   }
+}
+
+/* Animaciones para el componente colapsable */
+@keyframes slideDown {
+  from {
+    height: 0;
+    opacity: 0;
+  }
+  to {
+    height: var(--radix-collapsible-content-height);
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    height: var(--radix-collapsible-content-height);
+    opacity: 1;
+  }
+  to {
+    height: 0;
+    opacity: 0;
+  }
+}
+
+.animate-slideDown {
+  animation: slideDown 200ms ease-out;
+}
+
+.animate-slideUp {
+  animation: slideUp 200ms ease-out;
 }

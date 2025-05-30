@@ -9,7 +9,7 @@ import { Button } from "../ui/button";
 import { Plus, Users, DollarSign, CheckCircle, XCircle, Clock, AlertCircle, ChevronLeft, ChevronRight } from "lucide-react";
 import { AppointmentForm } from "./appointment-form";
 import { AppointmentPaymentForm } from "./appointment-payment-form";
-import { CalendarFilters, FilterState } from "./calendar-filters";
+import { CollapsibleFilters, FilterState } from "./collapsible-filters";
 import { Modal } from "../ui/modal";
 import { useAuth } from "../../contexts/auth-context";
 import { useLanguage } from "../../contexts/language-context";
@@ -236,6 +236,93 @@ export function Calendar() {
     }
   };
 
+  // Manejar cuando se mueve una cita (drag and drop)
+  const handleEventDrop = async (dropInfo: any) => {
+    try {
+      if (!user) return;
+
+      const appointment = appointments.find(a => a.id === dropInfo.event.id);
+      if (!appointment) return;
+
+      // Calcular la nueva duración basada en el evento original
+      const originalStart = new Date(appointment.start);
+      const originalEnd = new Date(appointment.end);
+      const duration = originalEnd.getTime() - originalStart.getTime();
+
+      // Nuevas fechas
+      const newStart = dropInfo.event.start;
+      const newEnd = new Date(newStart.getTime() + duration);
+
+      // Actualizar en Supabase
+      const updatedAppointment = {
+        ...appointment,
+        start: newStart.toISOString(),
+        end: newEnd.toISOString()
+      };
+
+      const result = await appointmentsService.updateAppointment(updatedAppointment);
+
+      if (result) {
+        // Actualizar el estado local
+        setAppointments(prev => prev.map(a =>
+          a.id === appointment.id
+            ? { ...a, start: newStart.toISOString(), end: newEnd.toISOString() }
+            : a
+        ));
+        toast.success("Cita movida correctamente");
+      } else {
+        // Revertir el cambio si falló
+        dropInfo.revert();
+        toast.error("Error al mover la cita");
+      }
+    } catch (error) {
+      console.error("Error al mover la cita:", error);
+      dropInfo.revert();
+      toast.error("Error al mover la cita");
+    }
+  };
+
+  // Manejar cuando se redimensiona una cita
+  const handleEventResize = async (resizeInfo: any) => {
+    try {
+      if (!user) return;
+
+      const appointment = appointments.find(a => a.id === resizeInfo.event.id);
+      if (!appointment) return;
+
+      // Nuevas fechas del evento redimensionado
+      const newStart = resizeInfo.event.start;
+      const newEnd = resizeInfo.event.end;
+
+      // Actualizar en Supabase
+      const updatedAppointment = {
+        ...appointment,
+        start: newStart.toISOString(),
+        end: newEnd.toISOString()
+      };
+
+      const result = await appointmentsService.updateAppointment(updatedAppointment);
+
+      if (result) {
+        // Actualizar el estado local
+        setAppointments(prev => prev.map(a =>
+          a.id === appointment.id
+            ? { ...a, start: newStart.toISOString(), end: newEnd.toISOString() }
+            : a
+        ));
+        toast.success("Duración de la cita actualizada");
+      } else {
+        // Revertir el cambio si falló
+        resizeInfo.revert();
+        toast.error("Error al cambiar la duración");
+      }
+    } catch (error) {
+      console.error("Error al redimensionar la cita:", error);
+      resizeInfo.revert();
+      toast.error("Error al cambiar la duración");
+    }
+  };
+
   const handlePaymentRegistered = async () => {
     setShowPaymentForm(false);
 
@@ -364,7 +451,7 @@ export function Calendar() {
           </div>
 
           {/* Filtros avanzados */}
-          <CalendarFilters
+          <CollapsibleFilters
             onFiltersChange={handleFiltersChange}
             staffMembers={staffMembers.map(staff => ({
               id: staff.id,
@@ -492,6 +579,8 @@ export function Calendar() {
               }}
               select={handleDateSelect}
               eventClick={handleEventClick}
+              eventDrop={handleEventDrop}
+              eventResize={handleEventResize}
               datesSet={(dateInfo) => {
                 setCurrentDate(dateInfo.start);
               }}
@@ -499,50 +588,80 @@ export function Calendar() {
                 // Determinar el color de fondo según el estado
                 let statusColor = "";
                 let statusIcon = null;
+                let textColor = "text-gray-800";
 
                 switch (eventInfo.event.extendedProps.status) {
                   case "completed":
-                    statusColor = "bg-green-100";
-                    statusIcon = <CheckCircle className="h-3 w-3 text-green-600" />;
+                    statusColor = "bg-green-100 border-l-4 border-green-500";
+                    statusIcon = <CheckCircle className="h-3 w-3 text-green-600 flex-shrink-0" />;
+                    textColor = "text-green-800";
                     break;
                   case "cancelled":
-                    statusColor = "bg-red-100";
-                    statusIcon = <XCircle className="h-3 w-3 text-red-600" />;
+                    statusColor = "bg-red-100 border-l-4 border-red-500";
+                    statusIcon = <XCircle className="h-3 w-3 text-red-600 flex-shrink-0" />;
+                    textColor = "text-red-800";
                     break;
                   case "no-show":
-                    statusColor = "bg-orange-100";
-                    statusIcon = <AlertCircle className="h-3 w-3 text-orange-600" />;
+                    statusColor = "bg-orange-100 border-l-4 border-orange-500";
+                    statusIcon = <AlertCircle className="h-3 w-3 text-orange-600 flex-shrink-0" />;
+                    textColor = "text-orange-800";
                     break;
                   default:
-                    statusColor = "bg-blue-100";
-                    statusIcon = <Clock className="h-3 w-3 text-blue-600" />;
+                    statusColor = "bg-blue-100 border-l-4 border-blue-500";
+                    statusIcon = <Clock className="h-3 w-3 text-blue-600 flex-shrink-0" />;
+                    textColor = "text-blue-800";
                 }
 
-                // Determinar el color del estado de pago
+                // Determinar el badge de estado de pago
                 let paymentStatusBadge = null;
-
                 switch (eventInfo.event.extendedProps.paymentStatus) {
                   case "paid":
-                    paymentStatusBadge = <span className="ml-1 rounded-full bg-green-100 px-1 text-[10px] text-green-600">{t('calendar.paid')}</span>;
+                    paymentStatusBadge = <span className="text-green-600 font-bold text-xs">✓</span>;
                     break;
                   case "partial":
-                    paymentStatusBadge = <span className="ml-1 rounded-full bg-yellow-100 px-1 text-[10px] text-yellow-600">{t('calendar.partial')}</span>;
+                    paymentStatusBadge = <span className="text-yellow-600 font-bold text-xs">◐</span>;
                     break;
                   default:
-                    paymentStatusBadge = <span className="ml-1 rounded-full bg-gray-100 px-1 text-[10px] text-gray-600">{t('calendar.pending')}</span>;
+                    paymentStatusBadge = <span className="text-red-600 font-bold text-xs">○</span>;
                 }
 
+                // Determinar si es vista mensual para mostrar menos información
+                const isMonthView = currentView === 'dayGridMonth';
+
                 return (
-                  <div className={`p-1.5 text-xs ${statusColor}`}>
-                    <div className="flex items-center justify-between">
-                      <div className="font-medium">{eventInfo.event.title}</div>
-                      {statusIcon}
-                    </div>
-                    <div>{eventInfo.event.extendedProps.client}</div>
-                    <div className="flex items-center">
-                      <DollarSign className="mr-0.5 h-3 w-3" />
-                      {eventInfo.event.extendedProps.price}
-                      {paymentStatusBadge}
+                  <div className={`${statusColor} ${textColor} rounded-sm overflow-hidden h-full`}>
+                    <div className="p-1.5 h-full flex flex-col justify-between min-h-0">
+                      {/* Header con título y estado */}
+                      <div className="flex items-start justify-between gap-1 mb-1">
+                        <div className="font-medium text-xs leading-tight truncate flex-1 min-w-0">
+                          {eventInfo.event.title}
+                        </div>
+                        {statusIcon}
+                      </div>
+
+                      {/* Información adicional solo si no es vista mensual */}
+                      {!isMonthView && (
+                        <>
+                          <div className="text-xs leading-tight truncate">
+                            {eventInfo.event.extendedProps.client}
+                          </div>
+                          <div className="flex items-center justify-between mt-1">
+                            <div className="flex items-center text-xs">
+                              <DollarSign className="mr-0.5 h-3 w-3 flex-shrink-0" />
+                              <span className="truncate">{eventInfo.event.extendedProps.price}</span>
+                            </div>
+                            {paymentStatusBadge}
+                          </div>
+                        </>
+                      )}
+
+                      {/* Vista mensual: solo mostrar precio y estado de pago */}
+                      {isMonthView && (
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs font-medium">${eventInfo.event.extendedProps.price}</span>
+                          {paymentStatusBadge}
+                        </div>
+                      )}
                     </div>
                   </div>
                 );

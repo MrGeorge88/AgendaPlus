@@ -17,21 +17,21 @@ export function AuthCallback() {
       try {
         // Get the URL hash (e.g., #access_token=...)
         const hash = window.location.hash;
-        
+
         if (hash && hash.includes('access_token')) {
           // Process the callback URL with Supabase
           const { data, error } = await supabase.auth.getSession();
-          
+
           if (error) {
             throw error;
           }
-          
+
           if (data?.session) {
             // Email verification successful
             setLoading(false);
-            // Redirect to dashboard after a short delay
+            // Redirect to agenda after a short delay
             setTimeout(() => {
-              navigate('/dashboard');
+              navigate('/agenda');
             }, 2000);
           } else {
             throw new Error('No session found');

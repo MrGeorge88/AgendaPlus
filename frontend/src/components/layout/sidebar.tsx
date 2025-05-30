@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { Calendar, Users, Briefcase, CreditCard, BarChart3, DollarSign, X, TrendingUp, ChevronLeft, ChevronRight, Menu } from "lucide-react";
+import { Calendar, Users, Briefcase, CreditCard, BarChart3, DollarSign, X, TrendingUp, ChevronLeft, ChevronRight, Menu, MessageCircle } from "lucide-react";
 import { cn } from "../../lib/utils";
 import { useLanguage } from "../../contexts/language-context";
 import { useIsMobile, useIsTouchDevice } from "../../hooks/use-media-query";
@@ -7,21 +7,15 @@ import { useEffect, useRef, useState } from "react";
 
 // Navigation items with translation keys
 const navItems = [
-  {
-    key: "navigation.dashboard",
-    path: "/dashboard",
-    icon: BarChart3,
-    subItems: [
-      { key: "Resumen", path: "/dashboard?view=overview", icon: BarChart3 },
-      { key: "Calendario", path: "/dashboard?view=calendar", icon: Calendar },
-      { key: "Analytics", path: "/dashboard?view=analytics", icon: TrendingUp },
-    ]
-  },
+  { key: "navigation.agenda", path: "/agenda", icon: Calendar },
+  { key: "navigation.overview", path: "/dashboard", icon: BarChart3 },
+  { key: "navigation.analytics", path: "/analytics", icon: TrendingUp },
   { key: "navigation.clients", path: "/clients", icon: Users },
   { key: "navigation.services", path: "/services", icon: Briefcase },
   { key: "navigation.staff", path: "/staff", icon: Users },
   { key: "navigation.income", path: "/income", icon: BarChart3 },
   { key: "navigation.expenses", path: "/expenses", icon: DollarSign },
+  { key: "navigation.whatsapp", path: "/whatsapp", icon: MessageCircle },
 ];
 
 interface SidebarProps {
@@ -37,16 +31,19 @@ export function Sidebar({ isOpen = false, onClose, onCollapseChange }: SidebarPr
   const isTouch = useIsTouchDevice();
   const sidebarRef = useRef<HTMLElement>(null);
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const [expandedItems, setExpandedItems] = useState<string[]>(['/dashboard']);
+
 
   // Traducciones manuales para evitar problemas con i18n
   const translations = {
-    'navigation.dashboard': language === 'es' ? 'Dashboard' : 'Dashboard',
+    'navigation.agenda': language === 'es' ? 'Agenda' : 'Calendar',
+    'navigation.overview': language === 'es' ? 'Resumen' : 'Overview',
+    'navigation.analytics': language === 'es' ? 'Analytics' : 'Analytics',
     'navigation.clients': language === 'es' ? 'Clientes' : 'Clients',
     'navigation.services': language === 'es' ? 'Servicios' : 'Services',
     'navigation.staff': language === 'es' ? 'Personal' : 'Staff',
     'navigation.income': language === 'es' ? 'Ingresos' : 'Income',
     'navigation.expenses': language === 'es' ? 'Gastos' : 'Expenses',
+    'navigation.whatsapp': language === 'es' ? 'WhatsApp' : 'WhatsApp',
   };
 
   // Manejar gestos de swipe en dispositivos táctiles
@@ -104,14 +101,7 @@ export function Sidebar({ isOpen = false, onClose, onCollapseChange }: SidebarPr
     onCollapseChange?.(newCollapsed);
   };
 
-  // Manejar expansión de elementos con subitems
-  const toggleExpanded = (path: string) => {
-    setExpandedItems(prev =>
-      prev.includes(path)
-        ? prev.filter(item => item !== path)
-        : [...prev, path]
-    );
-  };
+
 
   return (
     <>
@@ -134,7 +124,7 @@ export function Sidebar({ isOpen = false, onClose, onCollapseChange }: SidebarPr
         )}
       >
         <div className="sidebar-header">
-          <Link to="/dashboard" onClick={handleLinkClick}>
+          <Link to="/agenda" onClick={handleLinkClick}>
             <span className={cn(
               "text-xl font-bold text-primary transition-opacity",
               isCollapsed && "opacity-0"
@@ -170,74 +160,23 @@ export function Sidebar({ isOpen = false, onClose, onCollapseChange }: SidebarPr
           <ul>
             {navItems.map((item) => {
               const isActive = location.pathname === item.path;
-              const isExpanded = expandedItems.includes(item.path);
               const Icon = item.icon;
-              const itemName = item.suffix ? translations[item.key] + item.suffix : translations[item.key];
-              const hasSubItems = item.subItems && item.subItems.length > 0;
+              const itemName = translations[item.key];
 
               return (
                 <li key={item.path}>
-                  {hasSubItems ? (
-                    <>
-                      <button
-                        onClick={() => toggleExpanded(item.path)}
-                        className={cn(
-                          'sidebar-link w-full text-left',
-                          isActive && 'active',
-                          isTouch && 'touch-friendly'
-                        )}
-                      >
-                        <Icon />
-                        {!isCollapsed && (
-                          <>
-                            <span>{itemName}</span>
-                            <ChevronRight className={cn(
-                              "h-4 w-4 ml-auto transition-transform",
-                              isExpanded && "rotate-90"
-                            )} />
-                          </>
-                        )}
-                      </button>
-
-                      {/* Subitems */}
-                      {isExpanded && !isCollapsed && (
-                        <ul className="ml-6 mt-1 space-y-1">
-                          {item.subItems.map((subItem) => {
-                            const SubIcon = subItem.icon;
-                            return (
-                              <li key={subItem.path}>
-                                <Link
-                                  to={subItem.path}
-                                  className={cn(
-                                    'sidebar-link text-sm',
-                                    location.search.includes(subItem.path.split('?')[1]) && 'active',
-                                    isTouch && 'touch-friendly'
-                                  )}
-                                  onClick={handleLinkClick}
-                                >
-                                  <SubIcon className="h-4 w-4" />
-                                  <span>{subItem.key}</span>
-                                </Link>
-                              </li>
-                            );
-                          })}
-                        </ul>
-                      )}
-                    </>
-                  ) : (
-                    <Link
-                      to={item.path}
-                      className={cn(
-                        'sidebar-link',
-                        isActive && 'active',
-                        isTouch && 'touch-friendly'
-                      )}
-                      onClick={handleLinkClick}
-                    >
-                      <Icon />
-                      {!isCollapsed && <span>{itemName}</span>}
-                    </Link>
-                  )}
+                  <Link
+                    to={item.path}
+                    className={cn(
+                      'sidebar-link',
+                      isActive && 'active',
+                      isTouch && 'touch-friendly'
+                    )}
+                    onClick={handleLinkClick}
+                  >
+                    <Icon />
+                    {!isCollapsed && <span>{itemName}</span>}
+                  </Link>
                 </li>
               );
             })}

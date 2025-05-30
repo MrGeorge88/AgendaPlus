@@ -63,8 +63,8 @@ export function Register() {
         setRegistrationSuccess(true);
         setSuccessMessage(response.message);
       } else {
-        // If no confirmation required, redirect to dashboard
-        navigate('/dashboard');
+        // If no confirmation required, redirect to agenda
+        navigate('/agenda');
       }
     } catch (err) {
       if (err instanceof Error) {

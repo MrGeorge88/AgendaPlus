@@ -46,7 +46,7 @@
     "passwordHelperText": "Minimum 6 characters",
     "emailConfirmation": "Email Confirmation",
     "emailConfirmed": "Email confirmed successfully!",
-    "redirecting": "Redirecting to dashboard...",
+    "redirecting": "Redirecting to agenda...",
     "backToLogin": "Back to Login",
     "verifying": "Verifying...",
     "verifyingDescription": "Please wait while we verify your authentication.",

@@ -14,8 +14,8 @@ export function Login() {
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Get the intended destination from location state, or default to dashboard
-  const from = (location.state as { from?: { pathname: string } })?.from?.pathname || '/dashboard';
+  // Get the intended destination from location state, or default to agenda
+  const from = (location.state as { from?: { pathname: string } })?.from?.pathname || '/agenda';
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
