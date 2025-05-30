@@ -1,22 +1,21 @@
 import { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/auth-context';
-import { useTranslation } from 'react-i18next';
+import { useSimpleTranslation } from '../lib/translations';
 import { email as emailValidator, required } from '../utils/validation';
 
 export function Login() {
   const navigate = useNavigate();
   const location = useLocation();
   const { signIn } = useAuth();
-  const { t, ready } = useTranslation();
+  const { t } = useSimpleTranslation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Fallback function for translations
+  // Simple function for translations with fallback
   const getText = (key: string, fallback: string) => {
-    if (!ready) return fallback;
     const translation = t(key);
     return translation === key ? fallback : translation;
   };

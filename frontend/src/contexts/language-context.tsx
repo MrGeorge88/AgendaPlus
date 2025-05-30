@@ -1,14 +1,11 @@
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import i18n from '../i18n';
-
-// Define supported languages
-export type Language = 'en' | 'es';
+import { translations, Language } from '../lib/translations';
 
 // Define the context type
 interface LanguageContextType {
   language: Language;
   setLanguage: (language: Language) => void;
-  t: (key: string, options?: object) => string;
+  t: (key: string) => string;
 }
 
 // Create the context
@@ -24,7 +21,7 @@ interface LanguageProviderProps {
 // Create the provider component
 export function LanguageProvider({
   children,
-  defaultLanguage = 'es', // Changed default to Spanish
+  defaultLanguage = 'es',
   storageKey = 'agenda-plus-language',
   ...props
 }: LanguageProviderProps) {
@@ -33,24 +30,26 @@ export function LanguageProvider({
     () => (localStorage.getItem(storageKey) as Language) || defaultLanguage
   );
 
-  // Use i18n directly instead of useTranslation hook to avoid initialization issues
-  const t = i18n.t.bind(i18n);
+  // Translation function
+  const t = (key: string): string => {
+    return translations[language]?.[key] || key;
+  };
 
   // Update the language when it changes
   const setLanguage = (newLanguage: Language) => {
     localStorage.setItem(storageKey, newLanguage);
-    i18n.changeLanguage(newLanguage);
     setLanguageState(newLanguage);
+
+    // Dispatch custom event for language change
+    window.dispatchEvent(new CustomEvent('languageChange', {
+      detail: { language: newLanguage }
+    }));
   };
 
   // Initialize the language on mount
   useEffect(() => {
     const storedLanguage = localStorage.getItem(storageKey) as Language;
     const targetLanguage = storedLanguage || defaultLanguage;
-
-    if (i18n.language !== targetLanguage) {
-      i18n.changeLanguage(targetLanguage);
-    }
 
     if (!storedLanguage) {
       localStorage.setItem(storageKey, defaultLanguage);
@@ -83,3 +82,6 @@ export function useLanguage() {
 
   return context;
 }
+
+// Export Language type for compatibility
+export type { Language };

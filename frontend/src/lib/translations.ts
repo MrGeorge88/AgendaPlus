@@ -1,9 +1,9 @@
 // Simple translation system without react-i18next dependency
 import React from 'react';
 
-type Language = 'en' | 'es';
+export type Language = 'en' | 'es';
 
-const translations = {
+export const translations = {
   es: {
     // Landing page
     'landing.title': 'AgendaPlus',

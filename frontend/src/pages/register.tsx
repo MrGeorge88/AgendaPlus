@@ -6,14 +6,14 @@ import { Input } from '../components/ui/input';
 import { Form, FormGroup, FormActions } from '../components/ui/form';
 import { AlertWithIcon } from '../components/ui/alert';
 import { useAuth } from '../contexts/auth-context';
-import { useTranslation } from 'react-i18next';
+import { useSimpleTranslation } from '../lib/translations';
 import { useForm } from '../hooks/use-form';
 import { email as emailValidator, required, minLength, match } from '../utils/validation';
 
 export function Register() {
   const navigate = useNavigate();
   const { signUp } = useAuth();
-  const { t, ready } = useTranslation();
+  const { t } = useSimpleTranslation();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -23,9 +23,8 @@ export function Register() {
   const [registrationSuccess, setRegistrationSuccess] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
 
-  // Fallback function for translations
+  // Simple function for translations with fallback
   const getText = (key: string, fallback: string) => {
-    if (!ready) return fallback;
     const translation = t(key);
     return translation === key ? fallback : translation;
   };
