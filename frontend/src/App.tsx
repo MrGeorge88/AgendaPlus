@@ -15,6 +15,7 @@ import { Login } from './pages/login';
 import { Register } from './pages/register';
 import { AuthCallback } from './pages/auth-callback';
 import { WhatsAppIntegration } from './pages/whatsapp';
+import { Debug } from './pages/debug';
 import { ProtectedRoute } from './components/auth/protected-route';
 import { AppProvider } from './contexts/app-context';
 import { NotificationProvider } from './components/ui/notification';
@@ -36,6 +37,7 @@ function App() {
                   <Router>
                   <Routes>
                     <Route path="/" element={<Landing />} />
+                    <Route path="/debug" element={<Debug />} />
                     <Route path="/login" element={<Login />} />
                     <Route path="/register" element={<Register />} />
                     <Route path="/auth/callback" element={<AuthCallback />} />
