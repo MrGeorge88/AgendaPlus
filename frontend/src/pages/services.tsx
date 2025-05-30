@@ -7,43 +7,39 @@ import { Plus, Search, Edit, Trash2, Clock, DollarSign, Bug } from 'lucide-react
 import { servicesService } from '../services/services';
 import { Service } from '../contexts/app-context';
 import { useAuth } from '../contexts/auth-context';
-import { useNotification } from '../components/ui/notification';
 import { useLanguage } from '../contexts/language-context';
 import { testSupabaseConnection, testCreateService, listSupabaseTables } from '../tests/supabase-test';
+import { useAsyncList } from '../hooks/useAsyncState';
+import { useCrudNotifications } from '../hooks/useNotifications';
+import { ServiceListSkeleton } from '../components/ui/skeleton';
+import { ComponentErrorBoundary, DataErrorFallback } from '../components/ui/error-boundary';
 
 export function Services() {
   const { t } = useLanguage();
   const { user } = useAuth();
-  const { showNotification } = useNotification();
   const [searchTerm, setSearchTerm] = useState('');
-  const [services, setServices] = useState<Service[]>([]);
-  const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [currentService, setCurrentService] = useState<Service | null>(null);
 
+  // Usar nuestros hooks personalizados
+  const {
+    items: services,
+    loading,
+    error,
+    execute: loadServices,
+    addItem: addService,
+    updateItem: updateService,
+    removeItem: removeService
+  } = useAsyncList<Service>([]);
+
+  const { executeWithNotification } = useCrudNotifications('Servicio');
+
   // Cargar servicios desde Supabase
   useEffect(() => {
-    const loadServices = async () => {
-      if (user) {
-        try {
-          setLoading(true);
-          const data = await servicesService.getServices(user.id);
-          setServices(data);
-        } catch (error) {
-          console.error('Error al cargar servicios:', error);
-          showNotification({
-            title: t('common.error'),
-            message: t('services.errorLoading'),
-            type: 'error'
-          });
-        } finally {
-          setLoading(false);
-        }
-      }
-    };
-
-    loadServices();
-  }, [user, t, showNotification]);
+    if (user) {
+      loadServices(() => servicesService.getServices(user.id));
+    }
+  }, [user, loadServices]);
 
   const filteredServices = services.filter(service =>
     service.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -61,26 +57,17 @@ export function Services() {
   };
 
   const handleDeleteService = async (id: string) => {
+    const service = services.find(s => s.id === id);
     if (confirm(t('services.deleteConfirm'))) {
       try {
-        const success = await servicesService.deleteService(id);
-        if (success) {
-          setServices(prev => prev.filter(service => service.id !== id));
-          showNotification({
-            title: t('common.success'),
-            message: t('services.deleteSuccess'),
-            type: 'success'
-          });
-        } else {
-          throw new Error('Error al eliminar');
-        }
+        await executeWithNotification(
+          () => servicesService.deleteService(id),
+          'eliminar',
+          service?.name
+        );
+        removeService(id);
       } catch (error) {
         console.error('Error al eliminar el servicio:', error);
-        showNotification({
-          title: t('common.error'),
-          message: t('services.deleteError'),
-          type: 'error'
-        });
       }
     }
   };
@@ -178,69 +165,74 @@ export function Services() {
         </div>
       </div>
 
-      {loading ? (
-        <div className="flex h-64 items-center justify-center">
-          <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
-          <span className="ml-2">{t('common.loading')}</span>
-        </div>
-      ) : (
-        <>
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {filteredServices.map(service => (
-              <Card key={service.id} className="flex flex-col">
-                <div className="flex items-start justify-between p-4">
-                  <div>
-                    <div className="mb-1 inline-block rounded-full bg-primary/10 px-2 py-1 text-xs font-medium text-primary">
-                      {service.category}
+      <ComponentErrorBoundary componentName="Lista de Servicios">
+        {loading ? (
+          <ServiceListSkeleton count={6} />
+        ) : error ? (
+          <DataErrorFallback
+            error={new Error(error)}
+            onRetry={() => user && loadServices(() => servicesService.getServices(user.id))}
+            title="Error al cargar servicios"
+          />
+        ) : (
+          <>
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {filteredServices.map(service => (
+                <Card key={service.id} className="flex flex-col">
+                  <div className="flex items-start justify-between p-4">
+                    <div>
+                      <div className="mb-1 inline-block rounded-full bg-primary/10 px-2 py-1 text-xs font-medium text-primary">
+                        {service.category}
+                      </div>
+                      <h3 className="text-lg font-bold">{service.name}</h3>
+                      <p className="mt-1 text-sm text-slate-500">{service.description}</p>
                     </div>
-                    <h3 className="text-lg font-bold">{service.name}</h3>
-                    <p className="mt-1 text-sm text-slate-500">{service.description}</p>
-                  </div>
-                  <div className="flex space-x-2">
-                    <button
-                      onClick={() => handleEditService(service)}
-                      className="rounded-full p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
-                    >
-                      <Edit className="h-4 w-4" />
-                    </button>
-                    <button
-                      onClick={() => handleDeleteService(service.id)}
-                      className="rounded-full p-1 text-slate-400 hover:bg-red-100 hover:text-red-600"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </button>
-                  </div>
-                </div>
-                <div className="mt-auto border-t p-4">
-                  <div className="flex justify-between">
-                    <div className="flex items-center text-sm text-slate-500">
-                      <Clock className="mr-1 h-4 w-4" /> {service.duration} min
-                    </div>
-                    <div className="flex items-center font-medium">
-                      <DollarSign className="h-4 w-4 text-primary" /> ${service.price}
+                    <div className="flex space-x-2">
+                      <button
+                        onClick={() => handleEditService(service)}
+                        className="rounded-full p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+                      >
+                        <Edit className="h-4 w-4" />
+                      </button>
+                      <button
+                        onClick={() => handleDeleteService(service.id)}
+                        className="rounded-full p-1 text-slate-400 hover:bg-red-100 hover:text-red-600"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
                     </div>
                   </div>
-                </div>
-              </Card>
-            ))}
-          </div>
-
-          {filteredServices.length === 0 && services.length > 0 && (
-            <div className="mt-8 text-center">
-              <p className="text-slate-500">{t('services.noResults')}</p>
+                  <div className="mt-auto border-t p-4">
+                    <div className="flex justify-between">
+                      <div className="flex items-center text-sm text-slate-500">
+                        <Clock className="mr-1 h-4 w-4" /> {service.duration} min
+                      </div>
+                      <div className="flex items-center font-medium">
+                        <DollarSign className="h-4 w-4 text-primary" /> ${service.price}
+                      </div>
+                    </div>
+                  </div>
+                </Card>
+              ))}
             </div>
-          )}
 
-          {services.length === 0 && !loading && (
-            <div className="mt-8 text-center">
-              <p className="text-slate-500">{t('services.noServices')}</p>
-              <Button onClick={handleAddService} className="mt-4">
-                {t('services.addFirst')}
-              </Button>
-            </div>
-          )}
-        </>
-      )}
+            {filteredServices.length === 0 && services.length > 0 && (
+              <div className="mt-8 text-center">
+                <p className="text-slate-500">{t('services.noResults')}</p>
+              </div>
+            )}
+
+            {services.length === 0 && !loading && (
+              <div className="mt-8 text-center">
+                <p className="text-slate-500">{t('services.noServices')}</p>
+                <Button onClick={handleAddService} className="mt-4">
+                  {t('services.addFirst')}
+                </Button>
+              </div>
+            )}
+          </>
+        )}
+      </ComponentErrorBoundary>
 
       <Modal
         isOpen={showForm}
@@ -290,55 +282,31 @@ export function Services() {
 
                 let result;
                 if (user) {
-                  console.log('Usuario autenticado:', user.id);
-
                   if (currentService) {
                     // Actualizar servicio existente
-                    console.log('Actualizando servicio existente con ID:', currentService.id);
-                    result = await servicesService.updateService(currentService.id, serviceData);
-                    if (result) {
-                      console.log('Servicio actualizado:', result);
-                      setServices(prev => prev.map(service => service.id === currentService.id ? result! : service));
-                      showNotification({
-                        title: t('common.success'),
-                        message: t('services.updateSuccess'),
-                        type: 'success'
-                      });
-                    }
+                    result = await executeWithNotification(
+                      () => servicesService.updateService(currentService.id, serviceData),
+                      'actualizar',
+                      serviceData.name
+                    );
+                    updateService(currentService.id, result);
                   } else {
                     // Añadir nuevo servicio
-                    console.log('Creando nuevo servicio para usuario:', user.id);
-                    result = await servicesService.createService(serviceData, user.id);
-                    if (result) {
-                      console.log('Servicio creado:', result);
-                      setServices(prev => [...prev, result!]);
-                      showNotification({
-                        title: t('common.success'),
-                        message: t('services.createSuccess'),
-                        type: 'success'
-                      });
-                    }
+                    result = await executeWithNotification(
+                      () => servicesService.createService(serviceData, user.id),
+                      'crear',
+                      serviceData.name
+                    );
+                    addService(result);
                   }
                 } else {
-                  console.error('No hay usuario autenticado');
                   throw new Error('Usuario no autenticado');
                 }
 
-                if (!result) throw new Error('Error en la operación');
                 setShowForm(false);
               } catch (error) {
                 console.error('Error al guardar el servicio:', error);
-                let errorMessage = currentService ? t('services.updateError') : t('services.createError');
-
-                if (error instanceof Error) {
-                  errorMessage = error.message;
-                }
-
-                showNotification({
-                  title: t('common.error'),
-                  message: errorMessage,
-                  type: 'error'
-                });
+                // El error ya se maneja en executeWithNotification
               }
             }}>
               <div>

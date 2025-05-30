@@ -33,9 +33,9 @@ export const staffService = {
         color: staff.color || "#4f46e5",
         avatar: staff.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(staff.name)}&background=random`,
         userId: staff.user_id,
-        email: '', // Default empty values for fields that might not exist
-        phone: '',
-        specialty: ''
+        email: staff.email || '',
+        phone: staff.phone || '',
+        specialty: staff.specialty || ''
       }));
     } catch (error) {
       console.error('Error al obtener el personal:', error);
@@ -46,11 +46,14 @@ export const staffService = {
   // Crear un nuevo miembro del personal
   createStaffMember: async (staffMember: Omit<StaffMember, 'id'>, userId: string): Promise<StaffMember | null> => {
     try {
-      // Use only the minimal fields that are guaranteed to exist
+      // Include all fields that exist in the database
       const staffData = {
         name: staffMember.name,
         color: staffMember.color,
-        user_id: userId
+        user_id: userId,
+        email: staffMember.email || null,
+        phone: staffMember.phone || null,
+        specialty: staffMember.specialty || null
       };
 
       // Only add avatar_url if it exists
@@ -76,9 +79,9 @@ export const staffService = {
         color: data.color || "#4f46e5",
         avatar: data.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(data.name)}&background=random`,
         userId: data.user_id,
-        email: '', // Default empty values for fields that might not exist
-        phone: '',
-        specialty: ''
+        email: data.email || '',
+        phone: data.phone || '',
+        specialty: data.specialty || ''
       };
     } catch (error) {
       console.error('Error al crear el miembro del personal:', error);
@@ -89,10 +92,13 @@ export const staffService = {
   // Actualizar un miembro del personal existente
   updateStaffMember: async (staffMember: StaffMember): Promise<StaffMember | null> => {
     try {
-      // Use only the minimal fields that are guaranteed to exist
+      // Include all fields that exist in the database
       const staffData = {
         name: staffMember.name,
-        color: staffMember.color
+        color: staffMember.color,
+        email: staffMember.email || null,
+        phone: staffMember.phone || null,
+        specialty: staffMember.specialty || null
       };
 
       // Only add avatar_url if it exists
@@ -119,9 +125,9 @@ export const staffService = {
         color: data.color || "#4f46e5",
         avatar: data.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(data.name)}&background=random`,
         userId: data.user_id,
-        email: '', // Default empty values for fields that might not exist
-        phone: '',
-        specialty: ''
+        email: data.email || '',
+        phone: data.phone || '',
+        specialty: data.specialty || ''
       };
     } catch (error) {
       console.error('Error al actualizar el miembro del personal:', error);

@@ -1,20 +1,23 @@
-# AgendaPlus
+# 🗓️ AgendaPlus
 
-Una plataforma de gestión de citas, cobros y métricas destinada a profesionales de belleza, salud y wellness.
+**Una plataforma moderna de gestión de citas de clase mundial para profesionales de belleza, salud y wellness.**
 
-## Visión del producto
+## 🎯 Visión del producto
 
 "Hacer que profesionales de belleza, salud y wellness gestionen citas + cobros + métricas con la mínima fricción posible."
 
-### Verticales foco
-- Peluquerías/barberías
-- Odontólogos y médicos particulares
-- Masajistas/spa
+### 🎯 Verticales foco
+- 💇 Peluquerías/barberías
+- 🦷 Odontólogos y médicos particulares
+- 💆 Masajistas/spa
+- 💅 Centros de estética y belleza
 
-### Dolores que resuelve
-- Agenda confusa entre varios profesionales / sucursales.
-- Pérdida de ingresos por no-shows o servicios mal cobrados.
-- Falta de visibilidad sobre qué servicio deja mejor margen.
+### 🔧 Dolores que resuelve
+- 📅 Agenda confusa entre varios profesionales / sucursales
+- 💸 Pérdida de ingresos por no-shows o servicios mal cobrados
+- 📊 Falta de visibilidad sobre qué servicio deja mejor margen
+- 🔄 Procesos manuales que consumen tiempo valioso
+- 📱 Falta de herramientas modernas y móviles
 
 ## Estructura del proyecto
 

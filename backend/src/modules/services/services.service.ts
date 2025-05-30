@@ -7,39 +7,126 @@ import { UpdateServiceDto } from './dto/update-service.dto';
 export class ServicesService {
   constructor(private supabaseService: SupabaseService) {}
 
-  async findAll() {
-    // Por ahora, devolvemos datos de ejemplo
-    return [
-      { id: 1, name: "Corte de cabello", price: 25, duration: 30, category: "Peluquería" },
-      { id: 2, name: "Manicura", price: 20, duration: 45, category: "Uñas" },
-      { id: 3, name: "Pedicura", price: 25, duration: 45, category: "Uñas" },
-      { id: 4, name: "Tinte", price: 50, duration: 90, category: "Peluquería" },
-    ];
+  async findAll(userId?: string) {
+    try {
+      const supabase = this.supabaseService.getClient();
+      let query = supabase.from('services').select('*');
+
+      if (userId) {
+        query = query.eq('user_id', userId);
+      }
+
+      const { data, error } = await query.order('created_at', { ascending: false });
+
+      if (error) {
+        throw new Error(`Error al obtener servicios: ${error.message}`);
+      }
+
+      return data || [];
+    } catch (error) {
+      console.error('Error en findAll services:', error);
+      throw error;
+    }
   }
 
-  async findOne(id: number) {
-    // Implementación futura con Supabase
-    return { id, name: "Corte de cabello", price: 25, duration: 30, category: "Peluquería" };
+  async findOne(id: string, userId?: string) {
+    try {
+      const supabase = this.supabaseService.getClient();
+      let query = supabase.from('services').select('*').eq('id', id);
+
+      if (userId) {
+        query = query.eq('user_id', userId);
+      }
+
+      const { data, error } = await query.single();
+
+      if (error) {
+        throw new Error(`Error al obtener servicio: ${error.message}`);
+      }
+
+      return data;
+    } catch (error) {
+      console.error('Error en findOne service:', error);
+      throw error;
+    }
   }
 
-  async create(createServiceDto: CreateServiceDto) {
-    // Implementación futura con Supabase
-    return {
-      id: 5,
-      ...createServiceDto,
-    };
+  async create(createServiceDto: CreateServiceDto, userId: string) {
+    try {
+      const supabase = this.supabaseService.getClient();
+
+      const serviceData = {
+        ...createServiceDto,
+        user_id: userId,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      };
+
+      const { data, error } = await supabase
+        .from('services')
+        .insert(serviceData)
+        .select()
+        .single();
+
+      if (error) {
+        throw new Error(`Error al crear servicio: ${error.message}`);
+      }
+
+      return data;
+    } catch (error) {
+      console.error('Error en create service:', error);
+      throw error;
+    }
   }
 
-  async update(id: number, updateServiceDto: UpdateServiceDto) {
-    // Implementación futura con Supabase
-    return {
-      id,
-      ...updateServiceDto,
-    };
+  async update(id: string, updateServiceDto: UpdateServiceDto, userId?: string) {
+    try {
+      const supabase = this.supabaseService.getClient();
+
+      const updateData = {
+        ...updateServiceDto,
+        updated_at: new Date().toISOString(),
+      };
+
+      let query = supabase.from('services').update(updateData).eq('id', id);
+
+      if (userId) {
+        query = query.eq('user_id', userId);
+      }
+
+      const { data, error } = await query.select().single();
+
+      if (error) {
+        throw new Error(`Error al actualizar servicio: ${error.message}`);
+      }
+
+      return data;
+    } catch (error) {
+      console.error('Error en update service:', error);
+      throw error;
+    }
   }
 
-  async remove(id: number) {
-    // Implementación futura con Supabase
-    return { id };
+  async remove(id: string, userId?: string) {
+    try {
+      const supabase = this.supabaseService.getClient();
+
+      let query = supabase.from('services').delete().eq('id', id);
+
+      if (userId) {
+        query = query.eq('user_id', userId);
+      }
+
+      const { error } = await query;
+
+      if (error) {
+        throw new Error(`Error al eliminar servicio: ${error.message}`);
+      }
+
+      return { success: true, id };
+    } catch (error) {
+      console.error('Error en remove service:', error);
+      throw error;
+    }
   }
 }

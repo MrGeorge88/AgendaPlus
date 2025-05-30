@@ -2,8 +2,9 @@ import { useState, useEffect } from "react";
 import { Button } from "../ui/button";
 import { StaffMember } from "../../services/staff";
 import { Appointment } from "../../services/appointments";
-import { Service } from "../../contexts/app-context";
+import { Service, Client } from "../../contexts/app-context";
 import { servicesService } from "../../services/services";
+import { clientsService } from "../../services/clients";
 import { useAuth } from "../../contexts/auth-context";
 
 interface AppointmentFormProps {
@@ -16,6 +17,9 @@ interface AppointmentFormProps {
 export function AppointmentForm({ onClose, onSave, staffMembers, date = new Date() }: AppointmentFormProps) {
   const { user } = useAuth();
   const [services, setServices] = useState<Service[]>([]);
+  const [clients, setClients] = useState<Client[]>([]);
+  const [filteredClients, setFilteredClients] = useState<Client[]>([]);
+  const [showClientSuggestions, setShowClientSuggestions] = useState(false);
   const [loading, setLoading] = useState(false);
 
   // Formatear la hora para el input time
@@ -37,23 +41,27 @@ export function AppointmentForm({ onClose, onSave, staffMembers, date = new Date
     status: "confirmed",
   });
 
-  // Cargar servicios
+  // Cargar servicios y clientes
   useEffect(() => {
-    const loadServices = async () => {
+    const loadData = async () => {
       if (user) {
         setLoading(true);
         try {
-          const data = await servicesService.getServices(user.id);
-          setServices(data);
+          const [servicesData, clientsData] = await Promise.all([
+            servicesService.getServices(user.id),
+            clientsService.getClients(user.id)
+          ]);
+          setServices(servicesData);
+          setClients(clientsData);
         } catch (error) {
-          console.error("Error al cargar servicios:", error);
+          console.error("Error al cargar datos:", error);
         } finally {
           setLoading(false);
         }
       }
     };
 
-    loadServices();
+    loadData();
   }, [user]);
 
   // Calcular la hora de fin basada en la duración del servicio
@@ -66,8 +74,36 @@ export function AppointmentForm({ onClose, onSave, staffMembers, date = new Date
     return formatTimeForInput(endDate);
   };
 
+  // Filtrar clientes basado en el texto ingresado
+  const handleClientInputChange = (value: string) => {
+    setFormData(prev => ({ ...prev, clientName: value }));
+
+    if (value.length > 0) {
+      const filtered = clients.filter(client =>
+        client.name.toLowerCase().includes(value.toLowerCase()) ||
+        (client.email && client.email.toLowerCase().includes(value.toLowerCase())) ||
+        (client.phone && client.phone.includes(value))
+      );
+      setFilteredClients(filtered);
+      setShowClientSuggestions(true);
+    } else {
+      setShowClientSuggestions(false);
+    }
+  };
+
+  // Seleccionar un cliente de las sugerencias
+  const handleClientSelect = (client: Client) => {
+    setFormData(prev => ({ ...prev, clientName: client.name }));
+    setShowClientSuggestions(false);
+  };
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
+
+    if (name === "clientName") {
+      handleClientInputChange(value);
+      return;
+    }
 
     if (name === "serviceId" && value) {
       // Cuando se selecciona un servicio, actualizar título, precio y hora de fin
@@ -86,7 +122,7 @@ export function AppointmentForm({ onClose, onSave, staffMembers, date = new Date
     }
 
     if (name === "startTime") {
-      // Cuando cambia la hora de inicio, recalcular la hora de fin
+      // Cuando cambia la hora de inicio, recalcular la hora de fin si hay un servicio seleccionado
       const selectedService = services.find(service => service.id === formData.serviceId);
       if (selectedService) {
         const newEndTime = calculateEndTime(value, selectedService.duration);
@@ -189,7 +225,7 @@ export function AppointmentForm({ onClose, onSave, staffMembers, date = new Date
               )}
             </div>
 
-            <div>
+            <div className="relative">
               <label className="block mb-2 text-sm font-medium">
                 Cliente
               </label>
@@ -198,9 +234,41 @@ export function AppointmentForm({ onClose, onSave, staffMembers, date = new Date
                 name="clientName"
                 value={formData.clientName}
                 onChange={handleChange}
+                onFocus={() => {
+                  if (formData.clientName.length > 0) {
+                    setShowClientSuggestions(true);
+                  }
+                }}
+                onBlur={() => {
+                  // Delay hiding suggestions to allow clicking on them
+                  setTimeout(() => setShowClientSuggestions(false), 200);
+                }}
+                placeholder="Buscar cliente existente o escribir nuevo nombre"
                 className="w-full px-3 py-2 border border-slate-200 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 required
               />
+
+              {/* Sugerencias de clientes */}
+              {showClientSuggestions && filteredClients.length > 0 && (
+                <div className="absolute z-10 w-full mt-1 bg-white border border-slate-200 rounded-md shadow-lg max-h-48 overflow-y-auto">
+                  {filteredClients.map((client) => (
+                    <button
+                      key={client.id}
+                      type="button"
+                      onClick={() => handleClientSelect(client)}
+                      className="w-full px-3 py-2 text-left hover:bg-slate-50 focus:bg-slate-50 focus:outline-none"
+                    >
+                      <div className="font-medium">{client.name}</div>
+                      {client.email && (
+                        <div className="text-sm text-slate-500">{client.email}</div>
+                      )}
+                      {client.phone && (
+                        <div className="text-sm text-slate-500">{client.phone}</div>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
 
@@ -263,13 +331,19 @@ export function AppointmentForm({ onClose, onSave, staffMembers, date = new Date
                 name="endTime"
                 value={formData.endTime}
                 onChange={handleChange}
-                className="w-full px-3 py-2 border border-slate-200 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className={`w-full px-3 py-2 border border-slate-200 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
+                  formData.serviceId ? 'bg-slate-50 cursor-not-allowed' : ''
+                }`}
                 readOnly={!!formData.serviceId}
                 required
               />
-              {formData.serviceId && (
+              {formData.serviceId ? (
                 <p className="mt-1 text-xs text-slate-500">
                   Calculado automáticamente según la duración del servicio
+                </p>
+              ) : (
+                <p className="mt-1 text-xs text-slate-500">
+                  Puedes editar la hora de fin manualmente
                 </p>
               )}
             </div>
@@ -285,14 +359,23 @@ export function AppointmentForm({ onClose, onSave, staffMembers, date = new Date
                   name="price"
                   value={formData.price}
                   onChange={handleChange}
-                  className="w-full px-3 py-2 pl-7 border border-slate-200 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  step="0.01"
+                  min="0"
+                  placeholder="0.00"
+                  className={`w-full px-3 py-2 pl-7 border border-slate-200 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
+                    formData.serviceId ? 'bg-slate-50 cursor-not-allowed' : ''
+                  }`}
                   readOnly={!!formData.serviceId}
                   required
                 />
               </div>
-              {formData.serviceId && (
+              {formData.serviceId ? (
                 <p className="mt-1 text-xs text-slate-500">
                   Precio del servicio seleccionado
+                </p>
+              ) : (
+                <p className="mt-1 text-xs text-slate-500">
+                  Puedes editar el precio manualmente
                 </p>
               )}
             </div>

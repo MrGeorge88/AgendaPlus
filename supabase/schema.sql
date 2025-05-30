@@ -2,6 +2,9 @@
 CREATE TABLE IF NOT EXISTS public.staff (
   id SERIAL PRIMARY KEY,
   name TEXT NOT NULL,
+  email TEXT,
+  phone TEXT,
+  specialty TEXT,
   color TEXT NOT NULL DEFAULT '#4f46e5',
   avatar_url TEXT,
   user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,

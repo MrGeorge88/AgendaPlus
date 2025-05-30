@@ -1,11 +1,12 @@
 import { useState, useRef, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import { StaffFilter } from "./staff-filter";
 import { Button } from "../ui/button";
-import { Plus, Users, DollarSign, CheckCircle, XCircle, Clock, AlertCircle } from "lucide-react";
+import { Plus, Users, DollarSign, CheckCircle, XCircle, Clock, AlertCircle, ChevronLeft, ChevronRight } from "lucide-react";
 import { AppointmentForm } from "./appointment-form";
 import { AppointmentPaymentForm } from "./appointment-payment-form";
 import { Modal } from "../ui/modal";
@@ -16,6 +17,7 @@ import { toast } from "../../lib/toast";
 
 export function Calendar() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [staffMembers, setStaffMembers] = useState<StaffMember[]>([]);
   const [selectedStaff, setSelectedStaff] = useState<string[]>([]);
   const [appointments, setAppointments] = useState<Appointment[]>([]);
@@ -24,6 +26,9 @@ export function Calendar() {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
   const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null);
   const [loading, setLoading] = useState(true);
+  const [currentView, setCurrentView] = useState<'timeGridDay' | 'timeGridWeek'>('timeGridWeek');
+  const [showAppointmentActions, setShowAppointmentActions] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const calendarRef = useRef<any>(null);
 
   // Cargar datos del personal y citas
@@ -61,6 +66,32 @@ export function Calendar() {
     });
   };
 
+  // Funciones de navegación del calendario
+  const handlePrevious = () => {
+    const calendarApi = calendarRef.current?.getApi();
+    if (calendarApi) {
+      calendarApi.prev();
+    }
+  };
+
+  const handleNext = () => {
+    const calendarApi = calendarRef.current?.getApi();
+    if (calendarApi) {
+      calendarApi.next();
+    }
+  };
+
+  const handleToday = () => {
+    const calendarApi = calendarRef.current?.getApi();
+    if (calendarApi) {
+      calendarApi.today();
+    }
+  };
+
+  const handleStaffManagement = () => {
+    navigate('/staff');
+  };
+
   const handleDateSelect = (selectInfo: any) => {
     // Guardar la fecha y hora seleccionada
     const selectedDateTime = new Date(selectInfo.start);
@@ -73,65 +104,93 @@ export function Calendar() {
     const appointment = appointments.find(a => a.id === clickInfo.event.id);
     if (!appointment) return;
 
-    // Mostrar opciones para la cita
-    const action = prompt(
-      `Cita: ${clickInfo.event.title}\nCliente: ${clickInfo.event.extendedProps.client}\n\nSelecciona una acción:\n1. Registrar pago\n2. Marcar como completada\n3. Cancelar cita\n4. Eliminar cita`
-    );
+    // Mostrar el modal de acciones
+    setSelectedAppointment(appointment);
+    setShowAppointmentActions(true);
+  };
 
-    if (!action) return;
+  // Funciones para manejar las acciones de las citas
+  const handleAppointmentAction = async (action: string) => {
+    if (!selectedAppointment || !user) return;
 
     try {
-      if (user) {
-        switch (action) {
-          case "1": // Registrar pago
-            setSelectedAppointment(appointment);
-            setShowPaymentForm(true);
-            break;
+      switch (action) {
+        case "payment": // Registrar pago
+          setShowAppointmentActions(false);
+          setShowPaymentForm(true);
+          break;
 
-          case "2": // Marcar como completada
-            const completedSuccess = await appointmentsService.updateAppointmentStatus(appointment.id, "completed");
-            if (completedSuccess) {
-              toast.success("Cita marcada como completada");
-              // Actualizar la cita en el estado
-              setAppointments(prev => prev.map(a =>
-                a.id === appointment.id
-                  ? {...a, extendedProps: {...a.extendedProps, status: "completed"}}
-                  : a
-              ));
-            }
-            break;
+        case "complete": // Marcar como completada
+          const completedSuccess = await appointmentsService.updateAppointmentStatus(selectedAppointment.id, "completed");
+          if (completedSuccess) {
+            toast.success("Cita marcada como completada");
+            setAppointments(prev => prev.map(a =>
+              a.id === selectedAppointment.id
+                ? {...a, extendedProps: {...a.extendedProps, status: "completed"}}
+                : a
+            ));
+          }
+          setShowAppointmentActions(false);
+          break;
 
-          case "3": // Cancelar cita
-            const cancelSuccess = await appointmentsService.updateAppointmentStatus(appointment.id, "cancelled");
-            if (cancelSuccess) {
-              toast.success("Cita cancelada");
-              // Actualizar la cita en el estado
-              setAppointments(prev => prev.map(a =>
-                a.id === appointment.id
-                  ? {...a, extendedProps: {...a.extendedProps, status: "cancelled"}}
-                  : a
-              ));
-            }
-            break;
+        case "cancel": // Cancelar cita
+          const cancelSuccess = await appointmentsService.updateAppointmentStatus(selectedAppointment.id, "cancelled");
+          if (cancelSuccess) {
+            toast.success("Cita cancelada");
+            setAppointments(prev => prev.map(a =>
+              a.id === selectedAppointment.id
+                ? {...a, extendedProps: {...a.extendedProps, status: "cancelled"}}
+                : a
+            ));
+          }
+          setShowAppointmentActions(false);
+          break;
 
-          case "4": // Eliminar cita
-            if (confirm(`¿Estás seguro de que deseas eliminar la cita '${clickInfo.event.title}'?`)) {
-              const deleteSuccess = await appointmentsService.deleteAppointment(clickInfo.event.id);
-              if (deleteSuccess) {
-                toast.success("Cita eliminada");
-                clickInfo.event.remove();
-                setAppointments(prev => prev.filter(a => a.id !== clickInfo.event.id));
-              }
-            }
-            break;
+        case "no-show": // Marcar como no-show
+          const noShowSuccess = await appointmentsService.updateAppointmentStatus(selectedAppointment.id, "no-show");
+          if (noShowSuccess) {
+            toast.success("Cita marcada como no-show");
+            setAppointments(prev => prev.map(a =>
+              a.id === selectedAppointment.id
+                ? {...a, extendedProps: {...a.extendedProps, status: "no-show"}}
+                : a
+            ));
+          }
+          setShowAppointmentActions(false);
+          break;
 
-          default:
-            break;
-        }
+        case "delete": // Mostrar confirmación de eliminación
+          setShowAppointmentActions(false);
+          setShowDeleteConfirm(true);
+          break;
+
+        default:
+          setShowAppointmentActions(false);
+          break;
       }
     } catch (error) {
       console.error("Error al procesar la acción:", error);
       toast.error("Error al procesar la acción");
+      setShowAppointmentActions(false);
+    }
+  };
+
+  // Función para confirmar la eliminación
+  const handleConfirmDelete = async () => {
+    if (!selectedAppointment) return;
+
+    try {
+      const deleteSuccess = await appointmentsService.deleteAppointment(selectedAppointment.id);
+      if (deleteSuccess) {
+        toast.success("Cita eliminada");
+        setAppointments(prev => prev.filter(a => a.id !== selectedAppointment.id));
+      }
+    } catch (error) {
+      console.error("Error al eliminar la cita:", error);
+      toast.error("Error al eliminar la cita");
+    } finally {
+      setShowDeleteConfirm(false);
+      setSelectedAppointment(null);
     }
   };
 
@@ -231,7 +290,7 @@ export function Calendar() {
             </div>
             <div className="flex gap-2">
               <Button
-                onClick={() => window.location.href = '/staff'}
+                onClick={handleStaffManagement}
                 variant="outline"
                 className="flex items-center gap-1"
               >
@@ -251,16 +310,69 @@ export function Calendar() {
 
       {!loading && (
         <div className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
+          {/* Controles de navegación personalizados */}
+          <div className="flex items-center justify-between border-b border-slate-200 px-4 py-3">
+            <div className="flex items-center gap-2">
+              <Button
+                onClick={handlePrevious}
+                variant="outline"
+                size="sm"
+                className="flex items-center gap-1"
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+              <Button
+                onClick={handleNext}
+                variant="outline"
+                size="sm"
+                className="flex items-center gap-1"
+              >
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+              <Button
+                onClick={handleToday}
+                variant="outline"
+                size="sm"
+              >
+                Hoy
+              </Button>
+            </div>
+            <div className="flex items-center gap-2">
+              <Button
+                onClick={() => {
+                  const calendarApi = calendarRef.current?.getApi();
+                  if (calendarApi) {
+                    calendarApi.changeView('timeGridDay');
+                    setCurrentView('timeGridDay');
+                  }
+                }}
+                variant={currentView === 'timeGridDay' ? 'default' : 'outline'}
+                size="sm"
+              >
+                Día
+              </Button>
+              <Button
+                onClick={() => {
+                  const calendarApi = calendarRef.current?.getApi();
+                  if (calendarApi) {
+                    calendarApi.changeView('timeGridWeek');
+                    setCurrentView('timeGridWeek');
+                  }
+                }}
+                variant={currentView === 'timeGridWeek' ? 'default' : 'outline'}
+                size="sm"
+              >
+                Semana
+              </Button>
+            </div>
+          </div>
+
           <div className="h-[600px] p-4">
             <FullCalendar
               ref={calendarRef}
               plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
-              initialView="timeGridDay"
-              headerToolbar={{
-                left: "",
-                center: "title",
-                right: "timeGridDay,timeGridWeek",
-              }}
+              initialView={currentView}
+              headerToolbar={false}
               slotMinTime="08:00:00"
               slotMaxTime="20:00:00"
               height="100%"
@@ -270,13 +382,9 @@ export function Calendar() {
               selectable={true}
               selectMirror={true}
               dayMaxEvents={true}
-              weekends={true}
+              weekends={false}
               nowIndicator={true}
               locale="es"
-              buttonText={{
-                day: "Día",
-                week: "Semana",
-              }}
               slotLabelFormat={{
                 hour: "numeric",
                 minute: "2-digit",
@@ -366,6 +474,137 @@ export function Calendar() {
           onPaymentRegistered={handlePaymentRegistered}
         />
       )}
+
+      {/* Modal de acciones de cita */}
+      <Modal
+        isOpen={showAppointmentActions}
+        onClose={() => setShowAppointmentActions(false)}
+        title="Acciones de Cita"
+      >
+        {selectedAppointment && (
+          <div className="space-y-4">
+            {/* Información de la cita */}
+            <div className="rounded-lg bg-slate-50 p-4">
+              <h3 className="font-semibold text-slate-900">{selectedAppointment.title}</h3>
+              <p className="text-sm text-slate-600">Cliente: {selectedAppointment.extendedProps.client}</p>
+              <p className="text-sm text-slate-600">
+                Precio: ${selectedAppointment.extendedProps.price}
+              </p>
+              <p className="text-sm text-slate-600">
+                Estado: <span className="capitalize">{selectedAppointment.extendedProps.status}</span>
+              </p>
+            </div>
+
+            {/* Botones de acciones */}
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              <Button
+                onClick={() => handleAppointmentAction("payment")}
+                className="flex items-center justify-center gap-2"
+                variant="outline"
+              >
+                <DollarSign className="h-4 w-4" />
+                Registrar Pago
+              </Button>
+
+              <Button
+                onClick={() => handleAppointmentAction("complete")}
+                className="flex items-center justify-center gap-2"
+                variant="outline"
+              >
+                <CheckCircle className="h-4 w-4" />
+                Marcar Completada
+              </Button>
+
+              <Button
+                onClick={() => handleAppointmentAction("cancel")}
+                className="flex items-center justify-center gap-2"
+                variant="outline"
+              >
+                <XCircle className="h-4 w-4" />
+                Cancelar Cita
+              </Button>
+
+              <Button
+                onClick={() => handleAppointmentAction("no-show")}
+                className="flex items-center justify-center gap-2"
+                variant="outline"
+              >
+                <AlertCircle className="h-4 w-4" />
+                Marcar No-Show
+              </Button>
+            </div>
+
+            {/* Botón de eliminar separado */}
+            <div className="border-t pt-4">
+              <Button
+                onClick={() => handleAppointmentAction("delete")}
+                className="w-full flex items-center justify-center gap-2"
+                variant="destructive"
+              >
+                <XCircle className="h-4 w-4" />
+                Eliminar Cita
+              </Button>
+            </div>
+
+            {/* Botón de cancelar */}
+            <div className="flex justify-end">
+              <Button
+                onClick={() => setShowAppointmentActions(false)}
+                variant="outline"
+              >
+                Cancelar
+              </Button>
+            </div>
+          </div>
+        )}
+      </Modal>
+
+      {/* Modal de confirmación de eliminación */}
+      <Modal
+        isOpen={showDeleteConfirm}
+        onClose={() => setShowDeleteConfirm(false)}
+        title="Confirmar Eliminación"
+      >
+        {selectedAppointment && (
+          <div className="space-y-4">
+            <div className="text-center">
+              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-red-100">
+                <XCircle className="h-6 w-6 text-red-600" />
+              </div>
+              <div className="mt-3">
+                <h3 className="text-lg font-medium text-slate-900">
+                  ¿Eliminar cita?
+                </h3>
+                <div className="mt-2">
+                  <p className="text-sm text-slate-500">
+                    ¿Estás seguro de que deseas eliminar la cita <strong>"{selectedAppointment.title}"</strong> con <strong>{selectedAppointment.extendedProps.client}</strong>?
+                  </p>
+                  <p className="text-sm text-slate-500 mt-1">
+                    Esta acción no se puede deshacer.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex gap-3 justify-end">
+              <Button
+                onClick={() => setShowDeleteConfirm(false)}
+                variant="outline"
+              >
+                Cancelar
+              </Button>
+              <Button
+                onClick={handleConfirmDelete}
+                variant="destructive"
+                className="flex items-center gap-2"
+              >
+                <XCircle className="h-4 w-4" />
+                Eliminar
+              </Button>
+            </div>
+          </div>
+        )}
+      </Modal>
     </div>
   );
 }

@@ -1,5 +1,14 @@
 import { supabase } from '../lib/supabase';
 
+/**
+ * @deprecated Este archivo contiene datos mock y será eliminado.
+ * Usar los servicios específicos en su lugar:
+ * - frontend/src/services/services.ts para servicios
+ * - frontend/src/services/clients.ts para clientes
+ * - frontend/src/services/staff.ts para personal
+ * - frontend/src/services/appointments.ts para citas
+ */
+
 // Tipos
 export interface Appointment {
   id: string;

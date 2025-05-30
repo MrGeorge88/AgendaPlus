@@ -8,41 +8,38 @@ import { Plus, Search, Edit, Trash2, Phone, Mail, Briefcase } from 'lucide-react
 import { useLanguage } from '../contexts/language-context';
 import { useAuth } from '../contexts/auth-context';
 import { staffService, StaffMember } from '../services/staff';
-import { useNotification } from '../components/ui/notification';
+import { useAsyncList } from '../hooks/useAsyncState';
+import { useCrudNotifications } from '../hooks/useNotifications';
+import { StaffListSkeleton } from '../components/ui/skeleton';
+import { ComponentErrorBoundary, DataErrorFallback } from '../components/ui/error-boundary';
+import { EmptyStaff, EmptySearchResults, useEmptyState } from '../components/ui/empty-state';
 
 export function Staff() {
   const { t } = useLanguage();
   const { user } = useAuth();
-  const { showNotification } = useNotification();
   const [searchTerm, setSearchTerm] = useState('');
-  const [staff, setStaff] = useState<StaffMember[]>([]);
-  const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [currentStaff, setCurrentStaff] = useState<StaffMember | null>(null);
 
+  // Usar nuestros hooks personalizados
+  const {
+    items: staff,
+    loading,
+    error,
+    execute: loadStaff,
+    addItem: addStaff,
+    updateItem: updateStaff,
+    removeItem: removeStaff
+  } = useAsyncList<StaffMember>([]);
+
+  const { executeWithNotification } = useCrudNotifications('Miembro del personal');
+
   // Cargar datos del personal
   useEffect(() => {
-    const loadStaff = async () => {
-      if (user) {
-        try {
-          setLoading(true);
-          const staffData = await staffService.getStaffMembers(user.id);
-          setStaff(staffData);
-        } catch (error) {
-          console.error('Error al cargar el personal:', error);
-          showNotification({
-            title: t('common.error'),
-            message: t('staff.errorLoading'),
-            type: 'error'
-          });
-        } finally {
-          setLoading(false);
-        }
-      }
-    };
-
-    loadStaff();
-  }, [user, t, showNotification]);
+    if (user) {
+      loadStaff(() => staffService.getStaffMembers(user.id));
+    }
+  }, [user, loadStaff]);
 
   const filteredStaff = staff.filter(person =>
     person.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -61,29 +58,23 @@ export function Staff() {
   };
 
   const handleDeleteStaff = async (id: string) => {
+    const staffMember = staff.find(s => s.id === id);
     if (confirm(t('staff.deleteConfirm'))) {
       try {
-        const success = await staffService.deleteStaffMember(id);
-        if (success) {
-          setStaff(prev => prev.filter(person => person.id !== id));
-          showNotification({
-            title: t('common.success'),
-            message: t('staff.deleteSuccess'),
-            type: 'success'
-          });
-        } else {
-          throw new Error('Error al eliminar');
-        }
+        await executeWithNotification(
+          () => staffService.deleteStaffMember(id),
+          'eliminar',
+          staffMember?.name
+        );
+        removeStaff(id);
       } catch (error) {
         console.error('Error al eliminar el miembro del personal:', error);
-        showNotification({
-          title: t('common.error'),
-          message: t('staff.deleteError'),
-          type: 'error'
-        });
       }
     }
   };
+
+  // Determinar qué estado vacío mostrar
+  const emptyState = useEmptyState(filteredStaff, loading, error, searchTerm);
 
   const handleSubmitForm = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -97,50 +88,38 @@ export function Staff() {
           color: formData.get('color') as string,
           avatar: currentStaff?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(formData.get('name') as string)}&background=random`,
           userId: user.id,
-          // Include these fields in the frontend model but don't send to database
           email: formData.get('email') as string,
           phone: formData.get('phone') as string,
-          specialty: ''
+          specialty: formData.get('specialty') as string
         };
 
         let result;
         if (currentStaff) {
           // Actualizar miembro existente
-          result = await staffService.updateStaffMember({
-            ...staffData,
-            id: currentStaff.id
-          });
-          if (result) {
-            setStaff(prev => prev.map(person => person.id === currentStaff.id ? result! : person));
-            showNotification({
-              title: t('common.success'),
-              message: t('staff.updateSuccess'),
-              type: 'success'
-            });
-          }
+          result = await executeWithNotification(
+            () => staffService.updateStaffMember({
+              ...staffData,
+              id: currentStaff.id
+            }),
+            'actualizar',
+            staffData.name
+          );
+          updateStaff(currentStaff.id, result);
         } else {
           // Añadir nuevo miembro
-          result = await staffService.createStaffMember(staffData, user.id);
-          if (result) {
-            setStaff(prev => [...prev, result!]);
-            showNotification({
-              title: t('common.success'),
-              message: t('staff.createSuccess'),
-              type: 'success'
-            });
-          }
+          result = await executeWithNotification(
+            () => staffService.createStaffMember(staffData, user.id),
+            'crear',
+            staffData.name
+          );
+          addStaff(result);
         }
 
-        if (!result) throw new Error('Error en la operación');
         setShowForm(false);
       }
     } catch (error) {
       console.error('Error al guardar el miembro del personal:', error);
-      showNotification({
-        title: t('common.error'),
-        message: currentStaff ? t('staff.updateError') : t('staff.createError'),
-        type: 'error'
-      });
+      // El error ya se maneja en executeWithNotification
     }
   };
 
@@ -162,13 +141,25 @@ export function Staff() {
         </Button>
       </div>
 
-      {loading ? (
-        <div className="flex h-64 items-center justify-center">
-          <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
-          <span className="ml-2">{t('common.loading')}</span>
-        </div>
-      ) : (
-        <>
+      <ComponentErrorBoundary componentName="Lista de Personal">
+        {loading ? (
+          <StaffListSkeleton count={4} />
+        ) : error ? (
+          <DataErrorFallback
+            error={new Error(error)}
+            onRetry={() => user && loadStaff(() => staffService.getStaffMembers(user.id))}
+            title="Error al cargar personal"
+          />
+        ) : emptyState === 'empty' ? (
+          <EmptyStaff onAddStaff={handleAddStaff} />
+        ) : emptyState === 'search' ? (
+          <EmptySearchResults
+            searchTerm={searchTerm}
+            onClearSearch={() => setSearchTerm('')}
+            onCreateNew={handleAddStaff}
+            entityName="miembro del personal"
+          />
+        ) : (
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {filteredStaff.map(person => (
               <Card key={person.id} className="flex flex-col">
@@ -217,14 +208,8 @@ export function Staff() {
               </Card>
             ))}
           </div>
-
-          {filteredStaff.length === 0 && (
-            <div className="mt-8 text-center">
-              <p className="text-slate-500">{t('staff.noResults')}</p>
-            </div>
-          )}
-        </>
-      )}
+        )}
+      </ComponentErrorBoundary>
 
       <Modal
         isOpen={showForm}
@@ -243,7 +228,15 @@ export function Staff() {
                 />
               </div>
 
-              {/* Specialty field removed as it doesn't exist in the database */}
+              <div>
+                <label className="mb-1 block text-sm font-medium">{t('staff.specialty')} ({t('common.optional')})</label>
+                <input
+                  type="text"
+                  name="specialty"
+                  className="w-full rounded-lg border border-slate-300 p-2"
+                  defaultValue={currentStaff?.specialty || ''}
+                />
+              </div>
 
               <div>
                 <label className="mb-1 block text-sm font-medium">{t('staff.email')} ({t('common.optional')})</label>

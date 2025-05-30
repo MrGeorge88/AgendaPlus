@@ -6,42 +6,39 @@ import { Modal } from '../components/ui/modal';
 import { Plus, Search, Edit, Trash2, Phone, Mail } from 'lucide-react';
 import { useAuth } from '../contexts/auth-context';
 import { useLanguage } from '../contexts/language-context';
-import { useNotification } from '../components/ui/notification';
 import { clientsService, Client } from '../services/clients';
+import { useAsyncList } from '../hooks/useAsyncState';
+import { useCrudNotifications } from '../hooks/useNotifications';
+import { ClientListSkeleton } from '../components/ui/skeleton';
+import { ComponentErrorBoundary, DataErrorFallback } from '../components/ui/error-boundary';
+import { EmptyClients, EmptySearchResults, useEmptyState } from '../components/ui/empty-state';
 
 export function Clients() {
   const { t } = useLanguage();
   const { user } = useAuth();
-  const { showNotification } = useNotification();
   const [searchTerm, setSearchTerm] = useState('');
-  const [clients, setClients] = useState<Client[]>([]);
-  const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [currentClient, setCurrentClient] = useState<Client | null>(null);
 
+  // Usar nuestros hooks personalizados
+  const {
+    items: clients,
+    loading,
+    error,
+    execute: loadClients,
+    addItem: addClient,
+    updateItem: updateClient,
+    removeItem: removeClient
+  } = useAsyncList<Client>([]);
+
+  const { executeWithNotification } = useCrudNotifications('Cliente');
+
   // Cargar datos de clientes
   useEffect(() => {
-    const loadClients = async () => {
-      if (user) {
-        try {
-          setLoading(true);
-          const clientsData = await clientsService.getClients(user.id);
-          setClients(clientsData);
-        } catch (error) {
-          console.error('Error al cargar los clientes:', error);
-          showNotification({
-            title: t('common.error'),
-            message: t('clients.errorLoading'),
-            type: 'error'
-          });
-        } finally {
-          setLoading(false);
-        }
-      }
-    };
-
-    loadClients();
-  }, [user, t, showNotification]);
+    if (user) {
+      loadClients(() => clientsService.getClients(user.id));
+    }
+  }, [user, loadClients]);
 
   const filteredClients = clients.filter(client =>
     client.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -60,29 +57,23 @@ export function Clients() {
   };
 
   const handleDeleteClient = async (id: string) => {
+    const client = clients.find(c => c.id === id);
     if (confirm(t('clients.deleteConfirm'))) {
       try {
-        const success = await clientsService.deleteClient(id);
-        if (success) {
-          setClients(prev => prev.filter(client => client.id !== id));
-          showNotification({
-            title: t('common.success'),
-            message: t('clients.deleteSuccess'),
-            type: 'success'
-          });
-        } else {
-          throw new Error('Error al eliminar');
-        }
+        await executeWithNotification(
+          () => clientsService.deleteClient(id),
+          'eliminar',
+          client?.name
+        );
+        removeClient(id);
       } catch (error) {
         console.error('Error al eliminar el cliente:', error);
-        showNotification({
-          title: t('common.error'),
-          message: t('clients.deleteError'),
-          type: 'error'
-        });
       }
     }
   };
+
+  // Determinar qué estado vacío mostrar
+  const emptyState = useEmptyState(filteredClients, loading, error, searchTerm);
 
   const handleSubmitForm = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -102,43 +93,32 @@ export function Clients() {
         let result;
         if (currentClient) {
           // Actualizar cliente existente
-          result = await clientsService.updateClient({
-            ...clientData,
-            id: currentClient.id,
-            lastVisit: currentClient.lastVisit,
-            totalSpent: currentClient.totalSpent
-          });
-          if (result) {
-            setClients(prev => prev.map(client => client.id === currentClient.id ? result! : client));
-            showNotification({
-              title: t('common.success'),
-              message: t('clients.updateSuccess'),
-              type: 'success'
-            });
-          }
+          result = await executeWithNotification(
+            () => clientsService.updateClient({
+              ...clientData,
+              id: currentClient.id,
+              lastVisit: currentClient.lastVisit,
+              totalSpent: currentClient.totalSpent
+            }),
+            'actualizar',
+            clientData.name
+          );
+          updateClient(currentClient.id, result);
         } else {
           // Añadir nuevo cliente
-          result = await clientsService.createClient(clientData, user.id);
-          if (result) {
-            setClients(prev => [...prev, result!]);
-            showNotification({
-              title: t('common.success'),
-              message: t('clients.createSuccess'),
-              type: 'success'
-            });
-          }
+          result = await executeWithNotification(
+            () => clientsService.createClient(clientData, user.id),
+            'crear',
+            clientData.name
+          );
+          addClient(result);
         }
 
-        if (!result) throw new Error('Error en la operación');
         setShowForm(false);
       }
     } catch (error) {
       console.error('Error al guardar el cliente:', error);
-      showNotification({
-        title: t('common.error'),
-        message: currentClient ? t('clients.updateError') : t('clients.createError'),
-        type: 'error'
-      });
+      // El error ya se maneja en executeWithNotification
     }
   };
 
@@ -160,64 +140,72 @@ export function Clients() {
         </Button>
       </div>
 
-      {loading ? (
-        <div className="flex h-64 items-center justify-center">
-          <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
-          <span className="ml-2">{t('common.loading')}</span>
-        </div>
-      ) : (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {filteredClients.map(client => (
-            <Card key={client.id} className="flex flex-col">
-              <div className="flex items-start justify-between p-4">
-                <div>
-                  <h3 className="text-lg font-bold">{client.name}</h3>
-                  <div className="mt-2 space-y-1">
-                    <div className="flex items-center text-sm text-slate-500">
-                      <Phone className="mr-2 h-4 w-4" /> {client.phone}
+      <ComponentErrorBoundary componentName="Lista de Clientes">
+        {loading ? (
+          <ClientListSkeleton count={6} />
+        ) : error ? (
+          <DataErrorFallback
+            error={new Error(error)}
+            onRetry={() => user && loadClients(() => clientsService.getClients(user.id))}
+            title="Error al cargar clientes"
+          />
+        ) : emptyState === 'empty' ? (
+          <EmptyClients onAddClient={handleAddClient} />
+        ) : emptyState === 'search' ? (
+          <EmptySearchResults
+            searchTerm={searchTerm}
+            onClearSearch={() => setSearchTerm('')}
+            onCreateNew={handleAddClient}
+            entityName="cliente"
+          />
+        ) : (
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {filteredClients.map(client => (
+              <Card key={client.id} className="flex flex-col">
+                <div className="flex items-start justify-between p-4">
+                  <div>
+                    <h3 className="text-lg font-bold">{client.name}</h3>
+                    <div className="mt-2 space-y-1">
+                      <div className="flex items-center text-sm text-slate-500">
+                        <Phone className="mr-2 h-4 w-4" /> {client.phone}
+                      </div>
+                      <div className="flex items-center text-sm text-slate-500">
+                        <Mail className="mr-2 h-4 w-4" /> {client.email}
+                      </div>
                     </div>
-                    <div className="flex items-center text-sm text-slate-500">
-                      <Mail className="mr-2 h-4 w-4" /> {client.email}
+                  </div>
+                  <div className="flex space-x-2">
+                    <button
+                      onClick={() => handleEditClient(client)}
+                      className="rounded-full p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+                    >
+                      <Edit className="h-4 w-4" />
+                    </button>
+                    <button
+                      onClick={() => handleDeleteClient(client.id)}
+                      className="rounded-full p-1 text-slate-400 hover:bg-red-100 hover:text-red-600"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </div>
+                </div>
+                <div className="mt-auto border-t p-4">
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-slate-500">{t('clients.lastVisit')}:</span>
+                      <span>{client.lastVisit}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-500">{t('clients.totalSpent')}:</span>
+                      <span className="font-medium">{client.totalSpent}€</span>
                     </div>
                   </div>
                 </div>
-                <div className="flex space-x-2">
-                  <button
-                    onClick={() => handleEditClient(client)}
-                    className="rounded-full p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
-                  >
-                    <Edit className="h-4 w-4" />
-                  </button>
-                  <button
-                    onClick={() => handleDeleteClient(client.id)}
-                    className="rounded-full p-1 text-slate-400 hover:bg-red-100 hover:text-red-600"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </button>
-                </div>
-              </div>
-              <div className="mt-auto border-t p-4">
-                <div className="space-y-2 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-slate-500">{t('clients.lastVisit')}:</span>
-                    <span>{client.lastVisit}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-slate-500">{t('clients.totalSpent')}:</span>
-                    <span className="font-medium">{client.totalSpent}€</span>
-                  </div>
-                </div>
-              </div>
-            </Card>
-          ))}
-        </div>
-      )}
-
-      {!loading && filteredClients.length === 0 && (
-        <div className="mt-8 text-center">
-          <p className="text-slate-500">{t('clients.noResults')}</p>
-        </div>
-      )}
+              </Card>
+            ))}
+          </div>
+        )}
+      </ComponentErrorBoundary>
 
       <Modal
         isOpen={showForm}

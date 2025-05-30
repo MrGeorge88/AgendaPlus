@@ -5,14 +5,25 @@ import { BarChart3, TrendingUp, DollarSign, Calendar, Users } from 'lucide-react
 import { useLanguage } from '../contexts/language-context';
 import { useAuth } from '../contexts/auth-context';
 import { incomeService, IncomeStats } from '../services/income';
-import { toast } from '../lib/toast';
+import { useAsyncState } from '../hooks/useAsyncState';
+import { useNotifications } from '../hooks/useNotifications';
+import { DashboardSkeleton } from '../components/ui/skeleton';
+import { ComponentErrorBoundary, DataErrorFallback } from '../components/ui/error-boundary';
+import { EmptyIncome } from '../components/ui/empty-state';
 
 export function Income() {
   const { t } = useLanguage();
   const { user } = useAuth();
   const [period, setPeriod] = useState('month');
-  const [loading, setLoading] = useState(true);
-  const [data, setData] = useState<IncomeStats>({
+  const { showError } = useNotifications();
+
+  // Usar nuestro hook personalizado para el estado asíncrono
+  const {
+    data,
+    loading,
+    error,
+    execute: loadIncomeStats
+  } = useAsyncState<IncomeStats>({
     totalToday: 0,
     totalWeek: 0,
     totalMonth: 0,
@@ -25,34 +36,43 @@ export function Income() {
 
   useEffect(() => {
     if (user) {
-      loadIncomeStats();
+      loadIncomeStats(() => incomeService.getIncomeStats(user.id));
     }
-  }, [user]);
-
-  const loadIncomeStats = async () => {
-    if (!user) return;
-
-    setLoading(true);
-    try {
-      const stats = await incomeService.getIncomeStats(user.id);
-      setData(stats);
-    } catch (error) {
-      console.error('Error al cargar estadísticas de ingresos:', error);
-      toast.error('Error al cargar los datos de ingresos');
-    } finally {
-      setLoading(false);
-    }
-  };
+  }, [user, loadIncomeStats]);
 
   // Función para calcular la altura de las barras en el gráfico
   const getBarHeight = (value: number) => {
+    if (!data || !data.monthlyData || data.monthlyData.length === 0) return 0;
     const maxValue = Math.max(...data.monthlyData.map(item => item.income));
     return maxValue > 0 ? (value / maxValue) * 100 : 0;
   };
 
+  // Verificar si hay datos para mostrar
+  const hasIncomeData = data && (
+    data.totalToday > 0 ||
+    data.totalWeek > 0 ||
+    data.totalMonth > 0 ||
+    data.appointmentsToday > 0 ||
+    data.topServices.length > 0 ||
+    data.topStaff.length > 0
+  );
+
   return (
     <Layout title={t('income.title')}>
-      <div className="mb-6 grid grid-cols-1 gap-4 md:grid-cols-3">
+      <ComponentErrorBoundary componentName="Página de Ingresos">
+        {loading ? (
+          <DashboardSkeleton />
+        ) : error ? (
+          <DataErrorFallback
+            error={new Error(error)}
+            onRetry={() => user && loadIncomeStats(() => incomeService.getIncomeStats(user.id))}
+            title="Error al cargar datos de ingresos"
+          />
+        ) : !hasIncomeData ? (
+          <EmptyIncome />
+        ) : (
+          <>
+            <div className="mb-6 grid grid-cols-1 gap-4 md:grid-cols-3">
         <div className="card flex items-center p-4">
           <div className="mr-4 rounded-full bg-primary/10 p-3 text-primary" style={{ backgroundColor: 'rgba(79, 70, 229, 0.1)' }}>
             <DollarSign className="h-6 w-6" style={{ color: '#4f46e5' }} />
@@ -172,7 +192,9 @@ export function Income() {
             ))}
           </div>
         </div>
-      </div>
+            </>
+          )}
+      </ComponentErrorBoundary>
     </Layout>
   );
 }
