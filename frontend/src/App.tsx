@@ -1,5 +1,7 @@
 import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'sonner';
+import { QueryClientProvider } from '@tanstack/react-query';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { Landing } from './pages/landing';
 import { Dashboard } from './pages/dashboard';
 import { Clients } from './pages/clients';
@@ -17,16 +19,18 @@ import { ThemeProvider } from './contexts/theme-context';
 import { LanguageProvider } from './contexts/language-context';
 import { AuthProvider } from './contexts/auth-context';
 import { ErrorBoundary } from './components/ui/error-boundary';
+import { queryClient } from './lib/query-client';
 
 function App() {
   return (
     <ErrorBoundary>
-      <LanguageProvider>
-        <ThemeProvider>
-          <AuthProvider>
-            <AppProvider>
-              <NotificationProvider>
-                <Router>
+      <QueryClientProvider client={queryClient}>
+        <LanguageProvider>
+          <ThemeProvider>
+            <AuthProvider>
+              <AppProvider>
+                <NotificationProvider>
+                  <Router>
                   <Routes>
                     <Route path="/" element={<Landing />} />
                     <Route path="/login" element={<Login />} />
@@ -69,19 +73,25 @@ function App() {
                   </Routes>
                 </Router>
 
-                {/* Toaster de Sonner */}
-                <Toaster
-                  position="top-right"
-                  richColors
-                  closeButton
-                  expand={true}
-                  duration={4000}
-                />
-              </NotificationProvider>
-            </AppProvider>
-          </AuthProvider>
-        </ThemeProvider>
-      </LanguageProvider>
+                  {/* Toaster de Sonner */}
+                  <Toaster
+                    position="top-right"
+                    richColors
+                    closeButton
+                    expand={true}
+                    duration={4000}
+                  />
+                </NotificationProvider>
+              </AppProvider>
+            </AuthProvider>
+          </ThemeProvider>
+        </LanguageProvider>
+
+        {/* React Query Devtools - solo en desarrollo */}
+        {process.env.NODE_ENV === 'development' && (
+          <ReactQueryDevtools initialIsOpen={false} />
+        )}
+      </QueryClientProvider>
     </ErrorBoundary>
   );
 }

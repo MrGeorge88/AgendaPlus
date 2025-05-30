@@ -1,6 +1,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { vi } from 'vitest';
 import { Button } from '../../../components/ui/button';
 
 describe('Button Component', () => {
@@ -46,19 +47,19 @@ describe('Button Component', () => {
   });
 
   it('handles click events', async () => {
-    const handleClick = jest.fn();
+    const handleClick = vi.fn();
     render(<Button onClick={handleClick}>Click me</Button>);
     const button = screen.getByRole('button', { name: /click me/i });
-    
+
     await userEvent.click(button);
     expect(handleClick).toHaveBeenCalledTimes(1);
   });
 
   it('can be disabled', async () => {
-    const handleClick = jest.fn();
+    const handleClick = vi.fn();
     render(<Button disabled onClick={handleClick}>Disabled</Button>);
     const button = screen.getByRole('button', { name: /disabled/i });
-    
+
     expect(button).toBeDisabled();
     await userEvent.click(button);
     expect(handleClick).not.toHaveBeenCalled();
@@ -70,7 +71,7 @@ describe('Button Component', () => {
         <a href="https://example.com">Link Button</a>
       </Button>
     );
-    
+
     const link = screen.getByRole('link', { name: /link button/i });
     expect(link).toBeInTheDocument();
     expect(link).toHaveAttribute('href', 'https://example.com');

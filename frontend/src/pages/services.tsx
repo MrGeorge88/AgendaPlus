@@ -1,47 +1,33 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Layout } from '../components/layout/layout';
 import { Button } from '../components/ui/button';
 import { Card } from '../components/ui/card';
 import { Modal } from '../components/ui/modal';
-import { Plus, Search, Edit, Trash2, Clock, DollarSign, Bug } from 'lucide-react';
-import { servicesService } from '../services/services';
+import { Plus, Search, Edit, Trash2, Clock, DollarSign } from 'lucide-react';
 import { Service } from '../contexts/app-context';
-import { useAuth } from '../contexts/auth-context';
 import { useLanguage } from '../contexts/language-context';
-import { testSupabaseConnection, testCreateService, listSupabaseTables } from '../tests/supabase-test';
-import { useAsyncList } from '../hooks/useAsyncState';
-import { useCrudNotifications } from '../hooks/useNotifications';
 import { ServiceListSkeleton } from '../components/ui/skeleton';
 import { ComponentErrorBoundary, DataErrorFallback } from '../components/ui/error-boundary';
+import { EmptyServices } from '../components/ui/empty-state';
+import { useServices, useCreateService, useUpdateService, useDeleteService } from '../hooks/use-services';
+import { normalizeQueryState } from '../hooks/useAsyncState';
 
 export function Services() {
   const { t } = useLanguage();
-  const { user } = useAuth();
   const [searchTerm, setSearchTerm] = useState('');
   const [showForm, setShowForm] = useState(false);
   const [currentService, setCurrentService] = useState<Service | null>(null);
 
-  // Usar nuestros hooks personalizados
-  const {
-    items: services,
-    loading,
-    error,
-    execute: loadServices,
-    addItem: addService,
-    updateItem: updateService,
-    removeItem: removeService
-  } = useAsyncList<Service>([]);
+  // Usar React Query hooks
+  const servicesQuery = useServices();
+  const createServiceMutation = useCreateService();
+  const updateServiceMutation = useUpdateService();
+  const deleteServiceMutation = useDeleteService();
 
-  const { executeWithNotification } = useCrudNotifications('Servicio');
+  // Normalizar estado para compatibilidad
+  const { data: services, loading, error } = normalizeQueryState(servicesQuery);
 
-  // Cargar servicios desde Supabase
-  useEffect(() => {
-    if (user) {
-      loadServices(() => servicesService.getServices(user.id));
-    }
-  }, [user, loadServices]);
-
-  const filteredServices = services.filter(service =>
+  const filteredServices = (services || []).filter(service =>
     service.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     service.category.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -51,24 +37,42 @@ export function Services() {
     setShowForm(true);
   };
 
-  const handleEditService = (service: any) => {
+  const handleEditService = (service: Service) => {
     setCurrentService(service);
     setShowForm(true);
   };
 
   const handleDeleteService = async (id: string) => {
-    const service = services.find(s => s.id === id);
+    const service = services?.find(s => s.id === id);
     if (confirm(t('services.deleteConfirm'))) {
-      try {
-        await executeWithNotification(
-          () => servicesService.deleteService(id),
-          'eliminar',
-          service?.name
-        );
-        removeService(id);
-      } catch (error) {
-        console.error('Error al eliminar el servicio:', error);
+      deleteServiceMutation.mutate(id);
+    }
+  };
+
+  const handleSubmitService = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const form = e.target as HTMLFormElement;
+    const formData = new FormData(form);
+
+    const serviceData = {
+      name: formData.get('name') as string,
+      category: formData.get('category') as string,
+      price: Number(formData.get('price')),
+      duration: Number(formData.get('duration')),
+      description: formData.get('description') as string,
+    };
+
+    try {
+      if (currentService) {
+        await updateServiceMutation.mutateAsync({ id: currentService.id, data: serviceData });
+      } else {
+        await createServiceMutation.mutateAsync(serviceData);
       }
+      setShowForm(false);
+      setCurrentService(null);
+    } catch (error) {
+      // Los errores se manejan en los hooks
+      console.error('Error al guardar servicio:', error);
     }
   };
 
@@ -85,84 +89,9 @@ export function Services() {
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
-        <div className="flex gap-2">
-          {process.env.NODE_ENV === 'development' && (
-            <Button
-              variant="outline"
-              onClick={async () => {
-                if (user) {
-                  // Verificar la conexión a Supabase
-                  const connectionTest = await testSupabaseConnection();
-                  if (connectionTest.success) {
-                    showNotification({
-                      title: 'Conexión exitosa',
-                      message: 'La conexión a Supabase funciona correctamente',
-                      type: 'success'
-                    });
-
-                    // Verificar las tablas disponibles
-                    const tablesTest = await listSupabaseTables();
-                    if (tablesTest.success) {
-                      console.log('Estado de las tablas:', tablesTest.data);
-
-                      // Verificar si la tabla services existe
-                      if (tablesTest.data.services && tablesTest.data.services.exists) {
-                        showNotification({
-                          title: 'Tabla services',
-                          message: 'La tabla services existe y es accesible',
-                          type: 'success'
-                        });
-
-                        // Intentar crear un servicio de prueba
-                        const createTest = await testCreateService(user.id);
-                        if (createTest.success) {
-                          showNotification({
-                            title: 'Prueba exitosa',
-                            message: 'Se creó un servicio de prueba correctamente',
-                            type: 'success'
-                          });
-                          // Recargar servicios
-                          const data = await servicesService.getServices(user.id);
-                          setServices(data);
-                        } else {
-                          showNotification({
-                            title: 'Error en prueba',
-                            message: `Error al crear servicio: ${createTest.error?.message || 'Error desconocido'}`,
-                            type: 'error'
-                          });
-                        }
-                      } else {
-                        showNotification({
-                          title: 'Error de tabla',
-                          message: 'La tabla services no existe o no es accesible. Ejecuta el script SQL para crearla.',
-                          type: 'error'
-                        });
-                      }
-                    } else {
-                      showNotification({
-                        title: 'Error al verificar tablas',
-                        message: `Error: ${tablesTest.error?.message || 'Error desconocido'}`,
-                        type: 'error'
-                      });
-                    }
-                  } else {
-                    showNotification({
-                      title: 'Error de conexión',
-                      message: `Error al conectar con Supabase: ${connectionTest.error?.message || 'Error desconocido'}`,
-                      type: 'error'
-                    });
-                  }
-                }
-              }}
-              className="flex items-center gap-1"
-            >
-              <Bug className="h-4 w-4" /> Test
-            </Button>
-          )}
-          <Button onClick={handleAddService} className="flex items-center gap-1">
-            <Plus className="h-4 w-4" /> {t('services.new')}
-          </Button>
-        </div>
+        <Button onClick={handleAddService} className="flex items-center gap-1">
+          <Plus className="h-4 w-4" /> {t('services.new')}
+        </Button>
       </div>
 
       <ComponentErrorBoundary componentName="Lista de Servicios">
@@ -171,9 +100,11 @@ export function Services() {
         ) : error ? (
           <DataErrorFallback
             error={new Error(error)}
-            onRetry={() => user && loadServices(() => servicesService.getServices(user.id))}
+            onRetry={() => servicesQuery.refetch()}
             title="Error al cargar servicios"
           />
+        ) : !services || services.length === 0 ? (
+          <EmptyServices onCreateService={handleAddService} />
         ) : (
           <>
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -191,12 +122,14 @@ export function Services() {
                       <button
                         onClick={() => handleEditService(service)}
                         className="rounded-full p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+                        disabled={updateServiceMutation.isPending}
                       >
                         <Edit className="h-4 w-4" />
                       </button>
                       <button
                         onClick={() => handleDeleteService(service.id)}
                         className="rounded-full p-1 text-slate-400 hover:bg-red-100 hover:text-red-600"
+                        disabled={deleteServiceMutation.isPending}
                       >
                         <Trash2 className="h-4 w-4" />
                       </button>
@@ -221,15 +154,6 @@ export function Services() {
                 <p className="text-slate-500">{t('services.noResults')}</p>
               </div>
             )}
-
-            {services.length === 0 && !loading && (
-              <div className="mt-8 text-center">
-                <p className="text-slate-500">{t('services.noServices')}</p>
-                <Button onClick={handleAddService} className="mt-4">
-                  {t('services.addFirst')}
-                </Button>
-              </div>
-            )}
           </>
         )}
       </ComponentErrorBoundary>
@@ -239,76 +163,7 @@ export function Services() {
         onClose={() => setShowForm(false)}
         title={currentService ? t('services.edit') : t('services.new')}
       >
-
-            <form className="space-y-4" onSubmit={async (e) => {
-              e.preventDefault();
-              const form = e.target as HTMLFormElement;
-              const formData = new FormData(form);
-
-              try {
-                console.log('Formulario enviado');
-
-                // Validar datos del formulario
-                const name = formData.get('name') as string;
-                const category = formData.get('category') as string;
-                const priceStr = formData.get('price') as string;
-                const durationStr = formData.get('duration') as string;
-                const description = formData.get('description') as string;
-
-                if (!name || !category || !priceStr || !durationStr) {
-                  throw new Error('Todos los campos obligatorios deben estar completos');
-                }
-
-                const price = Number(priceStr);
-                const duration = Number(durationStr);
-
-                if (isNaN(price) || price <= 0) {
-                  throw new Error('El precio debe ser un número mayor que cero');
-                }
-
-                if (isNaN(duration) || duration <= 0) {
-                  throw new Error('La duración debe ser un número mayor que cero');
-                }
-
-                const serviceData = {
-                  name,
-                  category,
-                  price,
-                  duration,
-                  description,
-                };
-
-                console.log('Datos del servicio a guardar:', serviceData);
-
-                let result;
-                if (user) {
-                  if (currentService) {
-                    // Actualizar servicio existente
-                    result = await executeWithNotification(
-                      () => servicesService.updateService(currentService.id, serviceData),
-                      'actualizar',
-                      serviceData.name
-                    );
-                    updateService(currentService.id, result);
-                  } else {
-                    // Añadir nuevo servicio
-                    result = await executeWithNotification(
-                      () => servicesService.createService(serviceData, user.id),
-                      'crear',
-                      serviceData.name
-                    );
-                    addService(result);
-                  }
-                } else {
-                  throw new Error('Usuario no autenticado');
-                }
-
-                setShowForm(false);
-              } catch (error) {
-                console.error('Error al guardar el servicio:', error);
-                // El error ya se maneja en executeWithNotification
-              }
-            }}>
+        <form className="space-y-4" onSubmit={handleSubmitService}>
               <div>
                 <label className="mb-1 block text-sm font-medium">{t('services.nameLabel')}</label>
                 <input
@@ -364,18 +219,27 @@ export function Services() {
                 ></textarea>
               </div>
 
-              <div className="flex justify-end space-x-2">
-                <Button type="button" variant="outline" onClick={() => setShowForm(false)}>
-                  {t('common.cancel')}
-                </Button>
-                <Button type="submit">
-                  {currentService ? t('common.update') : t('common.save')}
-                </Button>
-              </div>
-            </form>
+          <div className="flex justify-end space-x-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setShowForm(false)}
+              disabled={createServiceMutation.isPending || updateServiceMutation.isPending}
+            >
+              {t('common.cancel')}
+            </Button>
+            <Button
+              type="submit"
+              disabled={createServiceMutation.isPending || updateServiceMutation.isPending}
+            >
+              {(createServiceMutation.isPending || updateServiceMutation.isPending)
+                ? 'Guardando...'
+                : currentService ? t('common.update') : t('common.save')
+              }
+            </Button>
+          </div>
+        </form>
       </Modal>
-
-      {/* Cierre del condicional showForm */}
     </Layout>
   );
 }

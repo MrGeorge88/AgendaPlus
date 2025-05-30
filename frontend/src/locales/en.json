@@ -43,7 +43,15 @@
     "registerTitle": "Create a new account",
     "registering": "Registering...",
     "haveAccount": "Already have an account?",
-    "passwordHelperText": "Minimum 6 characters"
+    "passwordHelperText": "Minimum 6 characters",
+    "emailConfirmation": "Email Confirmation",
+    "emailConfirmed": "Email confirmed successfully!",
+    "redirecting": "Redirecting to dashboard...",
+    "backToLogin": "Back to Login",
+    "verifying": "Verifying...",
+    "verifyingDescription": "Please wait while we verify your authentication.",
+    "verificationError": "Verification Error",
+    "redirectingToLogin": "Redirecting to login in a few seconds..."
   },
   "navigation": {
     "dashboard": "Agenda",
@@ -62,7 +70,14 @@
     "todayStats": "Today's Stats",
     "totalAppointments": "Total Appointments",
     "totalClients": "Total Clients",
-    "totalIncome": "Total Income"
+    "totalIncome": "Total Income",
+    "metrics": {
+      "todayRevenue": "Today's Revenue",
+      "weekRevenue": "This Week",
+      "monthRevenue": "This Month",
+      "todayAppointments": "Today's Appointments",
+      "todayClients": "Today's Clients"
+    }
   },
   "clients": {
     "title": "Clients",
@@ -178,6 +193,59 @@
     "topStaff": "Top Staff",
     "noData": "No data available",
     "appointments": "appointments"
+  },
+  "calendar": {
+    "title": "Calendar",
+    "day": "Day",
+    "week": "Week",
+    "month": "Month",
+    "today": "Today",
+    "previous": "Previous",
+    "next": "Next",
+    "newAppointment": "New Appointment",
+    "manageStaff": "Manage Staff",
+    "noStaffAvailable": "No staff available. Please add staff first.",
+    "loading": "Loading calendar...",
+    "appointmentActions": "Appointment Actions",
+    "registerPayment": "Register Payment",
+    "markCompleted": "Mark Completed",
+    "cancelAppointment": "Cancel Appointment",
+    "markNoShow": "Mark No-Show",
+    "deleteAppointment": "Delete Appointment",
+    "confirmDelete": "Confirm Deletion",
+    "deleteConfirmMessage": "Are you sure you want to delete the appointment \"{title}\" with {client}?",
+    "deleteWarning": "This action cannot be undone.",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "client": "Client",
+    "price": "Price",
+    "status": "Status",
+    "paid": "Paid",
+    "partial": "Partial",
+    "pending": "Pending",
+    "filters": "Filters",
+    "paymentStatus": "Payment Status",
+    "staff": "Staff",
+    "dateRange": "Date Range",
+    "startDate": "Start Date",
+    "endDate": "End Date",
+    "priceRange": "Price Range",
+    "minPrice": "Min Price",
+    "maxPrice": "Max Price"
+  },
+  "appointments": {
+    "status": {
+      "confirmed": "Confirmed",
+      "completed": "Completed",
+      "cancelled": "Cancelled",
+      "noShow": "No Show",
+      "pending": "Pending"
+    }
+  },
+  "common": {
+    "expand": "Expand",
+    "collapse": "Collapse",
+    "clear": "Clear"
   },
   "landing": {
     "hero": {

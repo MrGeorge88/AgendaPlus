@@ -1,6 +1,7 @@
 import { ReactNode, useState, useEffect } from "react";
 import { Sidebar } from "./sidebar";
 import { Topbar } from "./topbar";
+import { useIsMobile, useIsTouchDevice } from "../../hooks/use-media-query";
 import "./layout.css";
 
 interface LayoutProps {
@@ -10,21 +11,15 @@ interface LayoutProps {
 
 export function Layout({ children, title }: LayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  const isMobile = useIsMobile();
+  const isTouch = useIsTouchDevice();
 
-  // Detectar cambios en el tamaño de la ventana
+  // Cerrar sidebar automáticamente cuando se cambia a desktop
   useEffect(() => {
-    const handleResize = () => {
-      const mobile = window.innerWidth < 768;
-      setIsMobile(mobile);
-      if (!mobile) {
-        setSidebarOpen(false);
-      }
-    };
-
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
+    if (!isMobile) {
+      setSidebarOpen(false);
+    }
+  }, [isMobile]);
 
   // Cerrar el sidebar cuando se hace clic fuera de él en dispositivos móviles
   const handleMainContentClick = () => {
@@ -35,7 +30,10 @@ export function Layout({ children, title }: LayoutProps) {
 
   return (
     <div className="layout">
-      <Sidebar isOpen={sidebarOpen} />
+      <Sidebar
+        isOpen={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
+      />
       <div
         className={`main-content ${sidebarOpen ? 'sidebar-open' : ''}`}
         onClick={handleMainContentClick}

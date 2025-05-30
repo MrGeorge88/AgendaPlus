@@ -43,7 +43,15 @@
     "registerTitle": "Crea una nueva cuenta",
     "registering": "Registrando...",
     "haveAccount": "¿Ya tienes una cuenta?",
-    "passwordHelperText": "Mínimo 6 caracteres"
+    "passwordHelperText": "Mínimo 6 caracteres",
+    "emailConfirmation": "Confirmación de Email",
+    "emailConfirmed": "¡Email confirmado exitosamente!",
+    "redirecting": "Redirigiendo al panel...",
+    "backToLogin": "Volver al Login",
+    "verifying": "Verificando...",
+    "verifyingDescription": "Por favor espera mientras verificamos tu autenticación.",
+    "verificationError": "Error de Verificación",
+    "redirectingToLogin": "Redirigiendo al login en unos segundos..."
   },
   "navigation": {
     "dashboard": "Agenda del día",
@@ -62,7 +70,14 @@
     "todayStats": "Estadísticas de hoy",
     "totalAppointments": "Total de citas",
     "totalClients": "Total de clientes",
-    "totalIncome": "Ingresos totales"
+    "totalIncome": "Ingresos totales",
+    "metrics": {
+      "todayRevenue": "Ingresos de Hoy",
+      "weekRevenue": "Esta Semana",
+      "monthRevenue": "Este Mes",
+      "todayAppointments": "Citas de Hoy",
+      "todayClients": "Clientes de Hoy"
+    }
   },
   "clients": {
     "title": "Clientes",
@@ -178,6 +193,59 @@
     "topStaff": "Profesionales más activos",
     "noData": "No hay datos disponibles",
     "appointments": "citas"
+  },
+  "calendar": {
+    "title": "Calendario",
+    "day": "Día",
+    "week": "Semana",
+    "month": "Mes",
+    "today": "Hoy",
+    "previous": "Anterior",
+    "next": "Siguiente",
+    "newAppointment": "Nueva Cita",
+    "manageStaff": "Gestionar Personal",
+    "noStaffAvailable": "No hay personal disponible. Por favor, añade personal primero.",
+    "loading": "Cargando calendario...",
+    "appointmentActions": "Acciones de Cita",
+    "registerPayment": "Registrar Pago",
+    "markCompleted": "Marcar Completada",
+    "cancelAppointment": "Cancelar Cita",
+    "markNoShow": "Marcar No-Show",
+    "deleteAppointment": "Eliminar Cita",
+    "confirmDelete": "Confirmar Eliminación",
+    "deleteConfirmMessage": "¿Estás seguro de que deseas eliminar la cita \"{title}\" con {client}?",
+    "deleteWarning": "Esta acción no se puede deshacer.",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "client": "Cliente",
+    "price": "Precio",
+    "status": "Estado",
+    "paid": "Pagado",
+    "partial": "Parcial",
+    "pending": "Pendiente",
+    "filters": "Filtros",
+    "paymentStatus": "Estado de Pago",
+    "staff": "Personal",
+    "dateRange": "Rango de Fechas",
+    "startDate": "Fecha Inicio",
+    "endDate": "Fecha Fin",
+    "priceRange": "Rango de Precios",
+    "minPrice": "Precio Mínimo",
+    "maxPrice": "Precio Máximo"
+  },
+  "appointments": {
+    "status": {
+      "confirmed": "Confirmada",
+      "completed": "Completada",
+      "cancelled": "Cancelada",
+      "noShow": "No Show",
+      "pending": "Pendiente"
+    }
+  },
+  "common": {
+    "expand": "Expandir",
+    "collapse": "Contraer",
+    "clear": "Limpiar"
   },
   "landing": {
     "hero": {

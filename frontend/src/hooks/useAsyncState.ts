@@ -1,4 +1,5 @@
 import { useState, useCallback } from 'react';
+import { UseQueryResult, UseMutationResult } from '@tanstack/react-query';
 
 export interface AsyncState<T> {
   data: T | null;
@@ -27,7 +28,7 @@ export const useAsyncState = <T>(initialData: T | null = null): UseAsyncStateRet
   const execute = useCallback(async (asyncFunction: () => Promise<T>): Promise<T> => {
     setLoading(true);
     setError(null);
-    
+
     try {
       const result = await asyncFunction();
       setData(result);
@@ -81,7 +82,7 @@ export const useAsyncList = <T extends { id: string | number }>(
   }, [setItems]);
 
   const updateItem = useCallback((id: string | number, updatedItem: T) => {
-    setItems(prev => 
+    setItems(prev =>
       prev ? prev.map(item => item.id === id ? updatedItem : item) : [updatedItem]
     );
   }, [setItems]);
@@ -226,7 +227,7 @@ export const useFilter = <T>(
   const [searchTerm, setSearchTerm] = useState('');
   const [filters, setFilters] = useState<Record<string, any>>({});
 
-  const filteredItems = items.filter(item => 
+  const filteredItems = items.filter(item =>
     filterFunction(item, searchTerm, filters)
   );
 
@@ -277,4 +278,54 @@ export const useDebounce = <T>(value: T, delay: number): T => {
   });
 
   return debouncedValue;
+};
+
+/**
+ * Utilidad para normalizar estados de React Query
+ */
+export const normalizeQueryState = <T>(
+  query: UseQueryResult<T, Error>
+): AsyncState<T> => {
+  return {
+    data: query.data || null,
+    loading: query.isLoading || query.isFetching,
+    error: query.error?.message || null,
+  };
+};
+
+/**
+ * Utilidad para normalizar estados de mutaciones de React Query
+ */
+export const normalizeMutationState = <T>(
+  mutation: UseMutationResult<T, Error, any, unknown>
+): AsyncState<T> => {
+  return {
+    data: mutation.data || null,
+    loading: mutation.isPending,
+    error: mutation.error?.message || null,
+  };
+};
+
+/**
+ * Hook para combinar múltiples queries en un solo estado
+ */
+export const useCombinedQueries = <T extends Record<string, any>>(
+  queries: { [K in keyof T]: UseQueryResult<T[K], Error> }
+): AsyncState<T> => {
+  const queryValues = Object.values(queries) as UseQueryResult<any, Error>[];
+
+  const isLoading = queryValues.some(query => query.isLoading || query.isFetching);
+  const hasError = queryValues.find(query => query.error);
+
+  const data = Object.keys(queries).reduce((acc, key) => {
+    const query = queries[key as keyof T];
+    acc[key as keyof T] = query.data;
+    return acc;
+  }, {} as T);
+
+  return {
+    data: queryValues.every(query => query.data !== undefined) ? data : null,
+    loading: isLoading,
+    error: hasError?.error?.message || null,
+  };
 };

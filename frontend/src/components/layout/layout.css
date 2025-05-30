@@ -150,19 +150,124 @@ main {
   height: 16px;
 }
 
+/* Mejoras para dispositivos táctiles */
+.sidebar.touch-enabled .sidebar-link {
+  padding: 1rem 1.5rem; /* Área táctil más grande */
+  min-height: 48px; /* Altura mínima recomendada para touch */
+}
+
+.sidebar.touch-enabled .sidebar-link svg {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+/* Mejoras para el header del sidebar en móvil */
+.sidebar.mobile .sidebar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Animaciones suaves para el sidebar */
+.sidebar {
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              width 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              background-color 0.3s ease,
+              border-color 0.3s ease;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .sidebar {
-    width: 0;
+    width: 280px; /* Ligeramente más ancho en móvil */
     transform: translateX(-100%);
+    box-shadow: 0 0 0 rgba(0, 0, 0, 0);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                box-shadow 0.3s ease;
   }
-  
+
   .sidebar.open {
-    width: 250px;
     transform: translateX(0);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
   }
-  
+
   .main-content {
     margin-left: 0;
+  }
+
+  /* Mejorar el área táctil en móvil */
+  .sidebar-link {
+    padding: 1rem 1.5rem;
+    min-height: 52px;
+  }
+
+  /* Hacer el contenido principal más accesible en móvil */
+  main {
+    padding: 1rem;
+  }
+
+  .topbar {
+    padding: 0 1rem;
+  }
+}
+
+/* Tablet */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .sidebar {
+    width: 240px;
+  }
+
+  .main-content {
+    margin-left: 240px;
+  }
+
+  main {
+    padding: 1.25rem;
+  }
+}
+
+/* Pantallas muy pequeñas */
+@media (max-width: 480px) {
+  .sidebar {
+    width: 100vw; /* Ocupar toda la pantalla en móviles muy pequeños */
+  }
+
+  main {
+    padding: 0.75rem;
+  }
+
+  .topbar {
+    height: 56px;
+    padding: 0 0.75rem;
+  }
+}
+
+/* Mejoras para accesibilidad */
+@media (prefers-reduced-motion: reduce) {
+  .sidebar,
+  .sidebar-link,
+  .main-content {
+    transition: none;
+  }
+}
+
+/* Soporte para hover solo en dispositivos que lo soportan */
+@media (hover: hover) {
+  .sidebar-link:hover {
+    background-color: var(--accent);
+    color: var(--accent-foreground);
+  }
+}
+
+/* Estados de focus mejorados para navegación por teclado */
+.sidebar-link:focus {
+  outline: 2px solid var(--primary);
+  outline-offset: -2px;
+}
+
+/* Mejoras para modo oscuro */
+@media (prefers-color-scheme: dark) {
+  .sidebar.open {
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
   }
 }

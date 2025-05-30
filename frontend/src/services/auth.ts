@@ -45,7 +45,7 @@ export const authService = {
       const user: User = {
         id: data.user.id,
         email: data.user.email || '',
-        name: data.user.user_metadata?.name,
+        name: data.user.user_metadata?.name || data.user.email?.split('@')[0] || 'Usuario',
         avatar_url: data.user.user_metadata?.avatar_url,
       };
 
@@ -89,7 +89,7 @@ export const authService = {
       const user: User = data.user ? {
         id: data.user.id,
         email: data.user.email || '',
-        name: data.user.user_metadata?.name,
+        name: data.user.user_metadata?.name || data.user.email?.split('@')[0] || 'Usuario',
         avatar_url: data.user.user_metadata?.avatar_url,
       } : null;
 
@@ -186,7 +186,7 @@ export const authService = {
       const user: User = {
         id: data.user.id,
         email: data.user.email || '',
-        name: data.user.user_metadata?.name,
+        name: data.user.user_metadata?.name || data.user.email?.split('@')[0] || 'Usuario',
         avatar_url: data.user.user_metadata?.avatar_url,
       };
 

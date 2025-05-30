@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { authService, User, AuthResponse } from '../services/auth';
+import { supabase } from '../lib/supabase';
 
 interface AuthContextType {
   user: User | null;
@@ -35,6 +36,43 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
 
     checkUser();
+
+    // Escuchar cambios de autenticación de Supabase
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        console.log('Auth state changed:', event, session);
+
+        if (event === 'SIGNED_IN' && session) {
+          // Usuario se ha autenticado
+          const user: User = {
+            id: session.user.id,
+            email: session.user.email || '',
+            name: session.user.user_metadata?.name || session.user.email?.split('@')[0] || 'Usuario',
+            avatar_url: session.user.user_metadata?.avatar_url,
+          };
+          setUser(user);
+        } else if (event === 'SIGNED_OUT') {
+          // Usuario se ha desconectado
+          setUser(null);
+        } else if (event === 'TOKEN_REFRESHED' && session) {
+          // Token se ha renovado
+          const user: User = {
+            id: session.user.id,
+            email: session.user.email || '',
+            name: session.user.user_metadata?.name || session.user.email?.split('@')[0] || 'Usuario',
+            avatar_url: session.user.user_metadata?.avatar_url,
+          };
+          setUser(user);
+        }
+
+        setLoading(false);
+      }
+    );
+
+    // Cleanup subscription on unmount
+    return () => {
+      subscription.unsubscribe();
+    };
   }, []);
 
   const signIn = async (email: string, password: string) => {

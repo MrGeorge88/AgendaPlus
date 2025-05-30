@@ -9,14 +9,17 @@ import { Button } from "../ui/button";
 import { Plus, Users, DollarSign, CheckCircle, XCircle, Clock, AlertCircle, ChevronLeft, ChevronRight } from "lucide-react";
 import { AppointmentForm } from "./appointment-form";
 import { AppointmentPaymentForm } from "./appointment-payment-form";
+import { CalendarFilters, FilterState } from "./calendar-filters";
 import { Modal } from "../ui/modal";
 import { useAuth } from "../../contexts/auth-context";
+import { useLanguage } from "../../contexts/language-context";
 import { staffService, StaffMember } from "../../services/staff";
 import { appointmentsService, Appointment } from "../../services/appointments";
 import { toast } from "../../lib/toast";
 
 export function Calendar() {
   const { user } = useAuth();
+  const { t, language } = useLanguage();
   const navigate = useNavigate();
   const [staffMembers, setStaffMembers] = useState<StaffMember[]>([]);
   const [selectedStaff, setSelectedStaff] = useState<string[]>([]);
@@ -26,9 +29,17 @@ export function Calendar() {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
   const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null);
   const [loading, setLoading] = useState(true);
-  const [currentView, setCurrentView] = useState<'timeGridDay' | 'timeGridWeek'>('timeGridWeek');
+  const [currentView, setCurrentView] = useState<'timeGridDay' | 'timeGridWeek' | 'dayGridMonth'>('timeGridWeek');
   const [showAppointmentActions, setShowAppointmentActions] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [currentDate, setCurrentDate] = useState(new Date());
+  const [filters, setFilters] = useState<FilterState>({
+    status: [],
+    paymentStatus: [],
+    dateRange: { start: null, end: null },
+    staff: [],
+    priceRange: { min: null, max: null },
+  });
   const calendarRef = useRef<any>(null);
 
   // Cargar datos del personal y citas
@@ -64,6 +75,10 @@ export function Calendar() {
         return [...prev, staffId];
       }
     });
+  };
+
+  const handleFiltersChange = (newFilters: FilterState) => {
+    setFilters(newFilters);
   };
 
   // Funciones de navegación del calendario
@@ -236,9 +251,51 @@ export function Calendar() {
     }
   };
 
-  const filteredEvents = appointments.filter(event =>
-    selectedStaff.includes(event.resourceId)
-  );
+  const filteredEvents = appointments.filter(event => {
+    // Filtro por personal seleccionado
+    if (!selectedStaff.includes(event.resourceId)) {
+      return false;
+    }
+
+    // Filtro por estado
+    if (filters.status.length > 0 && !filters.status.includes(event.extendedProps.status)) {
+      return false;
+    }
+
+    // Filtro por estado de pago
+    if (filters.paymentStatus.length > 0 && !filters.paymentStatus.includes(event.extendedProps.paymentStatus)) {
+      return false;
+    }
+
+    // Filtro por personal (filtros avanzados)
+    if (filters.staff.length > 0 && !filters.staff.includes(event.resourceId)) {
+      return false;
+    }
+
+    // Filtro por rango de fechas
+    if (filters.dateRange.start || filters.dateRange.end) {
+      const eventDate = new Date(event.start);
+      if (filters.dateRange.start && eventDate < filters.dateRange.start) {
+        return false;
+      }
+      if (filters.dateRange.end && eventDate > filters.dateRange.end) {
+        return false;
+      }
+    }
+
+    // Filtro por rango de precios
+    if (filters.priceRange.min !== null || filters.priceRange.max !== null) {
+      const eventPrice = parseFloat(event.extendedProps.price) || 0;
+      if (filters.priceRange.min !== null && eventPrice < filters.priceRange.min) {
+        return false;
+      }
+      if (filters.priceRange.max !== null && eventPrice > filters.priceRange.max) {
+        return false;
+      }
+    }
+
+    return true;
+  });
 
   return (
     <div className="flex flex-col gap-4">
@@ -294,17 +351,27 @@ export function Calendar() {
                 variant="outline"
                 className="flex items-center gap-1"
               >
-                <Users className="h-4 w-4" /> Gestionar personal
+                <Users className="h-4 w-4" /> {t('calendar.manageStaff')}
               </Button>
               <Button
                 onClick={() => setShowForm(true)}
                 className="flex items-center gap-1"
                 disabled={staffMembers.length === 0}
               >
-                <Plus className="h-4 w-4" /> Nueva cita
+                <Plus className="h-4 w-4" /> {t('calendar.newAppointment')}
               </Button>
             </div>
           </div>
+
+          {/* Filtros avanzados */}
+          <CalendarFilters
+            onFiltersChange={handleFiltersChange}
+            staffMembers={staffMembers.map(staff => ({
+              id: staff.id,
+              name: staff.name,
+              color: staff.color
+            }))}
+          />
         </>
       )}
 
@@ -312,30 +379,44 @@ export function Calendar() {
         <div className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
           {/* Controles de navegación personalizados */}
           <div className="flex items-center justify-between border-b border-slate-200 px-4 py-3">
-            <div className="flex items-center gap-2">
-              <Button
-                onClick={handlePrevious}
-                variant="outline"
-                size="sm"
-                className="flex items-center gap-1"
-              >
-                <ChevronLeft className="h-4 w-4" />
-              </Button>
-              <Button
-                onClick={handleNext}
-                variant="outline"
-                size="sm"
-                className="flex items-center gap-1"
-              >
-                <ChevronRight className="h-4 w-4" />
-              </Button>
-              <Button
-                onClick={handleToday}
-                variant="outline"
-                size="sm"
-              >
-                Hoy
-              </Button>
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2">
+                <Button
+                  onClick={handlePrevious}
+                  variant="outline"
+                  size="sm"
+                  className="flex items-center gap-1"
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
+                <Button
+                  onClick={handleNext}
+                  variant="outline"
+                  size="sm"
+                  className="flex items-center gap-1"
+                >
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+                <Button
+                  onClick={handleToday}
+                  variant="outline"
+                  size="sm"
+                >
+                  {t('calendar.today')}
+                </Button>
+              </div>
+
+              {/* Título dinámico con fecha */}
+              <div className="hidden md:block">
+                <h2 className="text-lg font-semibold text-slate-900">
+                  {currentDate.toLocaleDateString(language, {
+                    year: 'numeric',
+                    month: 'long',
+                    ...(currentView === 'timeGridDay' && { day: 'numeric' }),
+                    ...(currentView === 'timeGridWeek' && { day: 'numeric' })
+                  })}
+                </h2>
+              </div>
             </div>
             <div className="flex items-center gap-2">
               <Button
@@ -349,7 +430,7 @@ export function Calendar() {
                 variant={currentView === 'timeGridDay' ? 'default' : 'outline'}
                 size="sm"
               >
-                Día
+                {t('calendar.day')}
               </Button>
               <Button
                 onClick={() => {
@@ -362,7 +443,20 @@ export function Calendar() {
                 variant={currentView === 'timeGridWeek' ? 'default' : 'outline'}
                 size="sm"
               >
-                Semana
+                {t('calendar.week')}
+              </Button>
+              <Button
+                onClick={() => {
+                  const calendarApi = calendarRef.current?.getApi();
+                  if (calendarApi) {
+                    calendarApi.changeView('dayGridMonth');
+                    setCurrentView('dayGridMonth');
+                  }
+                }}
+                variant={currentView === 'dayGridMonth' ? 'default' : 'outline'}
+                size="sm"
+              >
+                {t('calendar.month')}
               </Button>
             </div>
           </div>
@@ -376,15 +470,16 @@ export function Calendar() {
               slotMinTime="08:00:00"
               slotMaxTime="20:00:00"
               height="100%"
-              allDaySlot={false}
+              allDaySlot={currentView === 'dayGridMonth'}
               events={filteredEvents}
               editable={true}
               selectable={true}
               selectMirror={true}
-              dayMaxEvents={true}
-              weekends={false}
+              dayMaxEvents={currentView === 'dayGridMonth' ? 3 : true}
+              weekends={currentView === 'dayGridMonth'}
               nowIndicator={true}
-              locale="es"
+              locale={language}
+              firstDay={1}
               slotLabelFormat={{
                 hour: "numeric",
                 minute: "2-digit",
@@ -397,6 +492,9 @@ export function Calendar() {
               }}
               select={handleDateSelect}
               eventClick={handleEventClick}
+              datesSet={(dateInfo) => {
+                setCurrentDate(dateInfo.start);
+              }}
               eventContent={(eventInfo) => {
                 // Determinar el color de fondo según el estado
                 let statusColor = "";
@@ -425,13 +523,13 @@ export function Calendar() {
 
                 switch (eventInfo.event.extendedProps.paymentStatus) {
                   case "paid":
-                    paymentStatusBadge = <span className="ml-1 rounded-full bg-green-100 px-1 text-[10px] text-green-600">Pagado</span>;
+                    paymentStatusBadge = <span className="ml-1 rounded-full bg-green-100 px-1 text-[10px] text-green-600">{t('calendar.paid')}</span>;
                     break;
                   case "partial":
-                    paymentStatusBadge = <span className="ml-1 rounded-full bg-yellow-100 px-1 text-[10px] text-yellow-600">Parcial</span>;
+                    paymentStatusBadge = <span className="ml-1 rounded-full bg-yellow-100 px-1 text-[10px] text-yellow-600">{t('calendar.partial')}</span>;
                     break;
                   default:
-                    paymentStatusBadge = <span className="ml-1 rounded-full bg-gray-100 px-1 text-[10px] text-gray-600">Pendiente</span>;
+                    paymentStatusBadge = <span className="ml-1 rounded-full bg-gray-100 px-1 text-[10px] text-gray-600">{t('calendar.pending')}</span>;
                 }
 
                 return (
