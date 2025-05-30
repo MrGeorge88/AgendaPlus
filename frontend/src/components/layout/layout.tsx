@@ -11,6 +11,7 @@ interface LayoutProps {
 
 export function Layout({ children, title }: LayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const isMobile = useIsMobile();
   const isTouch = useIsTouchDevice();
 
@@ -33,9 +34,10 @@ export function Layout({ children, title }: LayoutProps) {
       <Sidebar
         isOpen={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
+        onCollapseChange={setSidebarCollapsed}
       />
       <div
-        className={`main-content ${sidebarOpen ? 'sidebar-open' : ''}`}
+        className={`main-content ${sidebarOpen ? 'sidebar-open' : ''} ${sidebarCollapsed ? 'sidebar-collapsed' : ''}`}
         onClick={handleMainContentClick}
       >
         <Topbar

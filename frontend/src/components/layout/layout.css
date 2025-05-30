@@ -15,8 +15,22 @@
   border-right: 1px solid var(--border);
   display: flex;
   flex-direction: column;
-  transition: background-color 0.3s ease, border-color 0.3s ease;
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.3s ease, border-color 0.3s ease;
   z-index: 50;
+}
+
+/* Sidebar colapsado */
+.sidebar.collapsed {
+  width: 70px;
+}
+
+.sidebar.collapsed .sidebar-header {
+  justify-content: center;
+}
+
+.sidebar.collapsed .sidebar-link span {
+  opacity: 0;
+  pointer-events: none;
 }
 
 .sidebar-header {
@@ -70,7 +84,12 @@
   flex-direction: column;
   min-height: 100vh;
   background-color: var(--background);
-  transition: background-color 0.3s ease;
+  transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.3s ease;
+}
+
+/* Contenido principal cuando sidebar está colapsado */
+.main-content.sidebar-collapsed {
+  margin-left: 70px;
 }
 
 /* Barra superior */

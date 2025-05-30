@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Layout } from "../components/layout/layout";
 import { Calendar } from "../components/calendar/calendar";
 import { useLanguage } from "../contexts/language-context";
@@ -22,14 +22,13 @@ import {
   Target,
   Award
 } from 'lucide-react';
-import { Button } from "../components/ui/button";
-import { cn } from "../lib/utils";
 
 type DashboardView = 'overview' | 'calendar' | 'analytics';
 
 export function Dashboard() {
   const { t } = useLanguage();
-  const [currentView, setCurrentView] = useState<DashboardView>('overview');
+  const [searchParams] = useSearchParams();
+  const currentView = (searchParams.get('view') as DashboardView) || 'overview';
 
   const {
     incomeStats,
@@ -41,6 +40,20 @@ export function Dashboard() {
 
   const trendMetrics = useTrendMetrics();
   const topServices = useTopServices();
+
+  // Función para obtener el título de la página según la vista
+  const getPageTitle = () => {
+    switch (currentView) {
+      case 'overview':
+        return 'Resumen';
+      case 'calendar':
+        return 'Calendario';
+      case 'analytics':
+        return 'Analytics';
+      default:
+        return 'Dashboard';
+    }
+  };
 
   const renderOverview = () => (
     <div className="space-y-6">
@@ -174,55 +187,11 @@ export function Dashboard() {
   );
 
   return (
-    <Layout title={t("dashboard.title")}>
-      <div className="space-y-6">
-        {/* Navegación de vistas */}
-        <div className="flex items-center gap-2 border-b border-gray-200 pb-4">
-          <Button
-            variant={currentView === 'overview' ? 'default' : 'ghost'}
-            size="sm"
-            onClick={() => setCurrentView('overview')}
-            className={cn(
-              "flex items-center gap-2",
-              currentView === 'overview' && "bg-indigo-600 text-white"
-            )}
-          >
-            <BarChart3 className="h-4 w-4" />
-            Resumen
-          </Button>
-
-          <Button
-            variant={currentView === 'calendar' ? 'default' : 'ghost'}
-            size="sm"
-            onClick={() => setCurrentView('calendar')}
-            className={cn(
-              "flex items-center gap-2",
-              currentView === 'calendar' && "bg-indigo-600 text-white"
-            )}
-          >
-            <CalendarIcon className="h-4 w-4" />
-            Calendario
-          </Button>
-
-          <Button
-            variant={currentView === 'analytics' ? 'default' : 'ghost'}
-            size="sm"
-            onClick={() => setCurrentView('analytics')}
-            className={cn(
-              "flex items-center gap-2",
-              currentView === 'analytics' && "bg-indigo-600 text-white"
-            )}
-          >
-            <TrendingUp className="h-4 w-4" />
-            Analytics
-          </Button>
-        </div>
-
-        {/* Contenido según la vista */}
-        {currentView === 'overview' && renderOverview()}
-        {currentView === 'calendar' && renderCalendar()}
-        {currentView === 'analytics' && renderAnalytics()}
-      </div>
+    <Layout title={getPageTitle()}>
+      {/* Contenido según la vista */}
+      {currentView === 'overview' && renderOverview()}
+      {currentView === 'calendar' && renderCalendar()}
+      {currentView === 'analytics' && renderAnalytics()}
     </Layout>
   );
 }
