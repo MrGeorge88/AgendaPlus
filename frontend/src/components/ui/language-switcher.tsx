@@ -1,5 +1,5 @@
 import React from 'react';
-import { useTranslation } from 'react-i18next';
+import { useSimpleTranslation } from '../../lib/translations';
 import { Button } from './button';
 import { Globe } from 'lucide-react';
 
@@ -10,13 +10,7 @@ interface LanguageSwitcherProps {
 }
 
 export function LanguageSwitcher({ variant = 'default' }: LanguageSwitcherProps) {
-  const { i18n } = useTranslation();
-  const language = i18n.language as Language;
-
-  const setLanguage = (newLanguage: Language) => {
-    i18n.changeLanguage(newLanguage);
-    localStorage.setItem('agenda-plus-language', newLanguage);
-  };
+  const { language, setLanguage } = useSimpleTranslation();
 
   const toggleLanguage = () => {
     const newLanguage: Language = language === 'en' ? 'es' : 'en';

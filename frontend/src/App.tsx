@@ -23,14 +23,12 @@ import { ThemeProvider } from './contexts/theme-context';
 import { LanguageProvider } from './contexts/language-context';
 import { AuthProvider } from './contexts/auth-context';
 import { ErrorBoundary } from './components/ui/error-boundary';
-import { I18nProvider } from './components/i18n/i18n-provider';
 import { queryClient } from './lib/query-client';
 
 function App() {
   return (
     <ErrorBoundary>
-      <I18nProvider>
-        <QueryClientProvider client={queryClient}>
+      <QueryClientProvider client={queryClient}>
           <LanguageProvider>
             <ThemeProvider>
               <AuthProvider>
@@ -114,7 +112,6 @@ function App() {
           <ReactQueryDevtools initialIsOpen={false} />
         )}
         </QueryClientProvider>
-      </I18nProvider>
     </ErrorBoundary>
   );
 }
