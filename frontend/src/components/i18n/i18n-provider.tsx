@@ -1,6 +1,6 @@
 import React, { useState, useEffect, ReactNode } from 'react';
 import { I18nextProvider } from 'react-i18next';
-import i18n from '../../i18n';
+import i18n, { i18nConfig } from '../../i18n';
 
 interface I18nProviderProps {
   children: ReactNode;
@@ -10,19 +10,21 @@ export function I18nProvider({ children }: I18nProviderProps) {
   const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
-    // Wait for i18n to be initialized
-    if (i18n.isInitialized) {
-      setIsReady(true);
-    } else {
-      i18n.on('initialized', () => {
+    // Initialize i18n and wait for it to be ready
+    const initializeI18n = async () => {
+      try {
+        if (!i18n.isInitialized) {
+          await i18n.init(i18nConfig);
+        }
         setIsReady(true);
-      });
-    }
-
-    // Cleanup
-    return () => {
-      i18n.off('initialized');
+      } catch (error) {
+        console.error('Error initializing i18n:', error);
+        // Even if there's an error, we'll continue to avoid blocking the app
+        setIsReady(true);
+      }
     };
+
+    initializeI18n();
   }, []);
 
   // Show loading while i18n is initializing
