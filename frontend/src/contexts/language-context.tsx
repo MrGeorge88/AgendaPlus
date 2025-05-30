@@ -1,5 +1,4 @@
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { useTranslation } from 'react-i18next';
 import i18n from '../i18n';
 
 // Define supported languages
@@ -34,13 +33,13 @@ export function LanguageProvider({
     () => (localStorage.getItem(storageKey) as Language) || defaultLanguage
   );
 
-  // Get the translation function from i18next
-  const { t, i18n: i18nInstance } = useTranslation();
+  // Use i18n directly instead of useTranslation hook to avoid initialization issues
+  const t = i18n.t.bind(i18n);
 
   // Update the language when it changes
   const setLanguage = (newLanguage: Language) => {
     localStorage.setItem(storageKey, newLanguage);
-    i18nInstance.changeLanguage(newLanguage);
+    i18n.changeLanguage(newLanguage);
     setLanguageState(newLanguage);
   };
 
@@ -49,8 +48,8 @@ export function LanguageProvider({
     const storedLanguage = localStorage.getItem(storageKey) as Language;
     const targetLanguage = storedLanguage || defaultLanguage;
 
-    if (i18nInstance.language !== targetLanguage) {
-      i18nInstance.changeLanguage(targetLanguage);
+    if (i18n.language !== targetLanguage) {
+      i18n.changeLanguage(targetLanguage);
     }
 
     if (!storedLanguage) {
@@ -58,7 +57,7 @@ export function LanguageProvider({
     }
 
     setLanguageState(targetLanguage);
-  }, [defaultLanguage, storageKey, i18nInstance]);
+  }, [defaultLanguage, storageKey]);
 
   // Create the context value
   const value = {
