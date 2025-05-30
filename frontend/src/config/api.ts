@@ -2,7 +2,12 @@
 // Este archivo centraliza la configuración para las llamadas a la API
 
 // URL base para las solicitudes a la API
-export const API_BASE_URL = 'http://localhost:3001';
+export const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+
+// Debug: Log the API URL in development
+if (import.meta.env.DEV) {
+  console.log('🔗 API Base URL:', API_BASE_URL);
+}
 
 // Endpoints de la API
 export const API_ENDPOINTS = {
