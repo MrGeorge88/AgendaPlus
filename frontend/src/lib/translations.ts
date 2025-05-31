@@ -74,8 +74,12 @@ export const translations = {
 
     // Filters
     'Filtros': 'Filtros',
+    'calendar.filters': 'Filtros',
 
     // Common
+    'common.clear': 'Limpiar',
+    'common.expand': 'Expandir',
+    'common.collapse': 'Colapsar',
     'common.loading': 'Cargando...',
     'common.error': 'Error',
     'common.save': 'Guardar',
@@ -165,8 +169,12 @@ export const translations = {
 
     // Filters
     'Filtros': 'Filters',
+    'calendar.filters': 'Filters',
 
     // Common
+    'common.clear': 'Clear',
+    'common.expand': 'Expand',
+    'common.collapse': 'Collapse',
     'common.loading': 'Loading...',
     'common.error': 'Error',
     'common.save': 'Save',
