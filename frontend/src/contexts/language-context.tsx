@@ -25,10 +25,8 @@ export function LanguageProvider({
   storageKey = 'agenda-plus-language',
   ...props
 }: LanguageProviderProps) {
-  // Get the stored language or use the default
-  const [language, setLanguageState] = useState<Language>(
-    () => (localStorage.getItem(storageKey) as Language) || defaultLanguage
-  );
+  // Get the stored language or use the default - safe initialization
+  const [language, setLanguageState] = useState<Language>(defaultLanguage);
 
   // Translation function
   const t = (key: string): string => {
@@ -37,25 +35,41 @@ export function LanguageProvider({
 
   // Update the language when it changes
   const setLanguage = (newLanguage: Language) => {
-    localStorage.setItem(storageKey, newLanguage);
-    setLanguageState(newLanguage);
+    try {
+      if (typeof window !== 'undefined') {
+        localStorage.setItem(storageKey, newLanguage);
+      }
+      setLanguageState(newLanguage);
 
-    // Dispatch custom event for language change
-    window.dispatchEvent(new CustomEvent('languageChange', {
-      detail: { language: newLanguage }
-    }));
+      // Dispatch custom event for language change
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('languageChange', {
+          detail: { language: newLanguage }
+        }));
+      }
+    } catch (error) {
+      console.warn('Error setting language:', error);
+      setLanguageState(newLanguage);
+    }
   };
 
-  // Initialize the language on mount
+  // Initialize the language on mount - safe for SSR
   useEffect(() => {
-    const storedLanguage = localStorage.getItem(storageKey) as Language;
-    const targetLanguage = storedLanguage || defaultLanguage;
+    try {
+      if (typeof window !== 'undefined') {
+        const storedLanguage = localStorage.getItem(storageKey) as Language;
+        const targetLanguage = storedLanguage || defaultLanguage;
 
-    if (!storedLanguage) {
-      localStorage.setItem(storageKey, defaultLanguage);
+        if (!storedLanguage) {
+          localStorage.setItem(storageKey, defaultLanguage);
+        }
+
+        setLanguageState(targetLanguage);
+      }
+    } catch (error) {
+      console.warn('Error initializing language from localStorage:', error);
+      setLanguageState(defaultLanguage);
     }
-
-    setLanguageState(targetLanguage);
   }, [defaultLanguage, storageKey]);
 
   // Create the context value
