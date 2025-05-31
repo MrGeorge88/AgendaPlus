@@ -118,10 +118,12 @@ class SimpleTranslationManager {
   private currentLanguage: Language = 'es';
 
   constructor() {
-    // Load language from localStorage
-    const savedLanguage = localStorage.getItem('agenda-plus-language') as Language;
-    if (savedLanguage && (savedLanguage === 'en' || savedLanguage === 'es')) {
-      this.currentLanguage = savedLanguage;
+    // Load language from localStorage (only in browser)
+    if (typeof window !== 'undefined') {
+      const savedLanguage = localStorage.getItem('agenda-plus-language') as Language;
+      if (savedLanguage && (savedLanguage === 'en' || savedLanguage === 'es')) {
+        this.currentLanguage = savedLanguage;
+      }
     }
   }
 
@@ -131,9 +133,12 @@ class SimpleTranslationManager {
 
   setLanguage(language: Language): void {
     this.currentLanguage = language;
-    localStorage.setItem('agenda-plus-language', language);
-    // Trigger a custom event to notify components of language change
-    window.dispatchEvent(new CustomEvent('languageChanged', { detail: language }));
+    // Save to localStorage (only in browser)
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('agenda-plus-language', language);
+      // Trigger a custom event to notify components of language change
+      window.dispatchEvent(new CustomEvent('languageChanged', { detail: language }));
+    }
   }
 
   translate(key: string, fallback?: string): string {
@@ -159,10 +164,13 @@ export function useSimpleTranslation() {
       setLanguageState(event.detail);
     };
 
-    window.addEventListener('languageChanged', handleLanguageChange as EventListener);
-    return () => {
-      window.removeEventListener('languageChanged', handleLanguageChange as EventListener);
-    };
+    // Only add event listeners in browser
+    if (typeof window !== 'undefined') {
+      window.addEventListener('languageChanged', handleLanguageChange as EventListener);
+      return () => {
+        window.removeEventListener('languageChanged', handleLanguageChange as EventListener);
+      };
+    }
   }, []);
 
   const setLanguage = (newLanguage: Language) => {
