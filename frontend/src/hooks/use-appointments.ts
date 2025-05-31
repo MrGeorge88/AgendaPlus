@@ -3,6 +3,7 @@ import { toast } from 'sonner';
 import { queryKeys, invalidateQueries } from '../lib/query-client';
 import { appointmentsService } from '../services/appointments';
 import { useAuth } from '../contexts/auth-context';
+import { useLanguage } from '../contexts/language-context';
 import type { Appointment, CreateAppointmentData, UpdateAppointmentData } from '../types/appointment';
 
 /**
@@ -63,6 +64,7 @@ export const useAppointment = (appointmentId: string) => {
  */
 export const useCreateAppointment = () => {
   const { user } = useAuth();
+  const { t } = useLanguage();
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -83,11 +85,11 @@ export const useCreateAppointment = () => {
         }
       );
       
-      toast.success('Cita creada exitosamente');
+      toast.success(t('notifications.success.appointmentCreated'));
     },
     onError: (error: any) => {
       console.error('Error creating appointment:', error);
-      toast.error(`Error al crear la cita: ${error.message || 'Error desconocido'}`);
+      toast.error(`${t('notifications.error.appointmentCreate')}: ${error.message || t('notifications.error.unknownError')}`);
     },
   });
 };
@@ -97,6 +99,7 @@ export const useCreateAppointment = () => {
  */
 export const useUpdateAppointment = () => {
   const { user } = useAuth();
+  const { t } = useLanguage();
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -122,11 +125,11 @@ export const useUpdateAppointment = () => {
         }
       );
       
-      toast.success('Cita actualizada exitosamente');
+      toast.success(t('notifications.success.appointmentUpdated'));
     },
     onError: (error: any) => {
       console.error('Error updating appointment:', error);
-      toast.error(`Error al actualizar la cita: ${error.message || 'Error desconocido'}`);
+      toast.error(`${t('notifications.error.appointmentUpdate')}: ${error.message || t('notifications.error.unknownError')}`);
     },
   });
 };
@@ -136,6 +139,7 @@ export const useUpdateAppointment = () => {
  */
 export const useDeleteAppointment = () => {
   const { user } = useAuth();
+  const { t } = useLanguage();
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -155,11 +159,11 @@ export const useDeleteAppointment = () => {
         }
       );
       
-      toast.success('Cita eliminada exitosamente');
+      toast.success(t('notifications.success.appointmentDeleted'));
     },
     onError: (error: any) => {
       console.error('Error deleting appointment:', error);
-      toast.error(`Error al eliminar la cita: ${error.message || 'Error desconocido'}`);
+      toast.error(`${t('notifications.error.appointmentDelete')}: ${error.message || t('notifications.error.unknownError')}`);
     },
   });
 };
@@ -169,6 +173,7 @@ export const useDeleteAppointment = () => {
  */
 export const useUpdateAppointmentStatus = () => {
   const { user } = useAuth();
+  const { t } = useLanguage();
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -183,11 +188,11 @@ export const useUpdateAppointmentStatus = () => {
       // Actualizar caché
       queryClient.setQueryData(queryKeys.appointment(id), updatedAppointment);
       
-      toast.success('Estado de la cita actualizado');
+      toast.success(t('notifications.success.appointmentUpdated'));
     },
     onError: (error: any) => {
       console.error('Error updating appointment status:', error);
-      toast.error(`Error al actualizar el estado: ${error.message || 'Error desconocido'}`);
+      toast.error(`${t('notifications.error.appointmentStatus')}: ${error.message || t('notifications.error.unknownError')}`);
     },
   });
 };

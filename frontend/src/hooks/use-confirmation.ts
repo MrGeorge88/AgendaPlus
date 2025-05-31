@@ -1,4 +1,5 @@
 import { useState, useCallback } from 'react';
+import { useLanguage } from '../contexts/language-context';
 
 export interface ConfirmationOptions {
   title: string;
@@ -16,6 +17,7 @@ export interface ConfirmationState {
 }
 
 export const useConfirmation = () => {
+  const { t } = useLanguage();
   const [state, setState] = useState<ConfirmationState>({
     isOpen: false,
     options: null,
@@ -32,8 +34,8 @@ export const useConfirmation = () => {
       setState({
         isOpen: true,
         options: {
-          confirmText: 'Confirmar',
-          cancelText: 'Cancelar',
+          confirmText: t('buttons.actions.confirm'),
+          cancelText: t('buttons.actions.cancel'),
           type: 'info',
           ...options,
         },
@@ -72,10 +74,10 @@ export const useDeleteConfirmation = () => {
   ): Promise<boolean> => {
     return confirmation.confirm(
       {
-        title: 'Confirmar eliminación',
+        title: t('modal.confirmDelete'),
         message: `¿Estás seguro de que quieres eliminar "${itemName}"? Esta acción no se puede deshacer.`,
-        confirmText: 'Eliminar',
-        cancelText: 'Cancelar',
+        confirmText: t('buttons.actions.delete'),
+        cancelText: t('buttons.actions.cancel'),
         type: 'danger',
       },
       onConfirm

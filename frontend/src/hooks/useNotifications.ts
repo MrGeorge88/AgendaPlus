@@ -1,5 +1,6 @@
 import { useCallback } from 'react';
 import { toast } from 'sonner';
+import { useLanguage } from '../contexts/language-context';
 
 // Tipos para las notificaciones
 export interface NotificationOptions {
@@ -23,6 +24,7 @@ export interface LoadingToastOptions {
  * Hook para manejar notificaciones de manera consistente usando Sonner
  */
 export const useNotifications = () => {
+  const { t } = useLanguage();
 
   const showSuccess = useCallback((message: string, options?: NotificationOptions) => {
     return toast.success(message, {
@@ -123,7 +125,7 @@ export const useCrudNotifications = (entityName: string) => {
   }, [showSuccess, entityName]);
 
   const notifyError = useCallback((operation: 'crear' | 'actualizar' | 'eliminar' | 'cargar', error?: string) => {
-    const message = error || `Error al ${operation} ${entityName.toLowerCase()}`;
+    const message = error || t('notifications.error.processAction');
     showError(message);
   }, [showError, entityName]);
 
@@ -152,10 +154,11 @@ export const useCrudNotifications = (entityName: string) => {
  * Hook para notificaciones de validación de formularios
  */
 export const useFormNotifications = () => {
+  const { t } = useLanguage();
   const { showError, showWarning } = useNotifications();
 
   const notifyValidationError = useCallback((field: string, message: string) => {
-    showError(`Error en ${field}: ${message}`);
+    showError(`${t('validation.custom')}: ${message}`);
   }, [showError]);
 
   const notifyFormError = useCallback((message: string = 'Por favor, revisa los campos del formulario') => {
@@ -163,8 +166,8 @@ export const useFormNotifications = () => {
   }, [showError]);
 
   const notifyUnsavedChanges = useCallback(() => {
-    showWarning('Tienes cambios sin guardar. ¿Estás seguro de que quieres salir?');
-  }, [showWarning]);
+    showWarning(t('notifications.warning.unsavedChanges'));
+  }, [showWarning, t]);
 
   const notifyRequiredFields = useCallback((fields: string[]) => {
     const fieldList = fields.join(', ');

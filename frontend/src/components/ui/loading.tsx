@@ -1,4 +1,5 @@
 import React from 'react';
+import { useLanguage } from '../../contexts/language-context';
 import { cn } from '../../lib/utils';
 
 interface SpinnerProps {
@@ -97,10 +98,12 @@ interface LoadingOverlayProps {
 
 export const LoadingOverlay: React.FC<LoadingOverlayProps> = ({
   isVisible,
-  message = 'Cargando...',
+  message,
   children,
   className
 }) => {
+  const { t } = useLanguage();
+  const loadingMessage = message || t('common.loading');
   if (!isVisible) return null;
 
   return (
@@ -112,7 +115,7 @@ export const LoadingOverlay: React.FC<LoadingOverlayProps> = ({
       <div className="bg-white rounded-lg p-6 shadow-xl max-w-sm w-full mx-4">
         <div className="flex flex-col items-center space-y-4">
           <Spinner size="lg" />
-          <p className="text-slate-700 text-center">{message}</p>
+          <p className="text-slate-700 text-center">{loadingMessage}</p>
           {children}
         </div>
       </div>

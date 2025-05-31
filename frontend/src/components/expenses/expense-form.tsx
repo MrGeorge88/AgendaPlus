@@ -41,7 +41,7 @@ export function ExpenseForm({ onClose, onSave, expense }: ExpenseFormProps) {
     e.preventDefault();
 
     if (!user) {
-      toast.error("Debes iniciar sesión para registrar un gasto");
+      toast.error(t('expenses.loginRequired'));
       return;
     }
 
@@ -72,14 +72,14 @@ export function ExpenseForm({ onClose, onSave, expense }: ExpenseFormProps) {
       }
 
       if (success) {
-        toast.success(expense ? "Gasto actualizado correctamente" : "Gasto registrado correctamente");
+        toast.success(expense ? t('expenses.expenseUpdated') : t('expenses.expenseRegistered'));
         onSave();
       } else {
-        toast.error(expense ? "Error al actualizar el gasto" : "Error al registrar el gasto");
+        toast.error(expense ? t('expenses.updateError') : t('expenses.registerError'));
       }
     } catch (error) {
-      console.error("Error al guardar el gasto:", error);
-      toast.error("Error al guardar el gasto");
+      console.error("Error saving expense:", error);
+      toast.error(t('expenses.saveError'));
     } finally {
       setLoading(false);
     }
@@ -89,7 +89,7 @@ export function ExpenseForm({ onClose, onSave, expense }: ExpenseFormProps) {
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
       <div className="bg-white rounded-lg shadow-lg w-full max-w-md max-h-[90vh] overflow-y-auto">
         <div className="p-4 border-b flex justify-between items-center">
-          <h2 className="text-xl font-semibold">{expense ? "Editar gasto" : "Registrar gasto"}</h2>
+          <h2 className="text-xl font-semibold">{expense ? t('expenses.editExpense') : t('expenses.registerExpense')}</h2>
           <button
             onClick={onClose}
             className="text-gray-500 hover:text-gray-700"
@@ -102,7 +102,7 @@ export function ExpenseForm({ onClose, onSave, expense }: ExpenseFormProps) {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="block mb-1 text-sm font-medium">
-                Categoría
+                {t('expenses.category')}
               </label>
               <select
                 name="category"
@@ -121,7 +121,7 @@ export function ExpenseForm({ onClose, onSave, expense }: ExpenseFormProps) {
 
             <div>
               <label className="block mb-1 text-sm font-medium">
-                Descripción
+                {t('expenses.description')}
               </label>
               <textarea
                 name="description"
@@ -134,7 +134,7 @@ export function ExpenseForm({ onClose, onSave, expense }: ExpenseFormProps) {
 
             <div>
               <label className="block mb-1 text-sm font-medium">
-                Monto
+                {t('expenses.amount')}
               </label>
               <div className="relative">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">$</span>
@@ -153,7 +153,7 @@ export function ExpenseForm({ onClose, onSave, expense }: ExpenseFormProps) {
 
             <div>
               <label className="block mb-1 text-sm font-medium">
-                Fecha
+                {t('common.date')}
               </label>
               <input
                 type="date"
@@ -167,7 +167,7 @@ export function ExpenseForm({ onClose, onSave, expense }: ExpenseFormProps) {
 
             <div>
               <label className="block mb-1 text-sm font-medium">
-                Método de pago
+                {t('expenses.paymentMethod')}
               </label>
               <select
                 name="paymentMethod"
@@ -176,10 +176,10 @@ export function ExpenseForm({ onClose, onSave, expense }: ExpenseFormProps) {
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 required
               >
-                <option value="efectivo">Efectivo</option>
-                <option value="tarjeta">Tarjeta</option>
-                <option value="transferencia">Transferencia</option>
-                <option value="otro">Otro</option>
+                <option value="efectivo">{t('expenses.paymentMethods.cash')}</option>
+                <option value="tarjeta">{t('expenses.paymentMethods.card')}</option>
+                <option value="transferencia">{t('expenses.paymentMethods.transfer')}</option>
+                <option value="otro">{t('expenses.paymentMethods.other')}</option>
               </select>
             </div>
 
@@ -193,14 +193,14 @@ export function ExpenseForm({ onClose, onSave, expense }: ExpenseFormProps) {
                 className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
               />
               <label htmlFor="recurring" className="ml-2 block text-sm text-gray-900">
-                Gasto recurrente
+                {t('expenses.recurringExpense')}
               </label>
             </div>
 
             {formData.recurring && (
               <div>
                 <label className="block mb-1 text-sm font-medium">
-                  Frecuencia
+                  {t('expenses.frequency')}
                 </label>
                 <select
                   name="frequency"
@@ -209,10 +209,10 @@ export function ExpenseForm({ onClose, onSave, expense }: ExpenseFormProps) {
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   required
                 >
-                  <option value="diario">Diario</option>
-                  <option value="semanal">Semanal</option>
-                  <option value="mensual">Mensual</option>
-                  <option value="anual">Anual</option>
+                  <option value="diario">{t('expenses.frequencies.daily')}</option>
+                  <option value="semanal">{t('expenses.frequencies.weekly')}</option>
+                  <option value="mensual">{t('expenses.frequencies.monthly')}</option>
+                  <option value="anual">{t('expenses.frequencies.yearly')}</option>
                 </select>
               </div>
             )}
@@ -224,7 +224,7 @@ export function ExpenseForm({ onClose, onSave, expense }: ExpenseFormProps) {
                 onClick={onClose}
                 className="mr-2"
               >
-                Cancelar
+                {t('common.cancel')}
               </Button>
               <Button
                 type="submit"
@@ -232,11 +232,11 @@ export function ExpenseForm({ onClose, onSave, expense }: ExpenseFormProps) {
               >
                 {loading ? (
                   <>
-                    <span className="mr-2">Guardando...</span>
+                    <span className="mr-2">{t('common.saving')}</span>
                     <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
                   </>
                 ) : (
-                  expense ? "Actualizar" : "Guardar"
+                  expense ? t('common.update') : t('common.save')
                 )}
               </Button>
             </div>

@@ -13,17 +13,18 @@ interface ServiceFormProps {
   onCancel?: () => void;
 }
 
-const serviceCategories = [
-  { value: 'corte', label: 'Corte de Cabello' },
-  { value: 'color', label: 'Coloración' },
-  { value: 'tratamiento', label: 'Tratamiento' },
-  { value: 'peinado', label: 'Peinado' },
-  { value: 'manicure', label: 'Manicure' },
-  { value: 'pedicure', label: 'Pedicure' },
-  { value: 'facial', label: 'Tratamiento Facial' },
-  { value: 'masaje', label: 'Masaje' },
-  { value: 'depilacion', label: 'Depilación' },
-  { value: 'otro', label: 'Otro' },
+// Service categories will be translated dynamically
+const getServiceCategories = (t: (key: string) => string) => [
+  { value: 'corte', label: t('services.categories.haircut') },
+  { value: 'color', label: t('services.categories.coloring') },
+  { value: 'tratamiento', label: t('services.categories.treatment') },
+  { value: 'peinado', label: t('services.categories.styling') },
+  { value: 'manicure', label: t('services.categories.manicure') },
+  { value: 'pedicure', label: t('services.categories.pedicure') },
+  { value: 'facial', label: t('services.categories.facial') },
+  { value: 'masaje', label: t('services.categories.massage') },
+  { value: 'depilacion', label: t('services.categories.hairRemoval') },
+  { value: 'otro', label: t('services.categories.other') },
 ];
 
 const initialValues = {
@@ -34,23 +35,24 @@ const initialValues = {
   duration: 30,
 };
 
-const validationSchema = {
+// Validation schema will be created dynamically with translations
+const getValidationSchema = (t: (key: string) => string) => ({
   name: [
-    validationRules.required('El nombre del servicio es obligatorio'),
-    validationRules.serviceName('El nombre debe tener entre 2 y 100 caracteres')
+    validationRules.required(t('validation.serviceNameRequired')),
+    validationRules.serviceName(t('validation.serviceNameLength'))
   ],
   category: [
-    validationRules.required('La categoría es obligatoria')
+    validationRules.required(t('validation.categoryRequired'))
   ],
   price: [
-    validationRules.required('El precio es obligatorio'),
-    validationRules.price('El precio debe ser un número válido entre 0 y 10,000')
+    validationRules.required(t('validation.priceRequired')),
+    validationRules.price(t('validation.priceRange'))
   ],
   duration: [
-    validationRules.required('La duración es obligatoria'),
-    validationRules.duration('La duración debe estar entre 5 y 480 minutos')
+    validationRules.required(t('validation.durationRequired')),
+    validationRules.duration(t('validation.durationRange'))
   ],
-};
+});
 
 export const ServiceForm: React.FC<ServiceFormProps> = ({
   service,
@@ -69,6 +71,10 @@ export const ServiceForm: React.FC<ServiceFormProps> = ({
     price: service.price,
     duration: service.duration,
   } : initialValues;
+
+  // Get translated categories and validation schema
+  const serviceCategories = getServiceCategories(t);
+  const validationSchema = getValidationSchema(t);
 
   // Usar el hook apropiado según si estamos editando o creando
   const form = isEditing
@@ -104,7 +110,7 @@ export const ServiceForm: React.FC<ServiceFormProps> = ({
           onChange={form.handleChange}
           onBlur={form.handleBlur}
           error={!!form.errors.name && form.touched.name}
-          placeholder="Ej: Corte de cabello clásico"
+          placeholder={t('forms.exampleHaircut')}
         />
       </FormField>
 
@@ -120,7 +126,7 @@ export const ServiceForm: React.FC<ServiceFormProps> = ({
           onBlur={form.handleBlur}
           error={!!form.errors.category && form.touched.category}
           options={serviceCategories}
-          placeholder="Selecciona una categoría"
+          placeholder={t('forms.selectCategory')}
         />
       </FormField>
 
@@ -129,7 +135,7 @@ export const ServiceForm: React.FC<ServiceFormProps> = ({
           label={t('services.priceLabel')}
           required
           error={form.touched.price ? form.errors.price : undefined}
-          description="Precio en dólares"
+          description={t('forms.priceInDollars')}
         >
           <Input
             type="number"
@@ -148,7 +154,7 @@ export const ServiceForm: React.FC<ServiceFormProps> = ({
           label={t('services.durationLabel')}
           required
           error={form.touched.duration ? form.errors.duration : undefined}
-          description="Duración en minutos"
+          description={t('forms.durationInMinutes')}
         >
           <Input
             type="number"
@@ -168,7 +174,7 @@ export const ServiceForm: React.FC<ServiceFormProps> = ({
       <FormField
         label={t('services.descriptionLabel')}
         error={form.touched.description ? form.errors.description : undefined}
-        description="Descripción opcional del servicio"
+        description={t('forms.optionalDescription')}
       >
         <Textarea
           name="description"
@@ -195,7 +201,7 @@ export const ServiceForm: React.FC<ServiceFormProps> = ({
           disabled={form.isSubmitting || !form.isValid}
         >
           {form.isSubmitting
-            ? (isEditing ? 'Actualizando...' : 'Creando...')
+            ? (isEditing ? t('common.saving') : t('common.saving'))
             : (isEditing ? t('common.update') : t('common.save'))
           }
         </Button>
@@ -212,7 +218,7 @@ export const ServiceForm: React.FC<ServiceFormProps> = ({
             </div>
             <div className="ml-3">
               <h3 className="text-sm font-medium text-red-800">
-                Error al {isEditing ? 'actualizar' : 'crear'} el servicio
+                {isEditing ? t('services.updateError') : t('services.createError')}
               </h3>
               <div className="mt-2 text-sm text-red-700">
                 {createServiceMutation.error?.message || updateServiceMutation.error?.message}

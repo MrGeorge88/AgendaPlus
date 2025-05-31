@@ -1,5 +1,6 @@
 import React, { Component, ErrorInfo, ReactNode } from 'react';
 import { AlertTriangle, RefreshCw, Home, Bug } from 'lucide-react';
+import { useLanguage } from '../../contexts/language-context';
 import { Button } from './button';
 
 interface Props {

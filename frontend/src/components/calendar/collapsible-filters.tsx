@@ -217,7 +217,7 @@ export function CollapsibleFilters({ onFiltersChange, staffMembers }: Collapsibl
                   });
                 }}
                 className="flex-1 p-2 border border-gray-300 rounded-md text-sm"
-                placeholder="Fecha inicio"
+                placeholder={t('calendar.filters.startDate')}
               />
               <input
                 type="date"
@@ -229,7 +229,7 @@ export function CollapsibleFilters({ onFiltersChange, staffMembers }: Collapsibl
                   });
                 }}
                 className="flex-1 p-2 border border-gray-300 rounded-md text-sm"
-                placeholder="Fecha fin"
+                placeholder={t('calendar.filters.endDate')}
               />
             </div>
           </div>
@@ -243,7 +243,7 @@ export function CollapsibleFilters({ onFiltersChange, staffMembers }: Collapsibl
             <div className="flex gap-2">
               <input
                 type="number"
-                placeholder="Precio mín."
+                placeholder={t('calendar.filters.minPrice')}
                 value={filters.priceRange.min || ''}
                 onChange={(e) => {
                   const value = e.target.value ? parseFloat(e.target.value) : null;
@@ -255,7 +255,7 @@ export function CollapsibleFilters({ onFiltersChange, staffMembers }: Collapsibl
               />
               <input
                 type="number"
-                placeholder="Precio máx."
+                placeholder={t('calendar.filters.maxPrice')}
                 value={filters.priceRange.max || ''}
                 onChange={(e) => {
                   const value = e.target.value ? parseFloat(e.target.value) : null;

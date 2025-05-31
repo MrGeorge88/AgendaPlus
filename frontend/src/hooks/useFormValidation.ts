@@ -1,4 +1,5 @@
 import { useState, useCallback, useMemo } from 'react';
+import { useLanguage } from '../contexts/language-context';
 
 // Tipos para las reglas de validación
 export interface ValidationRule {
@@ -360,4 +361,101 @@ export const useValidatedForm = <T extends Record<string, any>>(
     reset,
     ...validation
   };
+};
+
+// Hook para crear reglas de validación con traducciones
+export const useValidationRules = () => {
+  const { t } = useLanguage();
+
+  return useMemo(() => ({
+    required: (message?: string): ValidationRule => ({
+      validate: (value) => {
+        if (typeof value === 'string') return value.trim().length > 0;
+        return value != null && value !== '';
+      },
+      message: message || t('validation.required')
+    }),
+
+    email: (message?: string): ValidationRule => ({
+      validate: (value) => {
+        if (!value) return true;
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(value);
+      },
+      message: message || t('validation.email')
+    }),
+
+    phone: (message?: string): ValidationRule => ({
+      validate: (value) => {
+        if (!value) return true;
+        const phoneRegex = /^[\+]?[1-9][\d]{0,15}$/;
+        return phoneRegex.test(value.replace(/[\s\-\(\)]/g, ''));
+      },
+      message: message || t('validation.phone')
+    }),
+
+    number: (message?: string): ValidationRule => ({
+      validate: (value) => {
+        if (!value) return true;
+        return !isNaN(Number(value));
+      },
+      message: message || t('validation.number')
+    }),
+
+    positiveNumber: (message?: string): ValidationRule => ({
+      validate: (value) => {
+        if (!value) return true;
+        const num = Number(value);
+        return !isNaN(num) && num > 0;
+      },
+      message: message || t('validation.positiveNumber')
+    }),
+
+    url: (message?: string): ValidationRule => ({
+      validate: (value) => {
+        if (!value) return true;
+        try {
+          new URL(value);
+          return true;
+        } catch {
+          return false;
+        }
+      },
+      message: message || t('validation.url')
+    }),
+
+    serviceName: (message?: string): ValidationRule => ({
+      validate: (value) => {
+        if (!value) return true;
+        return value.trim().length >= 2 && value.trim().length <= 100;
+      },
+      message: message || t('validation.serviceName')
+    }),
+
+    clientName: (message?: string): ValidationRule => ({
+      validate: (value) => {
+        if (!value) return true;
+        return value.trim().length >= 2 && value.trim().length <= 100;
+      },
+      message: message || t('validation.clientName')
+    }),
+
+    price: (message?: string): ValidationRule => ({
+      validate: (value) => {
+        if (!value) return true;
+        const num = Number(value);
+        return !isNaN(num) && num >= 0 && num <= 10000;
+      },
+      message: message || t('validation.price')
+    }),
+
+    duration: (message?: string): ValidationRule => ({
+      validate: (value) => {
+        if (!value) return true;
+        const num = Number(value);
+        return !isNaN(num) && num >= 5 && num <= 480;
+      },
+      message: message || t('validation.duration')
+    })
+  }), [t]);
 };

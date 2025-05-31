@@ -249,10 +249,10 @@ export function WhatsAppIntegration() {
         <h3 className="text-lg font-semibold mb-4">Configuración de Mensajes</h3>
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium mb-1">Mensaje de Bienvenida</label>
+            <label className="block text-sm font-medium mb-1">{t('whatsapp.settings.welcomeMessage')}</label>
             <textarea
               rows={3}
-              placeholder="¡Hola! Gracias por contactarnos. ¿En qué podemos ayudarte?"
+              placeholder={t('whatsapp.settings.welcomeMessage')}
               value={welcomeMessage}
               onChange={(e) => setWelcomeMessage(e.target.value)}
               className="w-full p-2 border rounded-md"
@@ -276,7 +276,7 @@ export function WhatsAppIntegration() {
             disabled={isUpdating}
             className="w-full"
           >
-            {isUpdating ? 'Guardando...' : 'Guardar Configuración'}
+            {isUpdating ? t('buttons.actions.saving') : t('buttons.actions.saveConfiguration')}
           </Button>
         </div>
       </Card>
@@ -325,7 +325,7 @@ export function WhatsAppIntegration() {
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-2">
                       <span className="font-medium">
-                        {message.direction === 'inbound' ? message.from_phone : 'Tú'}
+                        {message.direction === 'inbound' ? message.from_phone : t('common.you')}
                       </span>
                       {message.direction === 'outbound' && (
                         <Badge variant="outline" className="text-xs">
@@ -352,10 +352,10 @@ export function WhatsAppIntegration() {
                         variant="outline"
                         onClick={() => {
                           // TODO: Implement reply functionality
-                          toast.info('Función de respuesta en desarrollo');
+                          toast.info(t('notifications.info.responseInDevelopment'));
                         }}
                       >
-                        Responder
+                        {t('buttons.actions.reply')}
                       </Button>
                       {message.status === 'unread' && (
                         <Button

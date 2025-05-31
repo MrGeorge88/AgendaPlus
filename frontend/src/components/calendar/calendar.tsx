@@ -138,7 +138,7 @@ export function Calendar() {
         case "complete": // Marcar como completada
           const completedSuccess = await appointmentsService.updateAppointmentStatus(selectedAppointment.id, "completed");
           if (completedSuccess) {
-            toast.success("Cita marcada como completada");
+            toast.success(t('notifications.success.appointmentCompleted'));
             setAppointments(prev => prev.map(a =>
               a.id === selectedAppointment.id
                 ? {...a, extendedProps: {...a.extendedProps, status: "completed"}}
@@ -151,7 +151,7 @@ export function Calendar() {
         case "cancel": // Cancelar cita
           const cancelSuccess = await appointmentsService.updateAppointmentStatus(selectedAppointment.id, "cancelled");
           if (cancelSuccess) {
-            toast.success("Cita cancelada");
+            toast.success(t('notifications.success.appointmentCancelled'));
             setAppointments(prev => prev.map(a =>
               a.id === selectedAppointment.id
                 ? {...a, extendedProps: {...a.extendedProps, status: "cancelled"}}
@@ -164,7 +164,7 @@ export function Calendar() {
         case "no-show": // Marcar como no-show
           const noShowSuccess = await appointmentsService.updateAppointmentStatus(selectedAppointment.id, "no-show");
           if (noShowSuccess) {
-            toast.success("Cita marcada como no-show");
+            toast.success(t('notifications.success.appointmentNoShow'));
             setAppointments(prev => prev.map(a =>
               a.id === selectedAppointment.id
                 ? {...a, extendedProps: {...a.extendedProps, status: "no-show"}}
@@ -185,7 +185,7 @@ export function Calendar() {
       }
     } catch (error) {
       console.error("Error al procesar la acción:", error);
-      toast.error("Error al procesar la acción");
+      toast.error(t('notifications.error.processAction'));
       setShowAppointmentActions(false);
     }
   };
@@ -197,12 +197,12 @@ export function Calendar() {
     try {
       const deleteSuccess = await appointmentsService.deleteAppointment(selectedAppointment.id);
       if (deleteSuccess) {
-        toast.success("Cita eliminada");
+        toast.success(t('notifications.success.appointmentDeleted'));
         setAppointments(prev => prev.filter(a => a.id !== selectedAppointment.id));
       }
     } catch (error) {
       console.error("Error al eliminar la cita:", error);
-      toast.error("Error al eliminar la cita");
+      toast.error(t('notifications.error.appointmentDelete'));
     } finally {
       setShowDeleteConfirm(false);
       setSelectedAppointment(null);
@@ -226,13 +226,13 @@ export function Calendar() {
 
         if (newAppointment) {
           setAppointments(prev => [...prev, newAppointment]);
-          toast.success("Cita creada correctamente");
+          toast.success(t('notifications.success.appointmentCreated'));
         }
       }
       setShowForm(false);
     } catch (error) {
       console.error("Error al guardar la cita:", error);
-      toast.error("Error al guardar la cita");
+      toast.error(t('notifications.error.appointmentCreate'));
     }
   };
 
@@ -269,16 +269,16 @@ export function Calendar() {
             ? { ...a, start: newStart.toISOString(), end: newEnd.toISOString() }
             : a
         ));
-        toast.success("Cita movida correctamente");
+        toast.success(t('notifications.success.appointmentMoved'));
       } else {
         // Revertir el cambio si falló
         dropInfo.revert();
-        toast.error("Error al mover la cita");
+        toast.error(t('notifications.error.appointmentMove'));
       }
     } catch (error) {
       console.error("Error al mover la cita:", error);
       dropInfo.revert();
-      toast.error("Error al mover la cita");
+      toast.error(t('notifications.error.appointmentMove'));
     }
   };
 
@@ -310,16 +310,16 @@ export function Calendar() {
             ? { ...a, start: newStart.toISOString(), end: newEnd.toISOString() }
             : a
         ));
-        toast.success("Duración de la cita actualizada");
+        toast.success(t('notifications.success.appointmentDurationUpdated'));
       } else {
         // Revertir el cambio si falló
         resizeInfo.revert();
-        toast.error("Error al cambiar la duración");
+        toast.error(t('notifications.error.appointmentDuration'));
       }
     } catch (error) {
       console.error("Error al redimensionar la cita:", error);
       resizeInfo.revert();
-      toast.error("Error al cambiar la duración");
+      toast.error(t('notifications.error.appointmentDuration'));
     }
   };
 
@@ -674,7 +674,7 @@ export function Calendar() {
       <Modal
         isOpen={showForm}
         onClose={() => setShowForm(false)}
-        title="Nueva Cita"
+        title={t('calendar.newAppointment')}
       >
         <AppointmentForm
           onClose={() => setShowForm(false)}
@@ -696,7 +696,7 @@ export function Calendar() {
       <Modal
         isOpen={showAppointmentActions}
         onClose={() => setShowAppointmentActions(false)}
-        title="Acciones de Cita"
+        title={t('appointments.actions')}
       >
         {selectedAppointment && (
           <div className="space-y-4">
@@ -780,7 +780,7 @@ export function Calendar() {
       <Modal
         isOpen={showDeleteConfirm}
         onClose={() => setShowDeleteConfirm(false)}
-        title="Confirmar Eliminación"
+        title={t('calendar.confirmDelete')}
       >
         {selectedAppointment && (
           <div className="space-y-4">

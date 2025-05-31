@@ -141,7 +141,7 @@ export function DataTable<T extends Record<string, any>>({
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
             <input
               type="text"
-              placeholder="Buscar..."
+              placeholder={t('common.search')}
               className="w-full rounded-lg border border-slate-300 py-2 pl-10 pr-4 text-sm"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
@@ -156,7 +156,7 @@ export function DataTable<T extends Record<string, any>>({
                 <div key={String(col.key)} className="relative">
                   <input
                     type="text"
-                    placeholder={`Filtrar ${col.title}`}
+                    placeholder={`${t('common.filter')} ${col.title}`}
                     className="w-32 rounded border border-slate-300 px-2 py-1 text-xs"
                     value={filters[String(col.key)] || ''}
                     onChange={(e) => handleFilterChange(String(col.key), e.target.value)}

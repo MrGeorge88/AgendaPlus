@@ -3,6 +3,7 @@ import { toast } from 'sonner';
 import { queryKeys, invalidateQueries } from '../lib/query-client';
 import { staffService } from '../services/staff';
 import { useAuth } from '../contexts/auth-context';
+import { useLanguage } from '../contexts/language-context';
 import type { Staff, CreateStaffData, UpdateStaffData } from '../types/staff';
 
 /**
@@ -36,6 +37,7 @@ export const useStaffMember = (staffId: string) => {
  */
 export const useCreateStaff = () => {
   const { user } = useAuth();
+  const { t } = useLanguage();
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -56,11 +58,11 @@ export const useCreateStaff = () => {
         }
       );
       
-      toast.success('Miembro del staff creado exitosamente');
+      toast.success(t('notifications.success.staffCreated'));
     },
     onError: (error: any) => {
       console.error('Error creating staff:', error);
-      toast.error(`Error al crear el miembro del staff: ${error.message || 'Error desconocido'}`);
+      toast.error(`${t('notifications.error.staffCreate')}: ${error.message || t('notifications.error.unknownError')}`);
     },
   });
 };
@@ -70,6 +72,7 @@ export const useCreateStaff = () => {
  */
 export const useUpdateStaff = () => {
   const { user } = useAuth();
+  const { t } = useLanguage();
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -97,11 +100,11 @@ export const useUpdateStaff = () => {
         }
       );
       
-      toast.success('Miembro del staff actualizado exitosamente');
+      toast.success(t('notifications.success.staffUpdated'));
     },
     onError: (error: any) => {
       console.error('Error updating staff:', error);
-      toast.error(`Error al actualizar el miembro del staff: ${error.message || 'Error desconocido'}`);
+      toast.error(`${t('notifications.error.staffUpdate')}: ${error.message || t('notifications.error.unknownError')}`);
     },
   });
 };
@@ -111,6 +114,7 @@ export const useUpdateStaff = () => {
  */
 export const useDeleteStaff = () => {
   const { user } = useAuth();
+  const { t } = useLanguage();
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -132,11 +136,11 @@ export const useDeleteStaff = () => {
         }
       );
       
-      toast.success('Miembro del staff eliminado exitosamente');
+      toast.success(t('notifications.success.staffDeleted'));
     },
     onError: (error: any) => {
       console.error('Error deleting staff:', error);
-      toast.error(`Error al eliminar el miembro del staff: ${error.message || 'Error desconocido'}`);
+      toast.error(`${t('notifications.error.staffDelete')}: ${error.message || t('notifications.error.unknownError')}`);
     },
   });
 };

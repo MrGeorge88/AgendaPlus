@@ -1,11 +1,12 @@
 import React from 'react';
 import { Button } from './button';
-import { 
-  Users, 
-  Calendar, 
-  Briefcase, 
-  DollarSign, 
-  FileText, 
+import { useLanguage } from '../../contexts/language-context';
+import {
+  Users,
+  Calendar,
+  Briefcase,
+  DollarSign,
+  FileText,
   Search,
   Plus,
   AlertCircle,
@@ -84,78 +85,94 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
 export const EmptyClients: React.FC<{
   onAddClient: () => void;
   onImportClients?: () => void;
-}> = ({ onAddClient, onImportClients }) => (
-  <EmptyState
-    icon={<Users className="h-12 w-12 text-slate-400" />}
-    title="No tienes clientes aún"
-    description="Comienza agregando tu primer cliente para gestionar sus citas y información de contacto."
-    action={{
-      label: 'Agregar primer cliente',
-      onClick: onAddClient
-    }}
-    secondaryAction={onImportClients ? {
-      label: 'Importar clientes',
-      onClick: onImportClients
-    } : undefined}
-  />
-);
+}> = ({ onAddClient, onImportClients }) => {
+  const { t } = useLanguage();
+
+  return (
+    <EmptyState
+      icon={<Users className="h-12 w-12 text-slate-400" />}
+      title={t('empty.noClients')}
+      description={t('empty.noClientsDescription')}
+      action={{
+        label: t('empty.addFirstClient'),
+        onClick: onAddClient
+      }}
+      secondaryAction={onImportClients ? {
+        label: t('empty.importClients'),
+        onClick: onImportClients
+      } : undefined}
+    />
+  );
+};
 
 export const EmptyServices: React.FC<{
   onAddService: () => void;
   onViewTemplates?: () => void;
-}> = ({ onAddService, onViewTemplates }) => (
-  <EmptyState
-    icon={<Briefcase className="h-12 w-12 text-slate-400" />}
-    title="No tienes servicios configurados"
-    description="Define los servicios que ofreces, sus precios y duración para poder programar citas."
-    action={{
-      label: 'Crear primer servicio',
-      onClick: onAddService
-    }}
-    secondaryAction={onViewTemplates ? {
-      label: 'Ver plantillas',
-      onClick: onViewTemplates
-    } : undefined}
-  />
-);
+}> = ({ onAddService, onViewTemplates }) => {
+  const { t } = useLanguage();
+
+  return (
+    <EmptyState
+      icon={<Briefcase className="h-12 w-12 text-slate-400" />}
+      title={t('empty.noServices')}
+      description={t('empty.noServicesDescription')}
+      action={{
+        label: t('empty.createFirstService'),
+        onClick: onAddService
+      }}
+      secondaryAction={onViewTemplates ? {
+        label: t('empty.viewTemplates'),
+        onClick: onViewTemplates
+      } : undefined}
+    />
+  );
+};
 
 export const EmptyStaff: React.FC<{
   onAddStaff: () => void;
   onInviteStaff?: () => void;
-}> = ({ onAddStaff, onInviteStaff }) => (
-  <EmptyState
-    icon={<UserPlus className="h-12 w-12 text-slate-400" />}
-    title="No tienes personal registrado"
-    description="Agrega miembros de tu equipo para asignarles citas y gestionar sus horarios."
-    action={{
-      label: 'Agregar personal',
-      onClick: onAddStaff
-    }}
-    secondaryAction={onInviteStaff ? {
-      label: 'Invitar por email',
-      onClick: onInviteStaff
-    } : undefined}
-  />
-);
+}> = ({ onAddStaff, onInviteStaff }) => {
+  const { t } = useLanguage();
+
+  return (
+    <EmptyState
+      icon={<UserPlus className="h-12 w-12 text-slate-400" />}
+      title={t('empty.noStaff')}
+      description={t('empty.noStaffDescription')}
+      action={{
+        label: t('empty.addStaff'),
+        onClick: onAddStaff
+      }}
+      secondaryAction={onInviteStaff ? {
+        label: t('empty.inviteByEmail'),
+        onClick: onInviteStaff
+      } : undefined}
+    />
+  );
+};
 
 export const EmptyAppointments: React.FC<{
   onCreateAppointment: () => void;
   onViewCalendar?: () => void;
-}> = ({ onCreateAppointment, onViewCalendar }) => (
-  <EmptyState
-    icon={<Calendar className="h-12 w-12 text-slate-400" />}
-    title="No hay citas programadas"
-    description="Programa tu primera cita para comenzar a gestionar tu agenda y clientes."
-    action={{
-      label: 'Programar primera cita',
-      onClick: onCreateAppointment
-    }}
-    secondaryAction={onViewCalendar ? {
-      label: 'Ver calendario',
-      onClick: onViewCalendar
-    } : undefined}
-  />
-);
+}> = ({ onCreateAppointment, onViewCalendar }) => {
+  const { t } = useLanguage();
+
+  return (
+    <EmptyState
+      icon={<Calendar className="h-12 w-12 text-slate-400" />}
+      title={t('empty.noAppointments')}
+      description={t('empty.noAppointmentsDescription')}
+      action={{
+        label: t('empty.scheduleFirstAppointment'),
+        onClick: onCreateAppointment
+      }}
+      secondaryAction={onViewCalendar ? {
+        label: t('empty.viewCalendar'),
+        onClick: onViewCalendar
+      } : undefined}
+    />
+  );
+};
 
 export const EmptyIncome: React.FC<{
   onCreateAppointment?: () => void;

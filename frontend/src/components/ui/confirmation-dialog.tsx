@@ -3,6 +3,7 @@ import { AlertTriangle, Info, AlertCircle } from 'lucide-react';
 import { Modal } from './modal';
 import { Button } from './button';
 import { cn } from '../../lib/utils';
+import { useLanguage } from '../../contexts/language-context';
 
 export interface ConfirmationDialogProps {
   isOpen: boolean;
@@ -43,13 +44,18 @@ export const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
   onConfirm,
   title,
   message,
-  confirmText = 'Confirmar',
-  cancelText = 'Cancelar',
+  confirmText,
+  cancelText,
   type = 'info',
   loading = false,
 }) => {
+  const { t } = useLanguage();
   const config = typeConfig[type];
   const Icon = config.icon;
+
+  // Use translations as defaults if not provided
+  const finalConfirmText = confirmText || t('modal.confirm');
+  const finalCancelText = cancelText || t('modal.cancel');
 
   const handleConfirm = () => {
     onConfirm();
@@ -89,14 +95,14 @@ export const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
             onClick={onClose}
             disabled={loading}
           >
-            {cancelText}
+            {finalCancelText}
           </Button>
           <Button
             variant={config.confirmVariant}
             onClick={handleConfirm}
             disabled={loading}
           >
-            {loading ? 'Procesando...' : confirmText}
+            {loading ? t('common.saving') : finalConfirmText}
           </Button>
         </div>
       </div>

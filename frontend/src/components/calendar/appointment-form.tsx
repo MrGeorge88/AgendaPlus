@@ -6,6 +6,7 @@ import { Service, Client } from "../../contexts/app-context";
 import { servicesService } from "../../services/services";
 import { clientsService } from "../../services/clients";
 import { useAuth } from "../../contexts/auth-context";
+import { useLanguage } from "../../contexts/language-context";
 
 interface AppointmentFormProps {
   onClose: () => void;
@@ -16,6 +17,7 @@ interface AppointmentFormProps {
 
 export function AppointmentForm({ onClose, onSave, staffMembers, date = new Date() }: AppointmentFormProps) {
   const { user } = useAuth();
+  const { t } = useLanguage();
   const [services, setServices] = useState<Service[]>([]);
   const [clients, setClients] = useState<Client[]>([]);
   const [filteredClients, setFilteredClients] = useState<Client[]>([]);
@@ -54,7 +56,7 @@ export function AppointmentForm({ onClose, onSave, staffMembers, date = new Date
           setServices(servicesData);
           setClients(clientsData);
         } catch (error) {
-          console.error("Error al cargar datos:", error);
+          console.error("Error loading data:", error);
         } finally {
           setLoading(false);
         }
@@ -155,7 +157,7 @@ export function AppointmentForm({ onClose, onSave, staffMembers, date = new Date
 
     // Verificar que se haya seleccionado un miembro del personal
     if (!staffMember) {
-      alert('Por favor, selecciona un profesional válido');
+      alert(t('validation.selectValidStaff'));
       return;
     }
 
@@ -186,7 +188,7 @@ export function AppointmentForm({ onClose, onSave, staffMembers, date = new Date
   return (
     <div>
       <div className="modal-header">
-        <h2 className="modal-title">Nueva Cita</h2>
+        <h2 className="modal-title">{t('calendar.newAppointment')}</h2>
         <button onClick={onClose} className="modal-close">
           ✕
         </button>
@@ -196,12 +198,12 @@ export function AppointmentForm({ onClose, onSave, staffMembers, date = new Date
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block mb-2 text-sm font-medium">
-                Servicio
+                {t('services.title')}
               </label>
               {loading ? (
                 <div className="flex items-center">
                   <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent mr-2"></div>
-                  <span className="text-sm">Cargando servicios...</span>
+                  <span className="text-sm">{t('common.loading')}</span>
                 </div>
               ) : (
                 <select
@@ -211,7 +213,7 @@ export function AppointmentForm({ onClose, onSave, staffMembers, date = new Date
                   className="w-full px-3 py-2 border border-slate-200 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   required
                 >
-                  <option value="">Seleccionar servicio</option>
+                  <option value="">{t('forms.selectService')}</option>
                   {services.map((service) => (
                     <option key={service.id} value={service.id}>
                       {service.name} - ${service.price} - {service.duration} min
@@ -228,7 +230,7 @@ export function AppointmentForm({ onClose, onSave, staffMembers, date = new Date
 
             <div className="relative">
               <label className="block mb-2 text-sm font-medium">
-                Cliente
+                {t('calendar.client')}
               </label>
               <input
                 type="text"
@@ -244,7 +246,7 @@ export function AppointmentForm({ onClose, onSave, staffMembers, date = new Date
                   // Delay hiding suggestions to allow clicking on them
                   setTimeout(() => setShowClientSuggestions(false), 200);
                 }}
-                placeholder="Buscar cliente existente o escribir nuevo nombre"
+                placeholder={t('clients.searchPlaceholder')}
                 className="w-full px-3 py-2 border border-slate-200 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 required
               />
@@ -276,7 +278,7 @@ export function AppointmentForm({ onClose, onSave, staffMembers, date = new Date
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block mb-2 text-sm font-medium">
-                Profesional
+                {t('calendar.staff')}
               </label>
               <select
                 name="staffId"
@@ -295,7 +297,7 @@ export function AppointmentForm({ onClose, onSave, staffMembers, date = new Date
 
             <div>
               <label className="block mb-2 text-sm font-medium">
-                Fecha
+                {t('common.date')}
               </label>
               <input
                 type="date"
@@ -311,7 +313,7 @@ export function AppointmentForm({ onClose, onSave, staffMembers, date = new Date
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
               <label className="block mb-2 text-sm font-medium">
-                Hora inicio
+                {t('common.startTime')}
               </label>
               <input
                 type="time"
@@ -325,7 +327,7 @@ export function AppointmentForm({ onClose, onSave, staffMembers, date = new Date
 
             <div>
               <label className="block mb-2 text-sm font-medium">
-                Hora fin
+                {t('common.endTime')}
               </label>
               <input
                 type="time"
@@ -337,15 +339,15 @@ export function AppointmentForm({ onClose, onSave, staffMembers, date = new Date
               />
               <p className="mt-1 text-xs text-slate-500">
                 {formData.serviceId
-                  ? 'Calculado automáticamente, pero puedes editarlo'
-                  : 'Puedes editar la hora de fin manualmente'
+                  ? t('forms.calculatedAutomatically')
+                  : t('forms.canEditEndTime')
                 }
               </p>
             </div>
 
             <div>
               <label className="block mb-2 text-sm font-medium">
-                Precio
+                {t('calendar.price')}
               </label>
               <div className="relative">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">$</span>
@@ -363,8 +365,8 @@ export function AppointmentForm({ onClose, onSave, staffMembers, date = new Date
               </div>
               <p className="mt-1 text-xs text-slate-500">
                 {formData.serviceId
-                  ? 'Precio del servicio seleccionado, pero puedes editarlo'
-                  : 'Puedes editar el precio manualmente'
+                  ? t('forms.servicePriceSelected')
+                  : t('forms.canEditPrice')
                 }
               </p>
             </div>
@@ -372,7 +374,7 @@ export function AppointmentForm({ onClose, onSave, staffMembers, date = new Date
 
           <div>
             <label className="block mb-2 text-sm font-medium">
-              Estado
+              {t('calendar.status')}
             </label>
             <select
               name="status"
@@ -381,10 +383,10 @@ export function AppointmentForm({ onClose, onSave, staffMembers, date = new Date
               className="w-full px-3 py-2 border border-slate-200 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
               required
             >
-              <option value="confirmed">Confirmada</option>
-              <option value="pending">Pendiente</option>
-              <option value="cancelled">Cancelada</option>
-              <option value="no-show">No-show</option>
+              <option value="confirmed">{t('appointments.status.confirmed')}</option>
+              <option value="pending">{t('appointments.status.pending')}</option>
+              <option value="cancelled">{t('appointments.status.cancelled')}</option>
+              <option value="no-show">{t('appointments.status.noShow')}</option>
             </select>
           </div>
 
@@ -394,12 +396,12 @@ export function AppointmentForm({ onClose, onSave, staffMembers, date = new Date
               variant="outline"
               onClick={onClose}
             >
-              Cancelar
+              {t('common.cancel')}
             </Button>
             <Button
               type="submit"
             >
-              Guardar
+              {t('common.save')}
             </Button>
           </div>
         </form>

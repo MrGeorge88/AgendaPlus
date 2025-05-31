@@ -3,6 +3,7 @@ import { toast } from 'sonner';
 import { queryKeys, invalidateQueries } from '../lib/query-client';
 import { clientsService } from '../services/clients';
 import { useAuth } from '../contexts/auth-context';
+import { useLanguage } from '../contexts/language-context';
 import type { Client, CreateClientData, UpdateClientData } from '../types/client';
 
 /**
@@ -36,6 +37,7 @@ export const useClient = (clientId: string) => {
  */
 export const useCreateClient = () => {
   const { user } = useAuth();
+  const { t } = useLanguage();
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -56,11 +58,11 @@ export const useCreateClient = () => {
         }
       );
       
-      toast.success('Cliente creado exitosamente');
+      toast.success(t('notifications.success.clientCreated'));
     },
     onError: (error: any) => {
       console.error('Error creating client:', error);
-      toast.error(`Error al crear el cliente: ${error.message || 'Error desconocido'}`);
+      toast.error(`${t('notifications.error.clientCreate')}: ${error.message || t('notifications.error.unknownError')}`);
     },
   });
 };
@@ -70,6 +72,7 @@ export const useCreateClient = () => {
  */
 export const useUpdateClient = () => {
   const { user } = useAuth();
+  const { t } = useLanguage();
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -97,11 +100,11 @@ export const useUpdateClient = () => {
         }
       );
       
-      toast.success('Cliente actualizado exitosamente');
+      toast.success(t('notifications.success.clientUpdated'));
     },
     onError: (error: any) => {
       console.error('Error updating client:', error);
-      toast.error(`Error al actualizar el cliente: ${error.message || 'Error desconocido'}`);
+      toast.error(`${t('notifications.error.clientUpdate')}: ${error.message || t('notifications.error.unknownError')}`);
     },
   });
 };
@@ -111,6 +114,7 @@ export const useUpdateClient = () => {
  */
 export const useDeleteClient = () => {
   const { user } = useAuth();
+  const { t } = useLanguage();
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -132,11 +136,11 @@ export const useDeleteClient = () => {
         }
       );
       
-      toast.success('Cliente eliminado exitosamente');
+      toast.success(t('notifications.success.clientDeleted'));
     },
     onError: (error: any) => {
       console.error('Error deleting client:', error);
-      toast.error(`Error al eliminar el cliente: ${error.message || 'Error desconocido'}`);
+      toast.error(`${t('notifications.error.clientDelete')}: ${error.message || t('notifications.error.unknownError')}`);
     },
   });
 };

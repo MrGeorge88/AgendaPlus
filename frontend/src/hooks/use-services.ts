@@ -3,6 +3,7 @@ import { toast } from 'sonner';
 import { queryKeys, invalidateQueries } from '../lib/query-client';
 import { servicesService } from '../services/services';
 import { useAuth } from '../contexts/auth-context';
+import { useLanguage } from '../contexts/language-context';
 import type { Service, CreateServiceData, UpdateServiceData } from '../types/service';
 
 /**
@@ -36,6 +37,7 @@ export const useService = (serviceId: string) => {
  */
 export const useCreateService = () => {
   const { user } = useAuth();
+  const { t } = useLanguage();
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -56,11 +58,11 @@ export const useCreateService = () => {
         }
       );
       
-      toast.success('Servicio creado exitosamente');
+      toast.success(t('notifications.success.serviceCreated'));
     },
     onError: (error: any) => {
       console.error('Error creating service:', error);
-      toast.error(`Error al crear el servicio: ${error.message || 'Error desconocido'}`);
+      toast.error(`${t('notifications.error.serviceCreate')}: ${error.message || t('notifications.error.unknownError')}`);
     },
   });
 };
@@ -70,6 +72,7 @@ export const useCreateService = () => {
  */
 export const useUpdateService = () => {
   const { user } = useAuth();
+  const { t } = useLanguage();
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -97,11 +100,11 @@ export const useUpdateService = () => {
         }
       );
       
-      toast.success('Servicio actualizado exitosamente');
+      toast.success(t('notifications.success.serviceUpdated'));
     },
     onError: (error: any) => {
       console.error('Error updating service:', error);
-      toast.error(`Error al actualizar el servicio: ${error.message || 'Error desconocido'}`);
+      toast.error(`${t('notifications.error.serviceUpdate')}: ${error.message || t('notifications.error.unknownError')}`);
     },
   });
 };
@@ -111,6 +114,7 @@ export const useUpdateService = () => {
  */
 export const useDeleteService = () => {
   const { user } = useAuth();
+  const { t } = useLanguage();
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -132,11 +136,11 @@ export const useDeleteService = () => {
         }
       );
       
-      toast.success('Servicio eliminado exitosamente');
+      toast.success(t('notifications.success.serviceDeleted'));
     },
     onError: (error: any) => {
       console.error('Error deleting service:', error);
-      toast.error(`Error al eliminar el servicio: ${error.message || 'Error desconocido'}`);
+      toast.error(`${t('notifications.error.serviceDelete')}: ${error.message || t('notifications.error.unknownError')}`);
     },
   });
 };
