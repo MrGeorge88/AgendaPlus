@@ -1,5 +1,5 @@
 import { api, API_ENDPOINTS } from '../config/api';
-import { supabase, supabaseUrl } from '../lib/supabase';
+import { supabase, supabaseUrl, isSupabaseConfigured } from '../lib/supabase';
 
 export interface User {
   id: string;
@@ -33,6 +33,11 @@ export const authService = {
   // Iniciar sesión con email y contraseña
   signIn: async (email: string, password: string): Promise<AuthResponse> => {
     try {
+      // Verificar si Supabase está configurado
+      if (!isSupabaseConfigured) {
+        throw new Error('Supabase no está configurado. Por favor, configura las variables de entorno.');
+      }
+
       // Intentar iniciar sesión directamente con Supabase
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
@@ -55,8 +60,6 @@ export const authService = {
       };
     } catch (error) {
       console.error('Error en signIn:', error);
-
-      // No usar datos simulados en producción
 
       return {
         user: null,
@@ -139,6 +142,15 @@ export const authService = {
   getCurrentUser: async (): Promise<AuthResponse> => {
     try {
       console.log('Obteniendo usuario actual desde Supabase...');
+
+      // Verificar si Supabase está configurado
+      if (!isSupabaseConfigured) {
+        console.warn('Supabase no está configurado');
+        return {
+          user: null,
+          error: null,
+        };
+      }
 
       // Obtener la sesión actual primero
       const { data: sessionData, error: sessionError } = await supabase.auth.getSession();

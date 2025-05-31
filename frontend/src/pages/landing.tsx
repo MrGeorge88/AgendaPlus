@@ -2,8 +2,9 @@ import { Link } from 'react-router-dom';
 import { Button } from '../components/ui/button';
 import { useSimpleTranslation } from '../lib/translations';
 import { LanguageSwitcher } from '../components/ui/language-switcher';
-import { ArrowRight, Calendar, Bell, BarChart2, CreditCard, ChevronRight } from 'lucide-react';
+import { ArrowRight, Calendar, Bell, BarChart2, CreditCard, ChevronRight, AlertTriangle } from 'lucide-react';
 import { useState } from 'react';
+import { isSupabaseConfigured } from '../lib/supabase';
 
 // Imagen del dashboard - usando una imagen más representativa
 const AppScreenshot = 'https://images.unsplash.com/photo-1551434678-e076c223a692?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80';
@@ -50,6 +51,27 @@ export function Landing() {
           </div>
         </div>
       </nav>
+
+      {/* Configuration Banner - Solo mostrar si Supabase no está configurado */}
+      {!isSupabaseConfigured && (
+        <div className="bg-yellow-50 border-b border-yellow-200">
+          <div className="max-w-7xl mx-auto py-3 px-4 sm:px-6 lg:px-8">
+            <div className="flex items-center justify-between flex-wrap">
+              <div className="w-0 flex-1 flex items-center">
+                <span className="flex p-2 rounded-lg bg-yellow-100">
+                  <AlertTriangle className="h-5 w-5 text-yellow-600" />
+                </span>
+                <p className="ml-3 font-medium text-yellow-800">
+                  <span className="md:hidden">Configuración pendiente</span>
+                  <span className="hidden md:inline">
+                    La aplicación está en modo demo. Para funcionalidad completa, configure las variables de entorno de Supabase.
+                  </span>
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Hero Section - Moderno con ilustración */}
       <section className="relative bg-white overflow-hidden" style={{ position: 'relative', backgroundColor: 'white', overflow: 'hidden' }}>

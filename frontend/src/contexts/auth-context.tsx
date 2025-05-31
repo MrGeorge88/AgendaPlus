@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { authService, User, AuthResponse } from '../services/auth';
-import { supabase } from '../lib/supabase';
+import { supabase, isSupabaseConfigured } from '../lib/supabase';
 
 interface AuthContextType {
   user: User | null;
@@ -36,6 +36,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
 
     checkUser();
+
+    // Solo escuchar cambios de autenticación si Supabase está configurado
+    if (!isSupabaseConfigured) {
+      console.warn('Supabase no está configurado, saltando configuración de auth listener');
+      return;
+    }
 
     // Escuchar cambios de autenticación de Supabase
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
