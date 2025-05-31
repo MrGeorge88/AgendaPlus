@@ -5,7 +5,7 @@ import { Card } from '../components/ui/card';
 import { Input } from '../components/ui/input';
 import { Form, FormGroup, FormActions } from '../components/ui/form';
 import { useAuth } from '../contexts/auth-context';
-import { useLanguage } from '../contexts/language-context';
+import { useLanguage } from '../lib/translations';
 import { useForm } from '../hooks/use-form';
 import { email as emailValidator, required } from '../utils/validation';
 

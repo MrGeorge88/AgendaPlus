@@ -1,6 +1,6 @@
 import { Layout } from "../components/layout/layout";
 import { Calendar } from "../components/calendar/calendar";
-import { useLanguage } from "../contexts/language-context";
+import { useLanguage } from "../lib/translations";
 
 export function Agenda() {
   const { t } = useLanguage();

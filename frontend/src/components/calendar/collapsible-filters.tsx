@@ -3,7 +3,7 @@ import * as Collapsible from '@radix-ui/react-collapsible';
 import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';
 import { Settings, X, Calendar, Clock, DollarSign, User, ChevronDown } from 'lucide-react';
-import { useLanguage } from '../../contexts/language-context';
+import { useLanguage } from '../../lib/translations';
 import { cn } from '../../lib/utils';
 
 interface CollapsibleFiltersProps {

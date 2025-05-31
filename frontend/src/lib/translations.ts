@@ -98,6 +98,74 @@ export const translations = {
     'common.no': 'No',
     'common.confirm': 'Confirmar',
     'common.close': 'Cerrar',
+
+    // Pages
+    'pages.dashboard': 'Panel de Control',
+    'pages.clients': 'Clientes',
+    'pages.services': 'Servicios',
+    'pages.staff': 'Personal',
+    'pages.income': 'Ingresos',
+    'pages.analytics': 'Analytics',
+    'pages.expenses': 'Gastos',
+
+    // Dashboard
+    'dashboard.totalRevenue': 'Ingresos Totales',
+    'dashboard.totalAppointments': 'Citas Totales',
+    'dashboard.totalClients': 'Clientes Totales',
+    'dashboard.averageRevenue': 'Ingreso Promedio',
+    'dashboard.revenueChart': 'Gráfico de Ingresos',
+    'dashboard.appointmentsChart': 'Gráfico de Citas',
+    'dashboard.topServices': 'Servicios Principales',
+    'dashboard.staffPerformance': 'Rendimiento del Personal',
+
+    // Clients
+    'clients.title': 'Gestión de Clientes',
+    'clients.addClient': 'Agregar Cliente',
+    'clients.editClient': 'Editar Cliente',
+    'clients.deleteClient': 'Eliminar Cliente',
+    'clients.name': 'Nombre',
+    'clients.email': 'Email',
+    'clients.phone': 'Teléfono',
+    'clients.notes': 'Notas',
+    'clients.search': 'Buscar clientes...',
+    'clients.noClients': 'No hay clientes registrados',
+
+    // Services
+    'services.title': 'Gestión de Servicios',
+    'services.addService': 'Agregar Servicio',
+    'services.editService': 'Editar Servicio',
+    'services.deleteService': 'Eliminar Servicio',
+    'services.name': 'Nombre del Servicio',
+    'services.description': 'Descripción',
+    'services.duration': 'Duración',
+    'services.price': 'Precio',
+    'services.category': 'Categoría',
+    'services.noServices': 'No hay servicios registrados',
+
+    // Staff
+    'staff.title': 'Gestión de Personal',
+    'staff.addStaff': 'Agregar Personal',
+    'staff.editStaff': 'Editar Personal',
+    'staff.deleteStaff': 'Eliminar Personal',
+    'staff.name': 'Nombre',
+    'staff.email': 'Email',
+    'staff.phone': 'Teléfono',
+    'staff.role': 'Rol',
+    'staff.specialties': 'Especialidades',
+    'staff.noStaff': 'No hay personal registrado',
+
+    // Income
+    'income.title': 'Gestión de Ingresos',
+    'income.totalIncome': 'Ingresos Totales',
+    'income.monthlyIncome': 'Ingresos Mensuales',
+    'income.weeklyIncome': 'Ingresos Semanales',
+    'income.dailyIncome': 'Ingresos Diarios',
+
+    // Forms
+    'forms.required': 'Este campo es obligatorio',
+    'forms.invalidEmail': 'Email inválido',
+    'forms.passwordTooShort': 'La contraseña debe tener al menos 6 caracteres',
+    'forms.passwordsDoNotMatch': 'Las contraseñas no coinciden',
   },
   en: {
     // Landing page
@@ -193,6 +261,74 @@ export const translations = {
     'common.no': 'No',
     'common.confirm': 'Confirm',
     'common.close': 'Close',
+
+    // Pages
+    'pages.dashboard': 'Dashboard',
+    'pages.clients': 'Clients',
+    'pages.services': 'Services',
+    'pages.staff': 'Staff',
+    'pages.income': 'Income',
+    'pages.analytics': 'Analytics',
+    'pages.expenses': 'Expenses',
+
+    // Dashboard
+    'dashboard.totalRevenue': 'Total Revenue',
+    'dashboard.totalAppointments': 'Total Appointments',
+    'dashboard.totalClients': 'Total Clients',
+    'dashboard.averageRevenue': 'Average Revenue',
+    'dashboard.revenueChart': 'Revenue Chart',
+    'dashboard.appointmentsChart': 'Appointments Chart',
+    'dashboard.topServices': 'Top Services',
+    'dashboard.staffPerformance': 'Staff Performance',
+
+    // Clients
+    'clients.title': 'Client Management',
+    'clients.addClient': 'Add Client',
+    'clients.editClient': 'Edit Client',
+    'clients.deleteClient': 'Delete Client',
+    'clients.name': 'Name',
+    'clients.email': 'Email',
+    'clients.phone': 'Phone',
+    'clients.notes': 'Notes',
+    'clients.search': 'Search clients...',
+    'clients.noClients': 'No clients registered',
+
+    // Services
+    'services.title': 'Service Management',
+    'services.addService': 'Add Service',
+    'services.editService': 'Edit Service',
+    'services.deleteService': 'Delete Service',
+    'services.name': 'Service Name',
+    'services.description': 'Description',
+    'services.duration': 'Duration',
+    'services.price': 'Price',
+    'services.category': 'Category',
+    'services.noServices': 'No services registered',
+
+    // Staff
+    'staff.title': 'Staff Management',
+    'staff.addStaff': 'Add Staff',
+    'staff.editStaff': 'Edit Staff',
+    'staff.deleteStaff': 'Delete Staff',
+    'staff.name': 'Name',
+    'staff.email': 'Email',
+    'staff.phone': 'Phone',
+    'staff.role': 'Role',
+    'staff.specialties': 'Specialties',
+    'staff.noStaff': 'No staff registered',
+
+    // Income
+    'income.title': 'Income Management',
+    'income.totalIncome': 'Total Income',
+    'income.monthlyIncome': 'Monthly Income',
+    'income.weeklyIncome': 'Weekly Income',
+    'income.dailyIncome': 'Daily Income',
+
+    // Forms
+    'forms.required': 'This field is required',
+    'forms.invalidEmail': 'Invalid email',
+    'forms.passwordTooShort': 'Password must be at least 6 characters',
+    'forms.passwordsDoNotMatch': 'Passwords do not match',
   }
 };
 
@@ -273,3 +409,10 @@ export function useSimpleTranslation() {
 
 // For compatibility with existing code
 export { useSimpleTranslation as useSafeTranslation };
+export { useSimpleTranslation as useTranslation };
+
+// Also export as useLanguage for backward compatibility
+export function useLanguage() {
+  const { language, setLanguage, t } = useSimpleTranslation();
+  return { language, setLanguage, t };
+}

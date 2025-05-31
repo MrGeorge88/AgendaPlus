@@ -3,7 +3,7 @@ import { Button } from '../ui/button';
 import { Card } from '../ui/card';
 import { Badge } from '../ui/badge';
 import { Filter, X, Calendar, Clock, DollarSign, User } from 'lucide-react';
-import { useLanguage } from '../../contexts/language-context';
+import { useLanguage } from '../../lib/translations';
 
 interface CalendarFiltersProps {
   onFiltersChange: (filters: FilterState) => void;

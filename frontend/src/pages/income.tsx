@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Layout } from '../components/layout/layout';
 import { Card } from '../components/ui/card';
 import { BarChart3, TrendingUp, DollarSign, Calendar, Users } from 'lucide-react';
-import { useLanguage } from '../contexts/language-context';
+import { useLanguage } from '../lib/translations';
 import { useAuth } from '../contexts/auth-context';
 import { incomeService, IncomeStats } from '../services/income';
 import { useAsyncState } from '../hooks/useAsyncState';

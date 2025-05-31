@@ -1,5 +1,5 @@
 import { Layout } from "../components/layout/layout";
-import { useLanguage } from "../contexts/language-context";
+import { useLanguage } from "../lib/translations";
 import {
   MetricCard,
   MetricGrid,

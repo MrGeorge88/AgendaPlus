@@ -4,7 +4,7 @@ import { supabase } from '../lib/supabase';
 import { AlertWithIcon } from '../components/ui/alert';
 import { Button } from '../components/ui/button';
 import { Card } from '../components/ui/card';
-import { useLanguage } from '../contexts/language-context';
+import { useLanguage } from '../lib/translations';
 
 export function AuthCallback() {
   const [error, setError] = useState<string | null>(null);

@@ -1,7 +1,7 @@
 import { Link, useLocation } from "react-router-dom";
 import { Calendar, Users, Briefcase, CreditCard, BarChart3, DollarSign, X, TrendingUp, ChevronLeft, ChevronRight, Menu, MessageCircle } from "lucide-react";
 import { cn } from "../../lib/utils";
-import { useLanguage } from "../../contexts/language-context";
+import { useLanguage } from "../../lib/translations";
 import { useIsMobile, useIsTouchDevice } from "../../hooks/use-media-query";
 import { useEffect, useRef, useState } from "react";
 

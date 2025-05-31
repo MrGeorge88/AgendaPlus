@@ -10,7 +10,7 @@ import { AlertWithIcon } from '../components/ui/alert';
 import { Badge } from '../components/ui/badge';
 import { Plus, Search, Edit, Trash2, Phone, Mail, Calendar } from 'lucide-react';
 import { useAppContext } from '../contexts/app-context';
-import { useLanguage } from '../contexts/language-context';
+import { useLanguage } from '../lib/translations';
 import { useForm } from '../hooks/use-form';
 import { email as emailValidator, required, phone as phoneValidator } from '../utils/validation';
 import { clientsService } from '../services/clients';

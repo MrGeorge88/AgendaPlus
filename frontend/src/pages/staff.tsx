@@ -5,7 +5,7 @@ import { Card } from '../components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '../components/ui/avatar';
 import { Modal } from '../components/ui/modal';
 import { Plus, Search, Edit, Trash2, Phone, Mail, Briefcase } from 'lucide-react';
-import { useLanguage } from '../contexts/language-context';
+import { useLanguage } from '../lib/translations';
 import { useAuth } from '../contexts/auth-context';
 import { staffService, StaffMember } from '../services/staff';
 import { useAsyncList } from '../hooks/useAsyncState';

@@ -5,7 +5,7 @@ import { Card } from '../components/ui/card';
 import { Modal } from '../components/ui/modal';
 import { Plus, Search, Edit, Trash2, Clock, DollarSign } from 'lucide-react';
 import { Service } from '../contexts/app-context';
-import { useLanguage } from '../contexts/language-context';
+import { useLanguage } from '../lib/translations';
 import { ServiceListSkeleton } from '../components/ui/skeleton';
 import { ComponentErrorBoundary, DataErrorFallback } from '../components/ui/error-boundary';
 import { EmptyServices } from '../components/ui/empty-state';

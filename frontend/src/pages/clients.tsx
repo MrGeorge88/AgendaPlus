@@ -5,7 +5,7 @@ import { Card } from '../components/ui/card';
 import { Modal } from '../components/ui/modal';
 import { Plus, Search, Edit, Trash2, Phone, Mail } from 'lucide-react';
 import { useAuth } from '../contexts/auth-context';
-import { useLanguage } from '../contexts/language-context';
+import { useLanguage } from '../lib/translations';
 import { clientsService, Client } from '../services/clients';
 import { useAsyncList } from '../hooks/useAsyncState';
 import { useCrudNotifications } from '../hooks/useNotifications';

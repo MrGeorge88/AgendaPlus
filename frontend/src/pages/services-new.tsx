@@ -11,7 +11,7 @@ import { AlertWithIcon } from '../components/ui/alert';
 import { Badge } from '../components/ui/badge';
 import { Plus, Search, Edit, Trash2, Clock, DollarSign } from 'lucide-react';
 import { useAppContext } from '../contexts/app-context';
-import { useLanguage } from '../contexts/language-context';
+import { useLanguage } from '../lib/translations';
 import { useForm } from '../hooks/use-form';
 import { useNotification } from '../components/ui/notification';
 import { required, min, numeric } from '../utils/validation';
