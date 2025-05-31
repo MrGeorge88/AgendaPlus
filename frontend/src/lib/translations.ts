@@ -37,6 +37,43 @@ export const translations = {
     'nav.income': 'Ingresos',
     'nav.analytics': 'Analíticas',
     'nav.whatsapp': 'WhatsApp',
+    'navigation.agenda': 'Agenda',
+    'navigation.overview': 'Resumen',
+    'navigation.analytics': 'Analytics',
+    'navigation.clients': 'Clientes',
+    'navigation.services': 'Servicios',
+    'navigation.staff': 'Personal',
+    'navigation.income': 'Ingresos',
+    'navigation.expenses': 'Gastos',
+    'navigation.whatsapp': 'WhatsApp',
+
+    // Calendar
+    'calendar.manageStaff': 'Gestionar Personal',
+    'calendar.newAppointment': 'Nueva Cita',
+    'calendar.today': 'Hoy',
+    'calendar.day': 'Día',
+    'calendar.week': 'Semana',
+    'calendar.month': 'Mes',
+    'calendar.status': 'Estado',
+    'calendar.paymentStatus': 'Estado de Pago',
+    'calendar.staff': 'Personal',
+    'calendar.dateRange': 'Rango de Fechas',
+    'calendar.priceRange': 'Rango de Precios',
+
+    // Appointment Status
+    'appointments.status.confirmed': 'Confirmada',
+    'appointments.status.completed': 'Completada',
+    'appointments.status.cancelled': 'Cancelada',
+    'appointments.status.noShow': 'No se presentó',
+    'appointments.status.pending': 'Pendiente',
+
+    // Payment Status
+    'calendar.paid': 'Pagado',
+    'calendar.partial': 'Parcial',
+    'calendar.pending': 'Pendiente',
+
+    // Filters
+    'Filtros': 'Filtros',
 
     // Common
     'common.loading': 'Cargando...',
@@ -91,6 +128,43 @@ export const translations = {
     'nav.income': 'Income',
     'nav.analytics': 'Analytics',
     'nav.whatsapp': 'WhatsApp',
+    'navigation.agenda': 'Agenda',
+    'navigation.overview': 'Overview',
+    'navigation.analytics': 'Analytics',
+    'navigation.clients': 'Clients',
+    'navigation.services': 'Services',
+    'navigation.staff': 'Staff',
+    'navigation.income': 'Income',
+    'navigation.expenses': 'Expenses',
+    'navigation.whatsapp': 'WhatsApp',
+
+    // Calendar
+    'calendar.manageStaff': 'Manage Staff',
+    'calendar.newAppointment': 'New Appointment',
+    'calendar.today': 'Today',
+    'calendar.day': 'Day',
+    'calendar.week': 'Week',
+    'calendar.month': 'Month',
+    'calendar.status': 'Status',
+    'calendar.paymentStatus': 'Payment Status',
+    'calendar.staff': 'Staff',
+    'calendar.dateRange': 'Date Range',
+    'calendar.priceRange': 'Price Range',
+
+    // Appointment Status
+    'appointments.status.confirmed': 'Confirmed',
+    'appointments.status.completed': 'Completed',
+    'appointments.status.cancelled': 'Cancelled',
+    'appointments.status.noShow': 'No Show',
+    'appointments.status.pending': 'Pending',
+
+    // Payment Status
+    'calendar.paid': 'Paid',
+    'calendar.partial': 'Partial',
+    'calendar.pending': 'Pending',
+
+    // Filters
+    'Filtros': 'Filters',
 
     // Common
     'common.loading': 'Loading...',
