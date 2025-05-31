@@ -128,11 +128,257 @@
 - ✅ **Imagen de landing arreglada**: URL de Unsplash funcional implementada
 - ✅ **Build exitoso**: Sin errores de compilación, aplicación estable
 
-## 🚀 **SPRINT 4: PRÓXIMOS PASOS RECOMENDADOS (Días 23-28)**
+### **✅ Día 23: Sistema de Traducciones Unificado - COMPLETADO**
+- ✅ **Sistema completamente unificado**: Eliminada duplicidad entre useLanguage y useSimpleTranslation
+- ✅ **60+ traducciones agregadas**: Páginas, dashboard, clientes, servicios, personal, ingresos, formularios
+- ✅ **15 archivos migrados**: Todas las páginas principales y componentes del calendario
+- ✅ **Compatibilidad mantenida**: Aliases creados para código existente
+- ✅ **SSR Safe**: Sistema compatible con Server-Side Rendering
+- ✅ **Build exitoso**: 3230 módulos transformados sin errores
+- ✅ **Cambio de idioma funcional**: Botón ES/EN ahora funciona correctamente
+
+## 🚀 **SPRINT 4: PLAN INTEGRAL DE TRADUCCIONES (Días 24-30)**
+
+### **🎯 OBJETIVO**: Completar 100% las traducciones en toda la aplicación
+
+### **📋 FASE 1: ANÁLISIS Y MAPEO COMPLETO (Día 24)**
+
+#### **🔍 Componentes Identificados con Texto Hardcodeado:**
+
+**A. Formularios y Modales:**
+- ❌ `service-form.tsx` - Categorías de servicios hardcodeadas
+- ❌ `appointment-form.tsx` - Estados de citas hardcodeados
+- ❌ `expense-form.tsx` - Botones y labels hardcodeados
+- ❌ `confirmation-dialog.tsx` - Textos por defecto hardcodeados
+- ❌ `calendar.tsx` - Modales de confirmación hardcodeados
+
+**B. Componentes UI:**
+- ❌ `sidebar.tsx` - Traducciones manuales inline
+- ❌ `whatsapp-integration.tsx` - Múltiples textos hardcodeados
+- ❌ `analytics.tsx` - Textos estáticos hardcodeados
+- ❌ `empty-state.tsx` - Mensajes de estado vacío
+- ❌ `error-boundary.tsx` - Mensajes de error
+
+**C. Validaciones y Mensajes:**
+- ❌ Mensajes de validación en formularios
+- ❌ Mensajes de error de API
+- ❌ Notificaciones toast
+- ❌ Placeholders de inputs
+- ❌ Tooltips y ayudas
+
+**D. Datos Estáticos:**
+- ❌ Categorías de servicios
+- ❌ Estados de citas
+- ❌ Tipos de gastos
+- ❌ Roles de personal
+- ❌ Opciones de filtros
+
+### **📋 FASE 2: EXPANSIÓN DE TRADUCCIONES (Día 25)**
+
+#### **🌐 Nuevas Claves de Traducción a Agregar:**
+
+**Formularios:**
+```typescript
+// Service Categories
+'categories.corte': 'Corte de Cabello' / 'Haircut'
+'categories.color': 'Coloración' / 'Hair Coloring'
+'categories.tratamiento': 'Tratamiento' / 'Treatment'
+'categories.peinado': 'Peinado' / 'Hairstyling'
+'categories.manicure': 'Manicure' / 'Manicure'
+'categories.pedicure': 'Pedicure' / 'Pedicure'
+'categories.facial': 'Tratamiento Facial' / 'Facial Treatment'
+'categories.masaje': 'Masaje' / 'Massage'
+'categories.depilacion': 'Depilación' / 'Hair Removal'
+'categories.otro': 'Otro' / 'Other'
+
+// Appointment Status
+'status.confirmed': 'Confirmada' / 'Confirmed'
+'status.pending': 'Pendiente' / 'Pending'
+'status.cancelled': 'Cancelada' / 'Cancelled'
+'status.noShow': 'No-show' / 'No-show'
+'status.completed': 'Completada' / 'Completed'
+
+// Form Labels & Placeholders
+'forms.selectCategory': 'Selecciona una categoría' / 'Select a category'
+'forms.priceInDollars': 'Precio en dólares' / 'Price in dollars'
+'forms.durationInMinutes': 'Duración en minutos' / 'Duration in minutes'
+'forms.optionalDescription': 'Descripción opcional del servicio' / 'Optional service description'
+'forms.exampleHaircut': 'Ej: Corte de cabello clásico' / 'Ex: Classic haircut'
+
+// Validation Messages
+'validation.serviceNameRequired': 'El nombre del servicio es obligatorio' / 'Service name is required'
+'validation.categoryRequired': 'La categoría es obligatoria' / 'Category is required'
+'validation.priceRequired': 'El precio es obligatorio' / 'Price is required'
+'validation.durationRequired': 'La duración es obligatoria' / 'Duration is required'
+'validation.serviceNameLength': 'El nombre debe tener entre 2 y 100 caracteres' / 'Name must be between 2 and 100 characters'
+'validation.priceRange': 'El precio debe ser un número válido entre 0 y 10,000' / 'Price must be a valid number between 0 and 10,000'
+'validation.durationRange': 'La duración debe estar entre 5 y 480 minutos' / 'Duration must be between 5 and 480 minutes'
+
+// Modals & Dialogs
+'modal.confirmDelete': 'Confirmar Eliminación' / 'Confirm Deletion'
+'modal.deleteAppointment': '¿Eliminar cita?' / 'Delete appointment?'
+'modal.deleteConfirmMessage': '¿Estás seguro de que deseas eliminar la cita "{title}" con {client}?' / 'Are you sure you want to delete the appointment "{title}" with {client}?'
+'modal.actionCannotBeUndone': 'Esta acción no se puede deshacer.' / 'This action cannot be undone.'
+
+// WhatsApp Integration
+'whatsapp.configuration': 'Configuración' / 'Configuration'
+'whatsapp.messages': 'Mensajes' / 'Messages'
+'whatsapp.appointments': 'Citas' / 'Appointments'
+'whatsapp.loadingMessages': 'Cargando mensajes...' / 'Loading messages...'
+'whatsapp.saving': 'Guardando...' / 'Saving...'
+'whatsapp.saveConfiguration': 'Guardar Configuración' / 'Save Configuration'
+'whatsapp.availableVariables': 'Variables disponibles' / 'Available variables'
+
+// Empty States
+'empty.noClients': 'No hay clientes registrados' / 'No clients registered'
+'empty.noServices': 'No hay servicios registrados' / 'No services registered'
+'empty.noStaff': 'No hay personal registrado' / 'No staff registered'
+'empty.noAppointments': 'No hay citas programadas' / 'No appointments scheduled'
+'empty.noExpenses': 'No hay gastos registrados' / 'No expenses registered'
+
+// Analytics
+'analytics.comingSoon': 'Próximamente' / 'Coming Soon'
+'analytics.advancedAnalytics': 'Analytics Avanzados' / 'Advanced Analytics'
+'analytics.description': 'Próximamente: análisis predictivos, insights de IA y métricas avanzadas de negocio.' / 'Coming soon: predictive analytics, AI insights and advanced business metrics.'
+
+// Buttons & Actions
+'actions.update': 'Actualizar' / 'Update'
+'actions.saving': 'Guardando...' / 'Saving...'
+'actions.loading': 'Cargando...' / 'Loading...'
+'actions.selectDate': 'Seleccionar fecha' / 'Select date'
+'actions.selectTime': 'Seleccionar hora' / 'Select time'
+```
+
+### **📋 FASE 3: MIGRACIÓN DE COMPONENTES (Días 26-27)**
+
+#### **🔧 Archivos a Modificar:**
+
+**Día 26 - Formularios y Modales:**
+- `frontend/src/components/forms/service-form.tsx`
+- `frontend/src/components/calendar/appointment-form.tsx`
+- `frontend/src/components/expenses/expense-form.tsx`
+- `frontend/src/components/ui/confirmation-dialog.tsx`
+- `frontend/src/components/calendar/calendar.tsx` (modales)
+
+**Día 27 - Componentes UI y Páginas:**
+- `frontend/src/pages/whatsapp/whatsapp-integration.tsx`
+- `frontend/src/pages/analytics.tsx`
+- `frontend/src/components/ui/empty-state.tsx`
+- `frontend/src/components/ui/error-boundary.tsx`
+- `frontend/src/components/layout/sidebar.tsx` (eliminar traducciones manuales)
+
+### **📋 FASE 4: VALIDACIONES Y MENSAJES (Día 28)**
+
+#### **🔧 Sistemas a Actualizar:**
+- Mensajes de validación en `utils/validation.ts`
+- Mensajes de error de API en servicios
+- Notificaciones toast en hooks
+- Placeholders y tooltips en componentes
+
+### **📋 FASE 5: TESTING Y QA (Día 29)**
+
+#### **🧪 Pruebas a Realizar:**
+- ✅ Cambio de idioma en todas las páginas
+- ✅ Formularios completos en ambos idiomas
+- ✅ Modales y diálogos traducidos
+- ✅ Mensajes de error y validación
+- ✅ Estados vacíos y de carga
+- ✅ Navegación completa en inglés/español
+
+### **📋 FASE 6: DOCUMENTACIÓN Y DEPLOY (Día 30)**
+
+#### **📚 Documentación Final:**
+- Guía de traducciones para desarrolladores
+- Lista completa de claves de traducción
+- Convenciones de nomenclatura
+- Proceso de agregar nuevas traducciones
+
+### **📋 CHECKLIST DE IMPLEMENTACIÓN**
+
+#### **✅ Día 24 - Análisis Completo:**
+- [ ] Auditoría completa de textos hardcodeados
+- [ ] Mapeo de componentes pendientes
+- [ ] Identificación de patrones de traducción
+- [ ] Documentación de casos especiales
+
+#### **✅ Día 25 - Expansión de Traducciones:**
+- [ ] Agregar 50+ nuevas claves de traducción
+- [ ] Categorías de servicios traducidas
+- [ ] Estados de citas traducidos
+- [ ] Mensajes de validación traducidos
+- [ ] Placeholders y tooltips traducidos
+
+#### **✅ Día 26 - Formularios y Modales:**
+- [ ] `service-form.tsx` - Migrar categorías y validaciones
+- [ ] `appointment-form.tsx` - Migrar estados y labels
+- [ ] `expense-form.tsx` - Migrar botones y mensajes
+- [ ] `confirmation-dialog.tsx` - Migrar textos por defecto
+- [ ] `calendar.tsx` - Migrar modales de confirmación
+
+#### **✅ Día 27 - Componentes UI:**
+- [ ] `whatsapp-integration.tsx` - Migrar todos los textos
+- [ ] `analytics.tsx` - Migrar textos estáticos
+- [ ] `empty-state.tsx` - Migrar mensajes de estado vacío
+- [ ] `error-boundary.tsx` - Migrar mensajes de error
+- [ ] `sidebar.tsx` - Eliminar traducciones manuales
+
+#### **✅ Día 28 - Validaciones y Mensajes:**
+- [ ] Migrar mensajes de validación
+- [ ] Migrar mensajes de error de API
+- [ ] Migrar notificaciones toast
+- [ ] Migrar placeholders dinámicos
+- [ ] Migrar tooltips y ayudas
+
+#### **✅ Día 29 - Testing Completo:**
+- [ ] Test de cambio de idioma en todas las páginas
+- [ ] Test de formularios en ambos idiomas
+- [ ] Test de modales y diálogos
+- [ ] Test de mensajes de error
+- [ ] Test de estados vacíos
+- [ ] Test de navegación completa
+
+#### **✅ Día 30 - Documentación y Deploy:**
+- [ ] Documentar guía de traducciones
+- [ ] Crear lista completa de claves
+- [ ] Establecer convenciones
+- [ ] Deploy final con traducciones completas
+
+### **🎯 MÉTRICAS DE ÉXITO:**
+- **100%** de textos traducidos (0 hardcoded)
+- **Cambio de idioma instantáneo** en toda la app
+- **Consistencia** en terminología
+- **UX fluida** en ambos idiomas
+- **Documentación completa** para futuros desarrollos
+
+### **� HERRAMIENTAS DE DESARROLLO:**
+
+#### **Script de Auditoría de Traducciones:**
+```bash
+# Buscar textos hardcodeados en español
+grep -r "Guardar\|Cancelar\|Eliminar\|Editar\|Agregar" frontend/src --include="*.tsx" --include="*.ts"
+
+# Buscar textos sin traducir
+grep -r "placeholder.*[áéíóúñ]" frontend/src --include="*.tsx"
+
+# Verificar uso de funciones de traducción
+grep -r "useLanguage\|useTranslation\|useSimpleTranslation" frontend/src --include="*.tsx"
+```
+
+#### **Convenciones de Nomenclatura:**
+```typescript
+// Estructura de claves
+'categoria.subcategoria.elemento': 'Texto'
+
+// Ejemplos:
+'forms.labels.name': 'Nombre'
+'buttons.actions.save': 'Guardar'
+'messages.validation.required': 'Este campo es obligatorio'
+'status.appointment.confirmed': 'Confirmada'
+```
+
+## 🚀 **SPRINT 5: PRÓXIMOS PASOS RECOMENDADOS (Días 31-35)**
 
 ### **📋 Prioridad Alta - Funcionalidades Core**
-
-#### **Día 23: Mejoras del Calendario**
 - [ ] **Vista semanal por defecto**: Cambiar de daily a weekly view
 - [ ] **Navegación mejorada**: Botones para navegar entre días/semanas
 - [ ] **Horarios de negocio**: Configuración de horarios por día
