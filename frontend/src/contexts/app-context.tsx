@@ -20,6 +20,7 @@ export interface Service {
   duration: number;
   price: number;
   category: string;
+  color: string;
 }
 
 export interface StaffMember {

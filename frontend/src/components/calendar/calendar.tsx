@@ -6,13 +6,15 @@ import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import { StaffFilter } from "./staff-filter";
 import { Button } from "../ui/button";
-import { Plus, Users, DollarSign, CheckCircle, XCircle, Clock, AlertCircle, ChevronLeft, ChevronRight } from "lucide-react";
+import { Plus, Users, DollarSign, CheckCircle, XCircle, Clock, AlertCircle, ChevronLeft, ChevronRight, Settings } from "lucide-react";
 import { AppointmentForm } from "./appointment-form";
 import { AppointmentPaymentForm } from "./appointment-payment-form";
 import { CollapsibleFilters, FilterState } from "./collapsible-filters";
+import { BusinessHoursSettings } from "./business-hours-settings";
 import { Modal } from "../ui/modal";
 import { useAuth } from "../../contexts/auth-context";
 import { useLanguage } from "../../contexts/language-context";
+import { useBusinessSettings } from "../../hooks/use-business-settings";
 import { staffService, StaffMember } from "../../services/staff";
 import { appointmentsService, Appointment } from "../../services/appointments";
 import { toast } from "../../lib/toast";
@@ -20,16 +22,18 @@ import { toast } from "../../lib/toast";
 export function Calendar() {
   const { user } = useAuth();
   const { t, language } = useLanguage();
+  const { getSlotMinTime, getSlotMaxTime, getHiddenDays, loadBusinessSettings } = useBusinessSettings();
   const navigate = useNavigate();
   const [staffMembers, setStaffMembers] = useState<StaffMember[]>([]);
   const [selectedStaff, setSelectedStaff] = useState<string[]>([]);
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [showPaymentForm, setShowPaymentForm] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
   const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null);
   const [loading, setLoading] = useState(true);
-  const [currentView, setCurrentView] = useState<'timeGridDay' | 'timeGridWeek' | 'dayGridMonth'>('timeGridWeek');
+  const [currentView, setCurrentView] = useState<'timeGridDay' | 'timeGridWeek' | 'timeGridWorkWeek' | 'dayGridMonth'>('timeGridWorkWeek');
   const [showAppointmentActions, setShowAppointmentActions] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -434,6 +438,13 @@ export function Calendar() {
             </div>
             <div className="flex gap-2">
               <Button
+                onClick={() => setShowSettings(true)}
+                variant="outline"
+                className="flex items-center gap-1"
+              >
+                <Settings className="h-4 w-4" /> {t('calendar.settings')}
+              </Button>
+              <Button
                 onClick={handleStaffManagement}
                 variant="outline"
                 className="flex items-center gap-1"
@@ -523,6 +534,19 @@ export function Calendar() {
                 onClick={() => {
                   const calendarApi = calendarRef.current?.getApi();
                   if (calendarApi) {
+                    calendarApi.changeView('timeGridWorkWeek');
+                    setCurrentView('timeGridWorkWeek');
+                  }
+                }}
+                variant={currentView === 'timeGridWorkWeek' ? 'default' : 'outline'}
+                size="sm"
+              >
+                {t('calendar.workWeek')}
+              </Button>
+              <Button
+                onClick={() => {
+                  const calendarApi = calendarRef.current?.getApi();
+                  if (calendarApi) {
                     calendarApi.changeView('timeGridWeek');
                     setCurrentView('timeGridWeek');
                   }
@@ -530,7 +554,7 @@ export function Calendar() {
                 variant={currentView === 'timeGridWeek' ? 'default' : 'outline'}
                 size="sm"
               >
-                {t('calendar.week')}
+                {t('calendar.fullWeek')}
               </Button>
               <Button
                 onClick={() => {
@@ -554,8 +578,8 @@ export function Calendar() {
               plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
               initialView={currentView}
               headerToolbar={false}
-              slotMinTime="08:00:00"
-              slotMaxTime="20:00:00"
+              slotMinTime={getSlotMinTime()}
+              slotMaxTime={getSlotMaxTime()}
               height="100%"
               allDaySlot={currentView === 'dayGridMonth'}
               events={filteredEvents}
@@ -564,6 +588,7 @@ export function Calendar() {
               selectMirror={true}
               dayMaxEvents={currentView === 'dayGridMonth' ? 3 : true}
               weekends={currentView === 'dayGridMonth'}
+              hiddenDays={currentView === 'timeGridWorkWeek' ? [0, 6] : getHiddenDays()}
               nowIndicator={true}
               locale={language}
               firstDay={1}
@@ -821,6 +846,34 @@ export function Calendar() {
             </div>
           </div>
         )}
+      </Modal>
+
+      {/* Modal de configuración de horarios */}
+      <Modal
+        isOpen={showSettings}
+        onClose={() => setShowSettings(false)}
+        title={t('calendar.settings')}
+        size="lg"
+      >
+        <BusinessHoursSettings
+          onClose={() => setShowSettings(false)}
+          onSave={() => {
+            // Recargar configuración de horarios
+            loadBusinessSettings();
+            // Recargar citas si es necesario
+            if (user) {
+              const loadData = async () => {
+                try {
+                  const appts = await appointmentsService.getAppointments(user.id);
+                  setAppointments(appts);
+                } catch (error) {
+                  console.error("Error al recargar las citas:", error);
+                }
+              };
+              loadData();
+            }
+          }}
+        />
       </Modal>
     </div>
   );

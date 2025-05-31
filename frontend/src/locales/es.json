@@ -200,6 +200,8 @@
     "priceLabel": "Precio ($)",
     "category": "Categoría",
     "categoryLabel": "Categoría",
+    "color": "Color",
+    "colorLabel": "Color",
     "minutes": "min",
     "addSuccess": "Servicio añadido con éxito",
     "editSuccess": "Servicio actualizado con éxito",
@@ -285,12 +287,14 @@
   "calendar": {
     "title": "Calendario",
     "day": "Día",
-    "week": "Semana",
+    "workWeek": "Semana Laboral",
+    "fullWeek": "Semana Completa",
     "month": "Mes",
     "today": "Hoy",
     "previous": "Anterior",
     "next": "Siguiente",
     "newAppointment": "Nueva Cita",
+    "settings": "Configuración",
     "manageStaff": "Gestionar Personal",
     "noStaffAvailable": "No hay personal disponible. Por favor, añade personal primero.",
     "loading": "Cargando calendario...",
@@ -334,7 +338,31 @@
   "common": {
     "expand": "Expandir",
     "collapse": "Contraer",
-    "clear": "Limpiar"
+    "clear": "Limpiar",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "loading": "Cargando...",
+    "saving": "Guardando..."
+  },
+  "settings": {
+    "business": {
+      "title": "Configuración del Negocio",
+      "description": "Configura los ajustes básicos de tu negocio",
+      "name": "Nombre del Negocio",
+      "namePlaceholder": "Ej: Salón de Belleza María",
+      "defaultDuration": "Duración por Defecto (minutos)",
+      "slotInterval": "Intervalo de Citas (minutos)",
+      "advanceBooking": "Días de Reserva Anticipada",
+      "cancellationHours": "Horas de Cancelación"
+    },
+    "businessHours": {
+      "title": "Horarios de Atención",
+      "description": "Configura los horarios de atención de tu negocio",
+      "open": "Abierto",
+      "closed": "Cerrado",
+      "from": "Desde",
+      "to": "Hasta"
+    }
   },
   "landing": {
     "hero": {
@@ -375,6 +403,7 @@
     "selectCategory": "Selecciona una categoría",
     "priceInDollars": "Precio en dólares",
     "durationInMinutes": "Duración en minutos",
+    "serviceColor": "Color para identificar el servicio en el calendario",
     "optionalDescription": "Descripción opcional del servicio",
     "exampleHaircut": "Ej: Corte de cabello clásico",
     "selectService": "Seleccionar servicio",
@@ -484,6 +513,7 @@
       "staffDeleted": "Personal eliminado exitosamente",
       "paymentRegistered": "Pago registrado exitosamente",
       "configurationSaved": "Configuración guardada correctamente",
+      "settingsUpdated": "Configuración actualizada correctamente",
       "whatsappConnected": "Conexión WhatsApp verificada",
       "connectionRestored": "Conexión restaurada"
     },
@@ -505,6 +535,8 @@
       "staffDelete": "Error al eliminar el personal",
       "paymentRegister": "Error al registrar el pago",
       "configurationSave": "Error al guardar la configuración",
+      "saveSettings": "Error al guardar la configuración",
+      "loadData": "Error al cargar los datos",
       "whatsappConnect": "Error al conectar WhatsApp",
       "whatsappDisconnect": "Error al desconectar WhatsApp",
       "whatsappVerify": "Error al verificar conexión",

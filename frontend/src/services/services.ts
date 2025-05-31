@@ -9,6 +9,7 @@ interface SupabaseService {
   duration: number;
   price: number;
   category: string | null;
+  color: string;
   created_at: string;
   updated_at: string;
   user_id: string;
@@ -22,6 +23,7 @@ const mapSupabaseService = (service: SupabaseService): Service => ({
   duration: service.duration,
   price: service.price,
   category: service.category || 'Sin categoría',
+  color: service.color || '#3B82F6',
 });
 
 // Servicio de servicios
@@ -78,6 +80,7 @@ export const servicesService = {
         duration: service.duration,
         price: service.price,
         category: service.category || null,
+        color: service.color || '#3B82F6',
         user_id: userId
       };
 
@@ -134,6 +137,7 @@ export const servicesService = {
       if (service.duration !== undefined) supabaseService.duration = service.duration;
       if (service.price !== undefined) supabaseService.price = service.price;
       if (service.category !== undefined) supabaseService.category = service.category || null;
+      if (service.color !== undefined) supabaseService.color = service.color;
 
       console.log('Actualizando servicio con datos:', supabaseService);
 

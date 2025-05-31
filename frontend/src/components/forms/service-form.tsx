@@ -1,6 +1,7 @@
 import React from 'react';
 import { FormField, Input, Textarea, Select, FormActions } from '../ui/form-field';
 import { Button } from '../ui/button';
+import { ColorPicker } from '../ui/color-picker';
 import { useCreateForm, useEditForm } from '../../hooks/use-form';
 import { useCreateService, useUpdateService } from '../../hooks/use-services';
 import { validationRules } from '../../hooks/useFormValidation';
@@ -33,6 +34,7 @@ const initialValues = {
   description: '',
   price: 0,
   duration: 30,
+  color: '#3B82F6',
 };
 
 // Validation schema will be created dynamically with translations
@@ -70,6 +72,7 @@ export const ServiceForm: React.FC<ServiceFormProps> = ({
     description: service.description || '',
     price: service.price,
     duration: service.duration,
+    color: service.color || '#3B82F6',
   } : initialValues;
 
   // Get translated categories and validation schema
@@ -130,7 +133,7 @@ export const ServiceForm: React.FC<ServiceFormProps> = ({
         />
       </FormField>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <FormField
           label={t('services.priceLabel')}
           required
@@ -167,6 +170,18 @@ export const ServiceForm: React.FC<ServiceFormProps> = ({
             min="5"
             max="480"
             step="5"
+          />
+        </FormField>
+
+        <FormField
+          label={t('services.colorLabel')}
+          error={form.touched.color ? form.errors.color : undefined}
+          description={t('forms.serviceColor')}
+        >
+          <ColorPicker
+            value={form.values.color}
+            onChange={(color) => form.setFieldValue('color', color)}
+            disabled={form.isSubmitting}
           />
         </FormField>
       </div>

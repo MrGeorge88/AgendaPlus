@@ -80,9 +80,11 @@ export const appointmentsService = {
           serviceName = appointment.services.name;
         }
 
-        // Determinar el color
+        // Determinar el color - priorizar servicio sobre personal
         let color = appointment.color || '#4f46e5';
-        if (!color && appointment.staff) {
+        if (!color && appointment.services && appointment.services.color) {
+          color = appointment.services.color;
+        } else if (!color && appointment.staff) {
           color = appointment.staff.color || '#4f46e5';
         }
 

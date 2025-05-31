@@ -200,6 +200,8 @@
     "priceLabel": "Price ($)",
     "category": "Category",
     "categoryLabel": "Category",
+    "color": "Color",
+    "colorLabel": "Color",
     "minutes": "min",
     "addSuccess": "Service added successfully",
     "editSuccess": "Service updated successfully",
@@ -285,12 +287,14 @@
   "calendar": {
     "title": "Calendar",
     "day": "Day",
-    "week": "Week",
+    "workWeek": "Work Week",
+    "fullWeek": "Full Week",
     "month": "Month",
     "today": "Today",
     "previous": "Previous",
     "next": "Next",
     "newAppointment": "New Appointment",
+    "settings": "Settings",
     "manageStaff": "Manage Staff",
     "noStaffAvailable": "No staff available. Please add staff first.",
     "loading": "Loading calendar...",
@@ -334,7 +338,31 @@
   "common": {
     "expand": "Expand",
     "collapse": "Collapse",
-    "clear": "Clear"
+    "clear": "Clear",
+    "save": "Save",
+    "cancel": "Cancel",
+    "loading": "Loading...",
+    "saving": "Saving..."
+  },
+  "settings": {
+    "business": {
+      "title": "Business Settings",
+      "description": "Configure your business basic settings",
+      "name": "Business Name",
+      "namePlaceholder": "Ex: Maria's Beauty Salon",
+      "defaultDuration": "Default Duration (minutes)",
+      "slotInterval": "Appointment Interval (minutes)",
+      "advanceBooking": "Advance Booking Days",
+      "cancellationHours": "Cancellation Hours"
+    },
+    "businessHours": {
+      "title": "Business Hours",
+      "description": "Configure your business operating hours",
+      "open": "Open",
+      "closed": "Closed",
+      "from": "From",
+      "to": "To"
+    }
   },
   "landing": {
     "hero": {
@@ -375,6 +403,7 @@
     "selectCategory": "Select a category",
     "priceInDollars": "Price in dollars",
     "durationInMinutes": "Duration in minutes",
+    "serviceColor": "Color to identify the service in the calendar",
     "optionalDescription": "Optional service description",
     "exampleHaircut": "Ex: Classic haircut",
     "selectService": "Select service",
@@ -484,6 +513,7 @@
       "staffDeleted": "Staff deleted successfully",
       "paymentRegistered": "Payment registered successfully",
       "configurationSaved": "Configuration saved successfully",
+      "settingsUpdated": "Settings updated successfully",
       "whatsappConnected": "WhatsApp connection verified",
       "connectionRestored": "Connection restored"
     },
@@ -505,6 +535,8 @@
       "staffDelete": "Error deleting staff",
       "paymentRegister": "Error registering payment",
       "configurationSave": "Error saving configuration",
+      "saveSettings": "Error saving settings",
+      "loadData": "Error loading data",
       "whatsappConnect": "Error connecting WhatsApp",
       "whatsappDisconnect": "Error disconnecting WhatsApp",
       "whatsappVerify": "Error verifying connection",
