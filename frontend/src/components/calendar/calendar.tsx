@@ -33,7 +33,7 @@ export function Calendar() {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
   const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null);
   const [loading, setLoading] = useState(true);
-  const [currentView, setCurrentView] = useState<'timeGridDay' | 'timeGridWeek' | 'timeGridWorkWeek' | 'dayGridMonth'>('timeGridWorkWeek');
+  const [currentView, setCurrentView] = useState<'timeGridDay' | 'timeGridWeek' | 'dayGridMonth'>('timeGridWeek');
   const [showAppointmentActions, setShowAppointmentActions] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -534,19 +534,6 @@ export function Calendar() {
                 onClick={() => {
                   const calendarApi = calendarRef.current?.getApi();
                   if (calendarApi) {
-                    calendarApi.changeView('timeGridWorkWeek');
-                    setCurrentView('timeGridWorkWeek');
-                  }
-                }}
-                variant={currentView === 'timeGridWorkWeek' ? 'default' : 'outline'}
-                size="sm"
-              >
-                {t('calendar.workWeek')}
-              </Button>
-              <Button
-                onClick={() => {
-                  const calendarApi = calendarRef.current?.getApi();
-                  if (calendarApi) {
                     calendarApi.changeView('timeGridWeek');
                     setCurrentView('timeGridWeek');
                   }
@@ -554,7 +541,7 @@ export function Calendar() {
                 variant={currentView === 'timeGridWeek' ? 'default' : 'outline'}
                 size="sm"
               >
-                {t('calendar.fullWeek')}
+                {t('calendar.week')}
               </Button>
               <Button
                 onClick={() => {
@@ -569,6 +556,7 @@ export function Calendar() {
               >
                 {t('calendar.month')}
               </Button>
+
             </div>
           </div>
 
@@ -588,7 +576,7 @@ export function Calendar() {
               selectMirror={true}
               dayMaxEvents={currentView === 'dayGridMonth' ? 3 : true}
               weekends={currentView === 'dayGridMonth'}
-              hiddenDays={currentView === 'timeGridWorkWeek' ? [0, 6] : getHiddenDays()}
+              hiddenDays={getHiddenDays()}
               nowIndicator={true}
               locale={language}
               firstDay={1}
